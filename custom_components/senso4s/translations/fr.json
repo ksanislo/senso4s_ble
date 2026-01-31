@@ -1,0 +1,244 @@
+{
+  "issues": {
+    "needs_calibration": {
+      "title": "Senso4s nécessite une calibration",
+      "description": "L'appareil '{device_name}' nécessite une calibration. Cliquez sur 'Démarrer la réparation' pour commencer le processus de calibration guidé. La balance doit être vide (bouteille retirée) pendant la calibration.",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Calibration requise",
+            "description": "Votre balance Senso4s doit être calibrée pour mesurer les niveaux de gaz avec précision.\n\n**Ce qui se passe pendant la calibration :**\n1. Vous retirerez la bouteille de gaz de la balance\n2. La balance se calibrera à vide\n3. Vous replacerez la bouteille sur la balance\n4. La configuration sera enregistrée\n\nCliquez sur Soumettre lorsque vous êtes prêt à commencer."
+          },
+          "remove_cylinder": {
+            "title": "Retirer la bouteille de gaz",
+            "description": "**Retirez la bouteille de gaz de la balance maintenant.**\n\nLa balance doit être complètement vide pour que la calibration fonctionne correctement. Assurez-vous que rien ne se trouve sur la balance.\n\nUne fois la bouteille retirée, cliquez sur Soumettre pour démarrer la calibration."
+          },
+          "replace_tank": {
+            "title": "Replacer la bouteille de gaz",
+            "description": "Calibration terminée !\n\nReplacez la bouteille de gaz sur la balance, puis cliquez sur Soumettre pour écrire la configuration et vérifier la lecture."
+          }
+        },
+        "abort": {
+          "device_not_found": "Appareil non trouvé. L'intégration a peut-être été supprimée.",
+          "no_bluetooth_connection": "Aucune connexion Bluetooth disponible. Assurez-vous que l'appareil est allumé et à portée.",
+          "connection_failed": "Échec de la connexion à l'appareil. Veuillez réessayer.",
+          "connection_lost": "La connexion Bluetooth a été perdue pendant la calibration. Veuillez réessayer.",
+          "calibration_failed": "La calibration a échoué. Assurez-vous que la balance est vide et réessayez.",
+          "config_write_failed": "Échec de l'écriture de la configuration sur l'appareil. Veuillez réessayer.",
+          "setup_date_write_failed": "Échec de l'écriture de la date de configuration sur l'appareil. Veuillez réessayer.",
+          "verification_timeout": "Délai d'attente dépassé pour la lecture du niveau. L'appareil peut avoir besoin de plus de temps pour se stabiliser.",
+          "verification_anomaly": "Calibration terminée mais l'appareil signale des anomalies : {anomalies}. Vérifiez le placement de l'appareil.",
+          "verification_failed": "Échec de la vérification du résultat de la calibration. Veuillez vérifier l'appareil."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sélectionner l'appareil Senso4s",
+        "description": "Sélectionnez l'appareil Senso4s à configurer.",
+        "data": {
+          "address": "Appareil"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "Configurer Senso4s",
+        "description": "Configurez votre appareil Senso4s ({name}) à l'adresse {address}. Paramètres chargés depuis : {config_source}.",
+        "data": {
+          "weight_unit": "Unité de poids",
+          "empty_weight_kg": "Poids de la bouteille vide",
+          "gas_capacity_kg": "Capacité de gaz",
+          "usage_mode": "Mode d'utilisation",
+          "low_level_threshold": "Seuil d'avertissement niveau bas (%)",
+          "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)"
+        },
+        "data_description": {
+          "weight_unit": "Unité pour l'affichage des valeurs de poids",
+          "empty_weight_kg": "Poids de la bouteille de gaz vide sans gaz (dans l'unité sélectionnée)",
+          "gas_capacity_kg": "Capacité maximale de gaz de la bouteille (dans l'unité sélectionnée)",
+          "usage_mode": "Mode d'utilisation prédéfini pour l'appareil",
+          "low_level_threshold": "Pourcentage de niveau de gaz déclenchant l'avertissement de gaz bas",
+          "history_poll_interval": "Fréquence de récupération de l'historique de consommation pour le calcul 'Estimé vide' (0 pour désactiver)"
+        }
+      },
+      "needs_setup": {
+        "title": "Configuration du nouvel appareil",
+        "description": "Votre appareil Senso4s ({name}) à l'adresse {address} nécessite une configuration initiale. Entrez la configuration de votre bouteille de gaz ci-dessous.\n\nAprès avoir soumis, vous serez guidé à travers le processus de calibration.",
+        "data": {
+          "weight_unit": "Unité de poids",
+          "empty_weight_kg": "Poids de la bouteille vide",
+          "gas_capacity_kg": "Capacité de gaz",
+          "usage_mode": "Mode d'utilisation"
+        },
+        "data_description": {
+          "weight_unit": "Unité pour la saisie des valeurs de poids",
+          "empty_weight_kg": "Poids de la bouteille de gaz vide sans gaz",
+          "gas_capacity_kg": "Capacité maximale de gaz de la bouteille",
+          "usage_mode": "Mode d'utilisation prédéfini pour l'appareil"
+        }
+      },
+      "remove_cylinder": {
+        "title": "Retirer la bouteille de gaz",
+        "description": "**Retirez la bouteille de gaz de la balance maintenant.**\n\nLa balance doit être complètement vide pour que la calibration fonctionne correctement. Assurez-vous que rien ne se trouve sur la balance.\n\nUne fois la bouteille retirée, cliquez sur Soumettre pour démarrer la calibration."
+      },
+      "replace_cylinder": {
+        "title": "Replacer la bouteille de gaz",
+        "description": "Calibration terminée !\n\nReplacez la bouteille de gaz sur la balance, puis cliquez sur Soumettre pour écrire la configuration et vérifier la lecture."
+      }
+    },
+    "error": {
+      "cannot_connect": "Échec de connexion à l'appareil",
+      "unknown": "Erreur inconnue"
+    },
+    "abort": {
+      "already_configured": "L'appareil est déjà configuré",
+      "not_supported": "L'appareil n'est pas un capteur Senso4s pris en charge",
+      "no_devices_found": "Aucun appareil Senso4s trouvé",
+      "connection_failed": "Échec de la connexion à l'appareil. Veuillez réessayer.",
+      "calibration_failed": "La calibration a échoué. Assurez-vous que la balance est vide et réessayez.",
+      "connection_lost": "La connexion Bluetooth a été perdue pendant la configuration. Veuillez réessayer.",
+      "config_write_failed": "Échec de l'écriture de la configuration sur l'appareil. Veuillez réessayer.",
+      "setup_date_write_failed": "Échec de l'écriture de la date de configuration sur l'appareil. Veuillez réessayer.",
+      "verification_timeout": "Délai d'attente dépassé pour la lecture du niveau. L'appareil peut avoir besoin de plus de temps pour se stabiliser.",
+      "verification_anomaly": "Calibration terminée mais l'appareil signale des anomalies : {anomalies}. Vérifiez le placement de l'appareil.",
+      "verification_failed": "Échec de la vérification du résultat de la calibration. Veuillez vérifier l'appareil."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options Senso4s",
+        "menu_options": {
+          "refill_tank": "Remplir la bouteille",
+          "recalibrate": "Recalibrer la balance",
+          "settings": "Paramètres uniquement"
+        }
+      },
+      "settings": {
+        "title": "Paramètres",
+        "description": "Configurez les paramètres Home Assistant pour cet appareil. Ces paramètres n'affectent pas l'appareil lui-même.",
+        "data": {
+          "weight_unit": "Unité de poids",
+          "low_level_threshold": "Seuil d'avertissement niveau bas (%)",
+          "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)"
+        },
+        "data_description": {
+          "weight_unit": "Unité pour la saisie et l'affichage des valeurs de poids",
+          "low_level_threshold": "Pourcentage de niveau de gaz déclenchant l'avertissement de gaz bas",
+          "history_poll_interval": "Fréquence de récupération de l'historique de consommation pour le calcul 'Estimé vide' (0 pour désactiver)"
+        }
+      },
+      "refill_tank": {
+        "title": "Remplir la bouteille",
+        "description": "Utilisez ceci lorsque vous avez remplacé ou rempli votre bouteille de gaz avec la même taille.\n\n**Placez votre bouteille pleine sur la balance avant de soumettre.**\n\nCela mettra à jour l'appareil avec une nouvelle date de début de mesure.",
+        "data": {
+          "weight_unit": "Unité de poids",
+          "low_level_threshold": "Seuil d'avertissement niveau bas (%)",
+          "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)"
+        },
+        "data_description": {
+          "weight_unit": "Unité pour la saisie et l'affichage des valeurs de poids",
+          "low_level_threshold": "Pourcentage de niveau de gaz déclenchant l'avertissement de gaz bas",
+          "history_poll_interval": "Fréquence de récupération de l'historique de consommation pour le calcul 'Estimé vide' (0 pour désactiver)"
+        }
+      },
+      "recalibrate": {
+        "title": "Recalibrer la balance",
+        "description": "Utilisez ceci lors du changement vers une taille de bouteille différente ou si les lectures sont inexactes.\n\n**Retirez la bouteille de gaz de la balance avant de soumettre.**",
+        "data": {
+          "weight_unit": "Unité de poids",
+          "empty_weight_kg": "Poids de la bouteille vide",
+          "gas_capacity_kg": "Capacité de gaz",
+          "usage_mode": "Mode d'utilisation",
+          "low_level_threshold": "Seuil d'avertissement niveau bas (%)",
+          "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)"
+        },
+        "data_description": {
+          "weight_unit": "Unité pour la saisie et l'affichage des valeurs de poids",
+          "empty_weight_kg": "Poids de la bouteille de gaz vide sans gaz",
+          "gas_capacity_kg": "Capacité maximale de gaz de la bouteille",
+          "usage_mode": "Mode d'utilisation prédéfini pour l'appareil",
+          "low_level_threshold": "Pourcentage de niveau de gaz déclenchant l'avertissement de gaz bas",
+          "history_poll_interval": "Fréquence de récupération de l'historique de consommation pour le calcul 'Estimé vide' (0 pour désactiver)"
+        }
+      },
+      "recalibrate_replace": {
+        "title": "Replacer la bouteille de gaz",
+        "description": "Calibration terminée !\n\nReplacez la bouteille de gaz sur la balance, puis cliquez sur Soumettre pour écrire la configuration et vérifier la lecture."
+      }
+    },
+    "abort": {
+      "connection_failed": "Échec de la connexion à l'appareil. Veuillez réessayer.",
+      "calibration_failed": "La calibration a échoué. Assurez-vous que la balance est vide et réessayez.",
+      "config_write_failed": "Échec de l'écriture de la configuration sur l'appareil. Veuillez réessayer.",
+      "setup_date_write_failed": "Échec de l'écriture de la date de configuration sur l'appareil. Veuillez réessayer.",
+      "verification_timeout": "Délai d'attente dépassé pour la lecture du niveau. L'appareil peut avoir besoin de plus de temps pour se stabiliser.",
+      "verification_anomaly": "Configuration terminée mais l'appareil signale des anomalies : {anomalies}. Vérifiez le placement de l'appareil.",
+      "verification_failed": "Échec de la vérification du résultat de la configuration. Veuillez vérifier l'appareil."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "gas_level": {
+        "name": "Niveau de gaz"
+      },
+      "gas_remaining": {
+        "name": "Gaz restant"
+      },
+      "battery": {
+        "name": "Batterie"
+      },
+      "usage_mode": {
+        "name": "Mode d'utilisation"
+      },
+      "estimated_empty": {
+        "name": "Estimé vide"
+      },
+      "last_setup": {
+        "name": "Dernière configuration"
+      }
+    },
+    "binary_sensor": {
+      "needs_calibration": {
+        "name": "Calibration nécessaire"
+      },
+      "has_error": {
+        "name": "Erreur"
+      },
+      "has_anomaly": {
+        "name": "Anomalie"
+      },
+      "low_gas": {
+        "name": "Gaz bas"
+      },
+      "temperature_anomaly": {
+        "name": "Anomalie de température"
+      },
+      "incline_anomaly": {
+        "name": "Anomalie d'inclinaison"
+      },
+      "motion_anomaly": {
+        "name": "Anomalie de mouvement"
+      }
+    }
+  },
+  "services": {
+    "calibrate": {
+      "name": "Calibrer",
+      "description": "ATTENTION : Retirez d'abord la bouteille de gaz ! La balance doit être vide pour calibrer."
+    },
+    "refresh_history": {
+      "name": "Actualiser l'historique",
+      "description": "Récupérer l'historique de consommation depuis l'appareil"
+    },
+    "write_config": {
+      "name": "Écrire la configuration",
+      "description": "Écrire la configuration de la bouteille sur l'appareil"
+    },
+    "set_setup_date": {
+      "name": "Définir la date de configuration",
+      "description": "Définir la date de début de mesure sur l'appareil"
+    }
+  }
+}

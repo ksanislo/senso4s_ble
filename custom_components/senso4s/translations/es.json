@@ -1,0 +1,244 @@
+{
+  "issues": {
+    "needs_calibration": {
+      "title": "Senso4s requiere calibración",
+      "description": "El dispositivo '{device_name}' necesita calibración. Haga clic en 'Iniciar reparación' para comenzar el proceso de calibración guiado. La báscula debe estar vacía (cilindro retirado) durante la calibración.",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Calibración requerida",
+            "description": "Su báscula Senso4s necesita ser calibrada para medir los niveles de gas con precisión.\n\n**Qué sucede durante la calibración:**\n1. Retirará el cilindro de gas de la báscula\n2. La báscula se calibrará mientras está vacía\n3. Colocará el cilindro de nuevo en la báscula\n4. Se guardará la configuración\n\nHaga clic en Enviar cuando esté listo para comenzar."
+          },
+          "remove_cylinder": {
+            "title": "Retirar cilindro de gas",
+            "description": "**Retire el cilindro de gas de la báscula ahora.**\n\nLa báscula debe estar completamente vacía para que la calibración funcione correctamente. Asegúrese de que no haya nada en la báscula.\n\nUna vez retirado el cilindro, haga clic en Enviar para iniciar la calibración."
+          },
+          "replace_tank": {
+            "title": "Colocar cilindro de gas",
+            "description": "¡Calibración completada!\n\nColoque el cilindro de gas de nuevo en la báscula y luego haga clic en Enviar para escribir la configuración y verificar la lectura."
+          }
+        },
+        "abort": {
+          "device_not_found": "Dispositivo no encontrado. Es posible que la integración haya sido eliminada.",
+          "no_bluetooth_connection": "No hay conexión Bluetooth disponible. Asegúrese de que el dispositivo esté encendido y dentro del alcance.",
+          "connection_failed": "Error al conectar con el dispositivo. Por favor, inténtelo de nuevo.",
+          "connection_lost": "Se perdió la conexión Bluetooth durante la calibración. Por favor, inténtelo de nuevo.",
+          "calibration_failed": "La calibración falló. Asegúrese de que la báscula esté vacía e inténtelo de nuevo.",
+          "config_write_failed": "Error al escribir la configuración en el dispositivo. Por favor, inténtelo de nuevo.",
+          "setup_date_write_failed": "Error al escribir la fecha de configuración en el dispositivo. Por favor, inténtelo de nuevo.",
+          "verification_timeout": "Tiempo de espera agotado para la lectura del nivel. El dispositivo puede necesitar más tiempo para estabilizarse.",
+          "verification_anomaly": "Calibración completada pero el dispositivo reporta anomalías: {anomalies}. Verifique la ubicación del dispositivo.",
+          "verification_failed": "Error al verificar el resultado de la calibración. Por favor, revise el dispositivo."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Seleccionar dispositivo Senso4s",
+        "description": "Seleccione el dispositivo Senso4s a configurar.",
+        "data": {
+          "address": "Dispositivo"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "Configurar Senso4s",
+        "description": "Configure su dispositivo Senso4s ({name}) en {address}. Configuración cargada desde: {config_source}.",
+        "data": {
+          "weight_unit": "Unidad de peso",
+          "empty_weight_kg": "Peso del cilindro vacío",
+          "gas_capacity_kg": "Capacidad de gas",
+          "usage_mode": "Modo de uso",
+          "low_level_threshold": "Umbral de advertencia de nivel bajo (%)",
+          "history_poll_interval": "Intervalo de actualización del historial (minutos)"
+        },
+        "data_description": {
+          "weight_unit": "Unidad para mostrar valores de peso",
+          "empty_weight_kg": "Peso del cilindro de gas vacío sin gas (en la unidad seleccionada)",
+          "gas_capacity_kg": "Capacidad máxima de gas del cilindro (en la unidad seleccionada)",
+          "usage_mode": "Modo de uso preestablecido para el dispositivo",
+          "low_level_threshold": "Porcentaje de nivel de gas que activa la advertencia de gas bajo",
+          "history_poll_interval": "Con qué frecuencia obtener el historial de consumo para el cálculo de 'Estimado vacío' (0 para deshabilitar)"
+        }
+      },
+      "needs_setup": {
+        "title": "Configuración de nuevo dispositivo",
+        "description": "Su dispositivo Senso4s ({name}) en {address} necesita configuración inicial. Introduzca la configuración de su cilindro de gas a continuación.\n\nDespués de enviar, se le guiará a través del proceso de calibración.",
+        "data": {
+          "weight_unit": "Unidad de peso",
+          "empty_weight_kg": "Peso del cilindro vacío",
+          "gas_capacity_kg": "Capacidad de gas",
+          "usage_mode": "Modo de uso"
+        },
+        "data_description": {
+          "weight_unit": "Unidad para introducir valores de peso",
+          "empty_weight_kg": "Peso del cilindro de gas vacío sin gas",
+          "gas_capacity_kg": "Capacidad máxima de gas del cilindro",
+          "usage_mode": "Modo de uso preestablecido para el dispositivo"
+        }
+      },
+      "remove_cylinder": {
+        "title": "Retirar cilindro de gas",
+        "description": "**Retire el cilindro de gas de la báscula ahora.**\n\nLa báscula debe estar completamente vacía para que la calibración funcione correctamente. Asegúrese de que no haya nada en la báscula.\n\nUna vez retirado el cilindro, haga clic en Enviar para iniciar la calibración."
+      },
+      "replace_cylinder": {
+        "title": "Colocar cilindro de gas",
+        "description": "¡Calibración completada!\n\nColoque el cilindro de gas de nuevo en la báscula y luego haga clic en Enviar para escribir la configuración y verificar la lectura."
+      }
+    },
+    "error": {
+      "cannot_connect": "Error al conectar con el dispositivo",
+      "unknown": "Error desconocido"
+    },
+    "abort": {
+      "already_configured": "El dispositivo ya está configurado",
+      "not_supported": "El dispositivo no es un sensor Senso4s compatible",
+      "no_devices_found": "No se encontraron dispositivos Senso4s",
+      "connection_failed": "Error al conectar con el dispositivo. Por favor, inténtelo de nuevo.",
+      "calibration_failed": "La calibración falló. Asegúrese de que la báscula esté vacía e inténtelo de nuevo.",
+      "connection_lost": "Se perdió la conexión Bluetooth durante la configuración. Por favor, inténtelo de nuevo.",
+      "config_write_failed": "Error al escribir la configuración en el dispositivo. Por favor, inténtelo de nuevo.",
+      "setup_date_write_failed": "Error al escribir la fecha de configuración en el dispositivo. Por favor, inténtelo de nuevo.",
+      "verification_timeout": "Tiempo de espera agotado para la lectura del nivel. El dispositivo puede necesitar más tiempo para estabilizarse.",
+      "verification_anomaly": "Calibración completada pero el dispositivo reporta anomalías: {anomalies}. Verifique la ubicación del dispositivo.",
+      "verification_failed": "Error al verificar el resultado de la calibración. Por favor, revise el dispositivo."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opciones de Senso4s",
+        "menu_options": {
+          "refill_tank": "Rellenar tanque",
+          "recalibrate": "Recalibrar báscula",
+          "settings": "Solo configuración"
+        }
+      },
+      "settings": {
+        "title": "Configuración",
+        "description": "Configure los ajustes de Home Assistant para este dispositivo. Estos ajustes no afectan al dispositivo en sí.",
+        "data": {
+          "weight_unit": "Unidad de peso",
+          "low_level_threshold": "Umbral de advertencia de nivel bajo (%)",
+          "history_poll_interval": "Intervalo de actualización del historial (minutos)"
+        },
+        "data_description": {
+          "weight_unit": "Unidad para ingresar y mostrar valores de peso",
+          "low_level_threshold": "Porcentaje de nivel de gas que activa la advertencia de gas bajo",
+          "history_poll_interval": "Con qué frecuencia obtener el historial de consumo para el cálculo de 'Estimado vacío' (0 para deshabilitar)"
+        }
+      },
+      "refill_tank": {
+        "title": "Rellenar tanque",
+        "description": "Use esto cuando haya reemplazado o rellenado su cilindro de gas con el mismo tamaño de tanque.\n\n**Coloque su tanque lleno en la báscula antes de enviar.**\n\nEsto actualizará el dispositivo con una nueva fecha de inicio de medición.",
+        "data": {
+          "weight_unit": "Unidad de peso",
+          "low_level_threshold": "Umbral de advertencia de nivel bajo (%)",
+          "history_poll_interval": "Intervalo de actualización del historial (minutos)"
+        },
+        "data_description": {
+          "weight_unit": "Unidad para ingresar y mostrar valores de peso",
+          "low_level_threshold": "Porcentaje de nivel de gas que activa la advertencia de gas bajo",
+          "history_poll_interval": "Con qué frecuencia obtener el historial de consumo para el cálculo de 'Estimado vacío' (0 para deshabilitar)"
+        }
+      },
+      "recalibrate": {
+        "title": "Recalibrar báscula",
+        "description": "Use esto cuando cambie a un tamaño de tanque diferente o si las lecturas son inexactas.\n\n**Retire el cilindro de gas de la báscula antes de enviar.**",
+        "data": {
+          "weight_unit": "Unidad de peso",
+          "empty_weight_kg": "Peso del cilindro vacío",
+          "gas_capacity_kg": "Capacidad de gas",
+          "usage_mode": "Modo de uso",
+          "low_level_threshold": "Umbral de advertencia de nivel bajo (%)",
+          "history_poll_interval": "Intervalo de actualización del historial (minutos)"
+        },
+        "data_description": {
+          "weight_unit": "Unidad para ingresar y mostrar valores de peso",
+          "empty_weight_kg": "Peso del cilindro de gas vacío sin gas",
+          "gas_capacity_kg": "Capacidad máxima de gas del cilindro",
+          "usage_mode": "Modo de uso preestablecido para el dispositivo",
+          "low_level_threshold": "Porcentaje de nivel de gas que activa la advertencia de gas bajo",
+          "history_poll_interval": "Con qué frecuencia obtener el historial de consumo para el cálculo de 'Estimado vacío' (0 para deshabilitar)"
+        }
+      },
+      "recalibrate_replace": {
+        "title": "Colocar cilindro de gas",
+        "description": "¡Calibración completada!\n\nColoque el cilindro de gas de nuevo en la báscula y luego haga clic en Enviar para escribir la configuración y verificar la lectura."
+      }
+    },
+    "abort": {
+      "connection_failed": "Error al conectar con el dispositivo. Por favor, inténtelo de nuevo.",
+      "calibration_failed": "La calibración falló. Asegúrese de que la báscula esté vacía e inténtelo de nuevo.",
+      "config_write_failed": "Error al escribir la configuración en el dispositivo. Por favor, inténtelo de nuevo.",
+      "setup_date_write_failed": "Error al escribir la fecha de configuración en el dispositivo. Por favor, inténtelo de nuevo.",
+      "verification_timeout": "Tiempo de espera agotado para la lectura del nivel. El dispositivo puede necesitar más tiempo para estabilizarse.",
+      "verification_anomaly": "Configuración completada pero el dispositivo reporta anomalías: {anomalies}. Verifique la ubicación del dispositivo.",
+      "verification_failed": "Error al verificar el resultado de la configuración. Por favor, revise el dispositivo."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "gas_level": {
+        "name": "Nivel de gas"
+      },
+      "gas_remaining": {
+        "name": "Gas restante"
+      },
+      "battery": {
+        "name": "Batería"
+      },
+      "usage_mode": {
+        "name": "Modo de uso"
+      },
+      "estimated_empty": {
+        "name": "Estimado vacío"
+      },
+      "last_setup": {
+        "name": "Última configuración"
+      }
+    },
+    "binary_sensor": {
+      "needs_calibration": {
+        "name": "Necesita calibración"
+      },
+      "has_error": {
+        "name": "Error"
+      },
+      "has_anomaly": {
+        "name": "Anomalía"
+      },
+      "low_gas": {
+        "name": "Gas bajo"
+      },
+      "temperature_anomaly": {
+        "name": "Anomalía de temperatura"
+      },
+      "incline_anomaly": {
+        "name": "Anomalía de inclinación"
+      },
+      "motion_anomaly": {
+        "name": "Anomalía de movimiento"
+      }
+    }
+  },
+  "services": {
+    "calibrate": {
+      "name": "Calibrar",
+      "description": "ADVERTENCIA: ¡Retire primero el cilindro de gas! La báscula debe estar vacía para calibrar."
+    },
+    "refresh_history": {
+      "name": "Actualizar historial",
+      "description": "Obtener historial de consumo del dispositivo"
+    },
+    "write_config": {
+      "name": "Escribir configuración",
+      "description": "Escribir configuración del cilindro en el dispositivo"
+    },
+    "set_setup_date": {
+      "name": "Establecer fecha de configuración",
+      "description": "Establecer la fecha de inicio de medición en el dispositivo"
+    }
+  }
+}

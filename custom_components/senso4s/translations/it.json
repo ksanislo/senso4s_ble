@@ -1,0 +1,244 @@
+{
+  "issues": {
+    "needs_calibration": {
+      "title": "Senso4s richiede calibrazione",
+      "description": "Il dispositivo '{device_name}' necessita di calibrazione. Clicca su 'Avvia riparazione' per iniziare il processo di calibrazione guidato. La bilancia deve essere vuota (bombola rimossa) durante la calibrazione.",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Calibrazione richiesta",
+            "description": "La tua bilancia Senso4s deve essere calibrata per misurare accuratamente i livelli di gas.\n\n**Cosa succede durante la calibrazione:**\n1. Rimuoverai la bombola del gas dalla bilancia\n2. La bilancia si calibrerà da vuota\n3. Rimetterai la bombola sulla bilancia\n4. La configurazione verrà salvata\n\nClicca su Invia quando sei pronto per iniziare."
+          },
+          "remove_cylinder": {
+            "title": "Rimuovere la bombola del gas",
+            "description": "**Rimuovi ora la bombola del gas dalla bilancia.**\n\nLa bilancia deve essere completamente vuota affinché la calibrazione funzioni correttamente. Assicurati che non ci sia nulla sulla bilancia.\n\nUna volta rimossa la bombola, clicca su Invia per avviare la calibrazione."
+          },
+          "replace_tank": {
+            "title": "Riposizionare la bombola del gas",
+            "description": "Calibrazione completata!\n\nRimetti la bombola del gas sulla bilancia, poi clicca su Invia per scrivere la configurazione e verificare la lettura."
+          }
+        },
+        "abort": {
+          "device_not_found": "Dispositivo non trovato. L'integrazione potrebbe essere stata rimossa.",
+          "no_bluetooth_connection": "Nessuna connessione Bluetooth disponibile. Assicurati che il dispositivo sia acceso e nel raggio d'azione.",
+          "connection_failed": "Connessione al dispositivo fallita. Riprova.",
+          "connection_lost": "La connessione Bluetooth è stata persa durante la calibrazione. Riprova.",
+          "calibration_failed": "Calibrazione fallita. Assicurati che la bilancia sia vuota e riprova.",
+          "config_write_failed": "Scrittura della configurazione sul dispositivo fallita. Riprova.",
+          "setup_date_write_failed": "Scrittura della data di configurazione sul dispositivo fallita. Riprova.",
+          "verification_timeout": "Timeout in attesa della lettura del livello. Il dispositivo potrebbe aver bisogno di più tempo per stabilizzarsi.",
+          "verification_anomaly": "Calibrazione completata ma il dispositivo segnala anomalie: {anomalies}. Controlla il posizionamento del dispositivo.",
+          "verification_failed": "Verifica del risultato della calibrazione fallita. Controlla il dispositivo."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Seleziona dispositivo Senso4s",
+        "description": "Seleziona il dispositivo Senso4s da configurare.",
+        "data": {
+          "address": "Dispositivo"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "Configura Senso4s",
+        "description": "Configura il tuo dispositivo Senso4s ({name}) all'indirizzo {address}. Impostazioni caricate da: {config_source}.",
+        "data": {
+          "weight_unit": "Unità di peso",
+          "empty_weight_kg": "Peso bombola vuota",
+          "gas_capacity_kg": "Capacità gas",
+          "usage_mode": "Modalità d'uso",
+          "low_level_threshold": "Soglia avviso livello basso (%)",
+          "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)"
+        },
+        "data_description": {
+          "weight_unit": "Unità per la visualizzazione dei valori di peso",
+          "empty_weight_kg": "Peso della bombola del gas vuota senza gas (nell'unità selezionata)",
+          "gas_capacity_kg": "Capacità massima di gas della bombola (nell'unità selezionata)",
+          "usage_mode": "Modalità d'uso preimpostata per il dispositivo",
+          "low_level_threshold": "Percentuale del livello di gas che attiva l'avviso di gas basso",
+          "history_poll_interval": "Frequenza di recupero della cronologia dei consumi per il calcolo 'Stima esaurimento' (0 per disabilitare)"
+        }
+      },
+      "needs_setup": {
+        "title": "Configurazione nuovo dispositivo",
+        "description": "Il tuo dispositivo Senso4s ({name}) all'indirizzo {address} necessita della configurazione iniziale. Inserisci la configurazione della tua bombola del gas qui sotto.\n\nDopo l'invio, sarai guidato attraverso il processo di calibrazione.",
+        "data": {
+          "weight_unit": "Unità di peso",
+          "empty_weight_kg": "Peso bombola vuota",
+          "gas_capacity_kg": "Capacità gas",
+          "usage_mode": "Modalità d'uso"
+        },
+        "data_description": {
+          "weight_unit": "Unità per l'inserimento dei valori di peso",
+          "empty_weight_kg": "Peso della bombola del gas vuota senza gas",
+          "gas_capacity_kg": "Capacità massima di gas della bombola",
+          "usage_mode": "Modalità d'uso preimpostata per il dispositivo"
+        }
+      },
+      "remove_cylinder": {
+        "title": "Rimuovere la bombola del gas",
+        "description": "**Rimuovi ora la bombola del gas dalla bilancia.**\n\nLa bilancia deve essere completamente vuota affinché la calibrazione funzioni correttamente. Assicurati che non ci sia nulla sulla bilancia.\n\nUna volta rimossa la bombola, clicca su Invia per avviare la calibrazione."
+      },
+      "replace_cylinder": {
+        "title": "Riposizionare la bombola del gas",
+        "description": "Calibrazione completata!\n\nRimetti la bombola del gas sulla bilancia, poi clicca su Invia per scrivere la configurazione e verificare la lettura."
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossibile connettersi al dispositivo",
+      "unknown": "Errore sconosciuto"
+    },
+    "abort": {
+      "already_configured": "Il dispositivo è già configurato",
+      "not_supported": "Il dispositivo non è un sensore Senso4s supportato",
+      "no_devices_found": "Nessun dispositivo Senso4s trovato",
+      "connection_failed": "Connessione al dispositivo fallita. Riprova.",
+      "calibration_failed": "Calibrazione fallita. Assicurati che la bilancia sia vuota e riprova.",
+      "connection_lost": "La connessione Bluetooth è stata persa durante la configurazione. Riprova.",
+      "config_write_failed": "Scrittura della configurazione sul dispositivo fallita. Riprova.",
+      "setup_date_write_failed": "Scrittura della data di configurazione sul dispositivo fallita. Riprova.",
+      "verification_timeout": "Timeout in attesa della lettura del livello. Il dispositivo potrebbe aver bisogno di più tempo per stabilizzarsi.",
+      "verification_anomaly": "Calibrazione completata ma il dispositivo segnala anomalie: {anomalies}. Controlla il posizionamento del dispositivo.",
+      "verification_failed": "Verifica del risultato della calibrazione fallita. Controlla il dispositivo."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opzioni Senso4s",
+        "menu_options": {
+          "refill_tank": "Riempi bombola",
+          "recalibrate": "Ricalibra bilancia",
+          "settings": "Solo impostazioni"
+        }
+      },
+      "settings": {
+        "title": "Impostazioni",
+        "description": "Configura le impostazioni di Home Assistant per questo dispositivo. Queste impostazioni non influenzano il dispositivo stesso.",
+        "data": {
+          "weight_unit": "Unità di peso",
+          "low_level_threshold": "Soglia avviso livello basso (%)",
+          "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)"
+        },
+        "data_description": {
+          "weight_unit": "Unità per l'inserimento e la visualizzazione dei valori di peso",
+          "low_level_threshold": "Percentuale del livello di gas che attiva l'avviso di gas basso",
+          "history_poll_interval": "Frequenza di recupero della cronologia dei consumi per il calcolo 'Stima esaurimento' (0 per disabilitare)"
+        }
+      },
+      "refill_tank": {
+        "title": "Riempi bombola",
+        "description": "Usa questo quando hai sostituito o riempito la tua bombola del gas con la stessa dimensione.\n\n**Posiziona la tua bombola piena sulla bilancia prima di inviare.**\n\nQuesto aggiornerà il dispositivo con una nuova data di inizio misurazione.",
+        "data": {
+          "weight_unit": "Unità di peso",
+          "low_level_threshold": "Soglia avviso livello basso (%)",
+          "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)"
+        },
+        "data_description": {
+          "weight_unit": "Unità per l'inserimento e la visualizzazione dei valori di peso",
+          "low_level_threshold": "Percentuale del livello di gas che attiva l'avviso di gas basso",
+          "history_poll_interval": "Frequenza di recupero della cronologia dei consumi per il calcolo 'Stima esaurimento' (0 per disabilitare)"
+        }
+      },
+      "recalibrate": {
+        "title": "Ricalibra bilancia",
+        "description": "Usa questo quando passi a una dimensione di bombola diversa o se le letture sono imprecise.\n\n**Rimuovi la bombola del gas dalla bilancia prima di inviare.**",
+        "data": {
+          "weight_unit": "Unità di peso",
+          "empty_weight_kg": "Peso bombola vuota",
+          "gas_capacity_kg": "Capacità gas",
+          "usage_mode": "Modalità d'uso",
+          "low_level_threshold": "Soglia avviso livello basso (%)",
+          "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)"
+        },
+        "data_description": {
+          "weight_unit": "Unità per l'inserimento e la visualizzazione dei valori di peso",
+          "empty_weight_kg": "Peso della bombola del gas vuota senza gas",
+          "gas_capacity_kg": "Capacità massima di gas della bombola",
+          "usage_mode": "Modalità d'uso preimpostata per il dispositivo",
+          "low_level_threshold": "Percentuale del livello di gas che attiva l'avviso di gas basso",
+          "history_poll_interval": "Frequenza di recupero della cronologia dei consumi per il calcolo 'Stima esaurimento' (0 per disabilitare)"
+        }
+      },
+      "recalibrate_replace": {
+        "title": "Riposizionare la bombola del gas",
+        "description": "Calibrazione completata!\n\nRimetti la bombola del gas sulla bilancia, poi clicca su Invia per scrivere la configurazione e verificare la lettura."
+      }
+    },
+    "abort": {
+      "connection_failed": "Connessione al dispositivo fallita. Riprova.",
+      "calibration_failed": "Calibrazione fallita. Assicurati che la bilancia sia vuota e riprova.",
+      "config_write_failed": "Scrittura della configurazione sul dispositivo fallita. Riprova.",
+      "setup_date_write_failed": "Scrittura della data di configurazione sul dispositivo fallita. Riprova.",
+      "verification_timeout": "Timeout in attesa della lettura del livello. Il dispositivo potrebbe aver bisogno di più tempo per stabilizzarsi.",
+      "verification_anomaly": "Configurazione completata ma il dispositivo segnala anomalie: {anomalies}. Controlla il posizionamento del dispositivo.",
+      "verification_failed": "Verifica del risultato della configurazione fallita. Controlla il dispositivo."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "gas_level": {
+        "name": "Livello gas"
+      },
+      "gas_remaining": {
+        "name": "Gas rimanente"
+      },
+      "battery": {
+        "name": "Batteria"
+      },
+      "usage_mode": {
+        "name": "Modalità d'uso"
+      },
+      "estimated_empty": {
+        "name": "Stima esaurimento"
+      },
+      "last_setup": {
+        "name": "Ultima configurazione"
+      }
+    },
+    "binary_sensor": {
+      "needs_calibration": {
+        "name": "Calibrazione necessaria"
+      },
+      "has_error": {
+        "name": "Errore"
+      },
+      "has_anomaly": {
+        "name": "Anomalia"
+      },
+      "low_gas": {
+        "name": "Gas basso"
+      },
+      "temperature_anomaly": {
+        "name": "Anomalia temperatura"
+      },
+      "incline_anomaly": {
+        "name": "Anomalia inclinazione"
+      },
+      "motion_anomaly": {
+        "name": "Anomalia movimento"
+      }
+    }
+  },
+  "services": {
+    "calibrate": {
+      "name": "Calibra",
+      "description": "ATTENZIONE: Rimuovere prima la bombola del gas! La bilancia deve essere vuota per calibrare."
+    },
+    "refresh_history": {
+      "name": "Aggiorna cronologia",
+      "description": "Recupera la cronologia dei consumi dal dispositivo"
+    },
+    "write_config": {
+      "name": "Scrivi configurazione",
+      "description": "Scrivi la configurazione della bombola sul dispositivo"
+    },
+    "set_setup_date": {
+      "name": "Imposta data configurazione",
+      "description": "Imposta la data di inizio misurazione sul dispositivo"
+    }
+  }
+}

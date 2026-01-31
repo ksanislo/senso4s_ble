@@ -1,0 +1,244 @@
+{
+  "issues": {
+    "needs_calibration": {
+      "title": "Senso4s vereist kalibratie",
+      "description": "Apparaat '{device_name}' heeft kalibratie nodig. Klik op 'Reparatie starten' om het begeleide kalibratieproces te starten. De weegschaal moet leeg zijn (fles verwijderd) tijdens de kalibratie.",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Kalibratie vereist",
+            "description": "Uw Senso4s-weegschaal moet worden gekalibreerd om de gasniveaus nauwkeurig te meten.\n\n**Wat er tijdens de kalibratie gebeurt:**\n1. U verwijdert de gasfles van de weegschaal\n2. De weegschaal kalibreert zichzelf terwijl deze leeg is\n3. U plaatst de fles terug op de weegschaal\n4. De configuratie wordt opgeslagen\n\nKlik op Verzenden wanneer u klaar bent om te beginnen."
+          },
+          "remove_cylinder": {
+            "title": "Gasfles verwijderen",
+            "description": "**Verwijder nu de gasfles van de weegschaal.**\n\nDe weegschaal moet volledig leeg zijn om correct te kunnen kalibreren. Zorg ervoor dat er niets op de weegschaal staat.\n\nZodra de fles is verwijderd, klikt u op Verzenden om de kalibratie te starten."
+          },
+          "replace_tank": {
+            "title": "Gasfles terugplaatsen",
+            "description": "Kalibratie voltooid!\n\nPlaats de gasfles terug op de weegschaal en klik vervolgens op Verzenden om de configuratie te schrijven en de meting te verifiëren."
+          }
+        },
+        "abort": {
+          "device_not_found": "Apparaat niet gevonden. De integratie is mogelijk verwijderd.",
+          "no_bluetooth_connection": "Geen Bluetooth-verbinding beschikbaar. Zorg ervoor dat het apparaat is ingeschakeld en binnen bereik is.",
+          "connection_failed": "Verbinding met apparaat mislukt. Probeer het opnieuw.",
+          "connection_lost": "Bluetooth-verbinding verloren tijdens kalibratie. Probeer het opnieuw.",
+          "calibration_failed": "Kalibratie mislukt. Zorg ervoor dat de weegschaal leeg is en probeer het opnieuw.",
+          "config_write_failed": "Configuratie schrijven naar apparaat mislukt. Probeer het opnieuw.",
+          "setup_date_write_failed": "Installatiedatum schrijven naar apparaat mislukt. Probeer het opnieuw.",
+          "verification_timeout": "Timeout bij wachten op niveaumeting. Het apparaat heeft mogelijk meer tijd nodig om te stabiliseren.",
+          "verification_anomaly": "Kalibratie voltooid maar apparaat meldt anomalieën: {anomalies}. Controleer de plaatsing van het apparaat.",
+          "verification_failed": "Verificatie van kalibratieresultaat mislukt. Controleer het apparaat."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Selecteer Senso4s-apparaat",
+        "description": "Selecteer het Senso4s-apparaat om in te stellen.",
+        "data": {
+          "address": "Apparaat"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "Configureer Senso4s",
+        "description": "Configureer uw Senso4s-apparaat ({name}) op {address}. Instellingen geladen van: {config_source}.",
+        "data": {
+          "weight_unit": "Gewichtseenheid",
+          "empty_weight_kg": "Gewicht lege fles",
+          "gas_capacity_kg": "Gascapaciteit",
+          "usage_mode": "Gebruiksmodus",
+          "low_level_threshold": "Waarschuwingsdrempel laag niveau (%)",
+          "history_poll_interval": "Geschiedenis verversingsinterval (minuten)"
+        },
+        "data_description": {
+          "weight_unit": "Eenheid voor het weergeven van gewichtswaarden",
+          "empty_weight_kg": "Gewicht van de lege gasfles zonder gas (in geselecteerde eenheid)",
+          "gas_capacity_kg": "Maximale gascapaciteit van de fles (in geselecteerde eenheid)",
+          "usage_mode": "Vooraf ingestelde gebruiksmodus voor het apparaat",
+          "low_level_threshold": "Gasniveaupercentage dat de waarschuwing voor laag gas activeert",
+          "history_poll_interval": "Hoe vaak verbruiksgeschiedenis ophalen voor berekening 'Geschat leeg' (0 om uit te schakelen)"
+        }
+      },
+      "needs_setup": {
+        "title": "Nieuw apparaat instellen",
+        "description": "Uw Senso4s-apparaat ({name}) op {address} moet worden ingesteld. Voer hieronder uw gasflesconfiguratie in.\n\nNa het verzenden wordt u door het kalibratieproces geleid.",
+        "data": {
+          "weight_unit": "Gewichtseenheid",
+          "empty_weight_kg": "Gewicht lege fles",
+          "gas_capacity_kg": "Gascapaciteit",
+          "usage_mode": "Gebruiksmodus"
+        },
+        "data_description": {
+          "weight_unit": "Eenheid voor het invoeren van gewichtswaarden",
+          "empty_weight_kg": "Gewicht van de lege gasfles zonder gas",
+          "gas_capacity_kg": "Maximale gascapaciteit van de fles",
+          "usage_mode": "Vooraf ingestelde gebruiksmodus voor het apparaat"
+        }
+      },
+      "remove_cylinder": {
+        "title": "Gasfles verwijderen",
+        "description": "**Verwijder nu de gasfles van de weegschaal.**\n\nDe weegschaal moet volledig leeg zijn om correct te kunnen kalibreren. Zorg ervoor dat er niets op de weegschaal staat.\n\nZodra de fles is verwijderd, klikt u op Verzenden om de kalibratie te starten."
+      },
+      "replace_cylinder": {
+        "title": "Gasfles terugplaatsen",
+        "description": "Kalibratie voltooid!\n\nPlaats de gasfles terug op de weegschaal en klik vervolgens op Verzenden om de configuratie te schrijven en de meting te verifiëren."
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan niet verbinden met apparaat",
+      "unknown": "Onbekende fout opgetreden"
+    },
+    "abort": {
+      "already_configured": "Apparaat is al geconfigureerd",
+      "not_supported": "Apparaat is geen ondersteunde Senso4s-sensor",
+      "no_devices_found": "Geen Senso4s-apparaten gevonden",
+      "connection_failed": "Verbinding met apparaat mislukt. Probeer het opnieuw.",
+      "calibration_failed": "Kalibratie mislukt. Zorg ervoor dat de weegschaal leeg is en probeer het opnieuw.",
+      "connection_lost": "Bluetooth-verbinding verloren tijdens instellen. Probeer het opnieuw.",
+      "config_write_failed": "Configuratie schrijven naar apparaat mislukt. Probeer het opnieuw.",
+      "setup_date_write_failed": "Installatiedatum schrijven naar apparaat mislukt. Probeer het opnieuw.",
+      "verification_timeout": "Timeout bij wachten op niveaumeting. Het apparaat heeft mogelijk meer tijd nodig om te stabiliseren.",
+      "verification_anomaly": "Kalibratie voltooid maar apparaat meldt anomalieën: {anomalies}. Controleer de plaatsing van het apparaat.",
+      "verification_failed": "Verificatie van kalibratieresultaat mislukt. Controleer het apparaat."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Senso4s-opties",
+        "menu_options": {
+          "refill_tank": "Tank bijvullen",
+          "recalibrate": "Weegschaal kalibreren",
+          "settings": "Alleen instellingen"
+        }
+      },
+      "settings": {
+        "title": "Instellingen",
+        "description": "Configureer Home Assistant-instellingen voor dit apparaat. Deze instellingen hebben geen invloed op het apparaat zelf.",
+        "data": {
+          "weight_unit": "Gewichtseenheid",
+          "low_level_threshold": "Waarschuwingsdrempel laag niveau (%)",
+          "history_poll_interval": "Geschiedenis verversingsinterval (minuten)"
+        },
+        "data_description": {
+          "weight_unit": "Eenheid voor het invoeren en weergeven van gewichtswaarden",
+          "low_level_threshold": "Gasniveaupercentage dat de waarschuwing voor laag gas activeert",
+          "history_poll_interval": "Hoe vaak verbruiksgeschiedenis ophalen voor berekening 'Geschat leeg' (0 om uit te schakelen)"
+        }
+      },
+      "refill_tank": {
+        "title": "Tank bijvullen",
+        "description": "Gebruik dit wanneer u uw gasfles hebt vervangen of bijgevuld met dezelfde maat tank.\n\n**Plaats uw volle tank op de weegschaal voordat u verzendt.**\n\nDit zal het apparaat bijwerken met een nieuwe meetstartdatum.",
+        "data": {
+          "weight_unit": "Gewichtseenheid",
+          "low_level_threshold": "Waarschuwingsdrempel laag niveau (%)",
+          "history_poll_interval": "Geschiedenis verversingsinterval (minuten)"
+        },
+        "data_description": {
+          "weight_unit": "Eenheid voor het invoeren en weergeven van gewichtswaarden",
+          "low_level_threshold": "Gasniveaupercentage dat de waarschuwing voor laag gas activeert",
+          "history_poll_interval": "Hoe vaak verbruiksgeschiedenis ophalen voor berekening 'Geschat leeg' (0 om uit te schakelen)"
+        }
+      },
+      "recalibrate": {
+        "title": "Weegschaal kalibreren",
+        "description": "Gebruik dit bij het overschakelen naar een andere tankmaat of als de metingen onnauwkeurig zijn.\n\n**Verwijder de gasfles van de weegschaal voordat u verzendt.**",
+        "data": {
+          "weight_unit": "Gewichtseenheid",
+          "empty_weight_kg": "Gewicht lege fles",
+          "gas_capacity_kg": "Gascapaciteit",
+          "usage_mode": "Gebruiksmodus",
+          "low_level_threshold": "Waarschuwingsdrempel laag niveau (%)",
+          "history_poll_interval": "Geschiedenis verversingsinterval (minuten)"
+        },
+        "data_description": {
+          "weight_unit": "Eenheid voor het invoeren en weergeven van gewichtswaarden",
+          "empty_weight_kg": "Gewicht van de lege gasfles zonder gas",
+          "gas_capacity_kg": "Maximale gascapaciteit van de fles",
+          "usage_mode": "Vooraf ingestelde gebruiksmodus voor het apparaat",
+          "low_level_threshold": "Gasniveaupercentage dat de waarschuwing voor laag gas activeert",
+          "history_poll_interval": "Hoe vaak verbruiksgeschiedenis ophalen voor berekening 'Geschat leeg' (0 om uit te schakelen)"
+        }
+      },
+      "recalibrate_replace": {
+        "title": "Gasfles terugplaatsen",
+        "description": "Kalibratie voltooid!\n\nPlaats de gasfles terug op de weegschaal en klik vervolgens op Verzenden om de configuratie te schrijven en de meting te verifiëren."
+      }
+    },
+    "abort": {
+      "connection_failed": "Verbinding met apparaat mislukt. Probeer het opnieuw.",
+      "calibration_failed": "Kalibratie mislukt. Zorg ervoor dat de weegschaal leeg is en probeer het opnieuw.",
+      "config_write_failed": "Configuratie schrijven naar apparaat mislukt. Probeer het opnieuw.",
+      "setup_date_write_failed": "Installatiedatum schrijven naar apparaat mislukt. Probeer het opnieuw.",
+      "verification_timeout": "Timeout bij wachten op niveaumeting. Het apparaat heeft mogelijk meer tijd nodig om te stabiliseren.",
+      "verification_anomaly": "Configuratie voltooid maar apparaat meldt anomalieën: {anomalies}. Controleer de plaatsing van het apparaat.",
+      "verification_failed": "Verificatie van configuratieresultaat mislukt. Controleer het apparaat."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "gas_level": {
+        "name": "Gasniveau"
+      },
+      "gas_remaining": {
+        "name": "Resterende gas"
+      },
+      "battery": {
+        "name": "Batterij"
+      },
+      "usage_mode": {
+        "name": "Gebruiksmodus"
+      },
+      "estimated_empty": {
+        "name": "Geschat leeg"
+      },
+      "last_setup": {
+        "name": "Laatste setup"
+      }
+    },
+    "binary_sensor": {
+      "needs_calibration": {
+        "name": "Kalibratie nodig"
+      },
+      "has_error": {
+        "name": "Fout"
+      },
+      "has_anomaly": {
+        "name": "Anomalie"
+      },
+      "low_gas": {
+        "name": "Laag gas"
+      },
+      "temperature_anomaly": {
+        "name": "Temperatuuranomalie"
+      },
+      "incline_anomaly": {
+        "name": "Hellingsanomalie"
+      },
+      "motion_anomaly": {
+        "name": "Bewegingsanomalie"
+      }
+    }
+  },
+  "services": {
+    "calibrate": {
+      "name": "Kalibreren",
+      "description": "WAARSCHUWING: Verwijder eerst de gasfles! De weegschaal moet leeg zijn om te kalibreren."
+    },
+    "refresh_history": {
+      "name": "Geschiedenis verversen",
+      "description": "Verbruiksgeschiedenis ophalen van het apparaat"
+    },
+    "write_config": {
+      "name": "Configuratie schrijven",
+      "description": "Flesconfiguratie naar het apparaat schrijven"
+    },
+    "set_setup_date": {
+      "name": "Installatiedatum instellen",
+      "description": "De startdatum van de meting op het apparaat instellen"
+    }
+  }
+}

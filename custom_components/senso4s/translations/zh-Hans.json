@@ -1,0 +1,244 @@
+{
+  "issues": {
+    "needs_calibration": {
+      "title": "Senso4s 需要校准",
+      "description": "设备 '{device_name}' 需要校准。点击「开始修复」以启动引导式校准流程。校准期间秤必须为空（气瓶已移除）。",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "需要校准",
+            "description": "您的 Senso4s 秤需要校准以准确测量气体液位。\n\n**校准过程中会发生什么：**\n1. 您将从秤上移除气瓶\n2. 秤将在空载状态下进行校准\n3. 您将气瓶放回秤上\n4. 配置将被保存\n\n准备好后点击提交开始。"
+          },
+          "remove_cylinder": {
+            "title": "移除气瓶",
+            "description": "**现在从秤上移除气瓶。**\n\n秤必须完全为空才能正确校准。确保秤上没有任何东西。\n\n气瓶移除后，点击提交开始校准。"
+          },
+          "replace_tank": {
+            "title": "放回气瓶",
+            "description": "校准完成！\n\n将气瓶放回秤上，然后点击提交以写入配置并验证读数。"
+          }
+        },
+        "abort": {
+          "device_not_found": "未找到设备。集成可能已被移除。",
+          "no_bluetooth_connection": "没有可用的蓝牙连接。请确保设备已开机并在范围内。",
+          "connection_failed": "连接设备失败。请重试。",
+          "connection_lost": "校准期间蓝牙连接丢失。请重试。",
+          "calibration_failed": "校准失败。请确保秤为空并重试。",
+          "config_write_failed": "写入配置到设备失败。请重试。",
+          "setup_date_write_failed": "写入配置日期到设备失败。请重试。",
+          "verification_timeout": "等待液位读数超时。设备可能需要更多时间来稳定。",
+          "verification_anomaly": "校准完成，但设备报告异常：{anomalies}。请检查设备放置位置。",
+          "verification_failed": "验证校准结果失败。请检查设备。"
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "选择 Senso4s 设备",
+        "description": "选择要设置的 Senso4s 设备。",
+        "data": {
+          "address": "设备"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "配置 Senso4s",
+        "description": "配置您的 Senso4s 设备 ({name})，地址：{address}。设置已从以下位置加载：{config_source}。",
+        "data": {
+          "weight_unit": "重量单位",
+          "empty_weight_kg": "空罐重量",
+          "gas_capacity_kg": "气体容量",
+          "usage_mode": "使用模式",
+          "low_level_threshold": "低液位警告阈值 (%)",
+          "history_poll_interval": "历史记录刷新间隔（分钟）"
+        },
+        "data_description": {
+          "weight_unit": "显示重量值的单位",
+          "empty_weight_kg": "空气瓶不含气体的重量（以选定单位计）",
+          "gas_capacity_kg": "气瓶的最大气体容量（以选定单位计）",
+          "usage_mode": "设备的预设使用模式",
+          "low_level_threshold": "触发低气量警告的气体液位百分比",
+          "history_poll_interval": "获取消耗历史记录以计算'预计用完'的频率（0 表示禁用）"
+        }
+      },
+      "needs_setup": {
+        "title": "新设备设置",
+        "description": "您的 Senso4s 设备 ({name}) 地址 {address} 需要初始设置。请在下方输入气瓶配置。\n\n提交后，您将被引导完成校准过程。",
+        "data": {
+          "weight_unit": "重量单位",
+          "empty_weight_kg": "空罐重量",
+          "gas_capacity_kg": "气体容量",
+          "usage_mode": "使用模式"
+        },
+        "data_description": {
+          "weight_unit": "输入重量值的单位",
+          "empty_weight_kg": "空气瓶不含气体的重量",
+          "gas_capacity_kg": "气瓶的最大气体容量",
+          "usage_mode": "设备的预设使用模式"
+        }
+      },
+      "remove_cylinder": {
+        "title": "移除气瓶",
+        "description": "**现在从秤上移除气瓶。**\n\n秤必须完全为空才能正确校准。确保秤上没有任何东西。\n\n气瓶移除后，点击提交开始校准。"
+      },
+      "replace_cylinder": {
+        "title": "放回气瓶",
+        "description": "校准完成！\n\n将气瓶放回秤上，然后点击提交以写入配置并验证读数。"
+      }
+    },
+    "error": {
+      "cannot_connect": "无法连接到设备",
+      "unknown": "发生未知错误"
+    },
+    "abort": {
+      "already_configured": "设备已配置",
+      "not_supported": "设备不是受支持的 Senso4s 传感器",
+      "no_devices_found": "未找到 Senso4s 设备",
+      "connection_failed": "连接设备失败。请重试。",
+      "calibration_failed": "校准失败。请确保秤为空并重试。",
+      "connection_lost": "设置期间蓝牙连接丢失。请重试。",
+      "config_write_failed": "写入配置到设备失败。请重试。",
+      "setup_date_write_failed": "写入配置日期到设备失败。请重试。",
+      "verification_timeout": "等待液位读数超时。设备可能需要更多时间来稳定。",
+      "verification_anomaly": "校准完成，但设备报告异常：{anomalies}。请检查设备放置位置。",
+      "verification_failed": "验证校准结果失败。请检查设备。"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Senso4s 选项",
+        "menu_options": {
+          "refill_tank": "更换气瓶",
+          "recalibrate": "重新校准秤",
+          "settings": "仅设置"
+        }
+      },
+      "settings": {
+        "title": "设置",
+        "description": "配置此设备的 Home Assistant 设置。这些设置不会影响设备本身。",
+        "data": {
+          "weight_unit": "重量单位",
+          "low_level_threshold": "低液位警告阈值 (%)",
+          "history_poll_interval": "历史记录刷新间隔（分钟）"
+        },
+        "data_description": {
+          "weight_unit": "输入和显示重量值的单位",
+          "low_level_threshold": "触发低气量警告的气体液位百分比",
+          "history_poll_interval": "获取消耗历史记录以计算'预计用完'的频率（0 表示禁用）"
+        }
+      },
+      "refill_tank": {
+        "title": "更换气瓶",
+        "description": "当您更换或重新加注相同尺寸的气瓶时使用此选项。\n\n**提交前请将满瓶放在秤上。**\n\n这将使用新的测量开始日期更新设备。",
+        "data": {
+          "weight_unit": "重量单位",
+          "low_level_threshold": "低液位警告阈值 (%)",
+          "history_poll_interval": "历史记录刷新间隔（分钟）"
+        },
+        "data_description": {
+          "weight_unit": "输入和显示重量值的单位",
+          "low_level_threshold": "触发低气量警告的气体液位百分比",
+          "history_poll_interval": "获取消耗历史记录以计算'预计用完'的频率（0 表示禁用）"
+        }
+      },
+      "recalibrate": {
+        "title": "重新校准秤",
+        "description": "当更换为不同尺寸的气瓶或读数不准确时使用此选项。\n\n**提交前请从秤上移除气瓶。**",
+        "data": {
+          "weight_unit": "重量单位",
+          "empty_weight_kg": "空罐重量",
+          "gas_capacity_kg": "气体容量",
+          "usage_mode": "使用模式",
+          "low_level_threshold": "低液位警告阈值 (%)",
+          "history_poll_interval": "历史记录刷新间隔（分钟）"
+        },
+        "data_description": {
+          "weight_unit": "输入和显示重量值的单位",
+          "empty_weight_kg": "空气瓶不含气体的重量",
+          "gas_capacity_kg": "气瓶的最大气体容量",
+          "usage_mode": "设备的预设使用模式",
+          "low_level_threshold": "触发低气量警告的气体液位百分比",
+          "history_poll_interval": "获取消耗历史记录以计算'预计用完'的频率（0 表示禁用）"
+        }
+      },
+      "recalibrate_replace": {
+        "title": "放回气瓶",
+        "description": "校准完成！\n\n将气瓶放回秤上，然后点击提交以写入配置并验证读数。"
+      }
+    },
+    "abort": {
+      "connection_failed": "连接设备失败。请重试。",
+      "calibration_failed": "校准失败。请确保秤为空并重试。",
+      "config_write_failed": "写入配置到设备失败。请重试。",
+      "setup_date_write_failed": "写入配置日期到设备失败。请重试。",
+      "verification_timeout": "等待液位读数超时。设备可能需要更多时间来稳定。",
+      "verification_anomaly": "配置完成，但设备报告异常：{anomalies}。请检查设备放置位置。",
+      "verification_failed": "验证配置结果失败。请检查设备。"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "gas_level": {
+        "name": "气体液位"
+      },
+      "gas_remaining": {
+        "name": "剩余气体"
+      },
+      "battery": {
+        "name": "电池"
+      },
+      "usage_mode": {
+        "name": "使用模式"
+      },
+      "estimated_empty": {
+        "name": "预计用完"
+      },
+      "last_setup": {
+        "name": "上次设置"
+      }
+    },
+    "binary_sensor": {
+      "needs_calibration": {
+        "name": "需要校准"
+      },
+      "has_error": {
+        "name": "错误"
+      },
+      "has_anomaly": {
+        "name": "异常"
+      },
+      "low_gas": {
+        "name": "低气量"
+      },
+      "temperature_anomaly": {
+        "name": "温度异常"
+      },
+      "incline_anomaly": {
+        "name": "倾斜异常"
+      },
+      "motion_anomaly": {
+        "name": "运动异常"
+      }
+    }
+  },
+  "services": {
+    "calibrate": {
+      "name": "校准",
+      "description": "警告：请先移除气瓶！秤必须为空才能校准。"
+    },
+    "refresh_history": {
+      "name": "刷新历史记录",
+      "description": "从设备获取消耗历史记录"
+    },
+    "write_config": {
+      "name": "写入配置",
+      "description": "将气瓶配置写入设备"
+    },
+    "set_setup_date": {
+      "name": "设置配置日期",
+      "description": "在设备上设置测量开始日期"
+    }
+  }
+}

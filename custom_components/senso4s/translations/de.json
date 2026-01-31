@@ -1,0 +1,244 @@
+{
+  "issues": {
+    "needs_calibration": {
+      "title": "Senso4s erfordert Kalibrierung",
+      "description": "Gerät '{device_name}' muss kalibriert werden. Klicken Sie auf 'Reparatur starten', um den geführten Kalibrierungsprozess zu beginnen. Die Waage muss während der Kalibrierung leer sein (Flasche entfernt).",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Kalibrierung erforderlich",
+            "description": "Ihre Senso4s-Waage muss kalibriert werden, um den Gasstand genau zu messen.\n\n**Was während der Kalibrierung passiert:**\n1. Sie entfernen die Gasflasche von der Waage\n2. Die Waage kalibriert sich im leeren Zustand\n3. Sie stellen die Flasche wieder auf die Waage\n4. Die Konfiguration wird gespeichert\n\nKlicken Sie auf Absenden, wenn Sie bereit sind zu beginnen."
+          },
+          "remove_cylinder": {
+            "title": "Gasflasche entfernen",
+            "description": "**Entfernen Sie jetzt die Gasflasche von der Waage.**\n\nDie Waage muss für eine korrekte Kalibrierung vollständig leer sein. Stellen Sie sicher, dass nichts auf der Waage steht.\n\nSobald die Flasche entfernt ist, klicken Sie auf Absenden, um die Kalibrierung zu starten."
+          },
+          "replace_tank": {
+            "title": "Gasflasche wieder aufstellen",
+            "description": "Kalibrierung abgeschlossen!\n\nStellen Sie die Gasflasche wieder auf die Waage und klicken Sie dann auf Absenden, um die Konfiguration zu schreiben und den Messwert zu überprüfen."
+          }
+        },
+        "abort": {
+          "device_not_found": "Gerät nicht gefunden. Die Integration wurde möglicherweise entfernt.",
+          "no_bluetooth_connection": "Keine Bluetooth-Verbindung verfügbar. Stellen Sie sicher, dass das Gerät eingeschaltet und in Reichweite ist.",
+          "connection_failed": "Verbindung zum Gerät fehlgeschlagen. Bitte versuchen Sie es erneut.",
+          "connection_lost": "Bluetooth-Verbindung wurde während der Kalibrierung unterbrochen. Bitte versuchen Sie es erneut.",
+          "calibration_failed": "Kalibrierung fehlgeschlagen. Stellen Sie sicher, dass die Waage leer ist, und versuchen Sie es erneut.",
+          "config_write_failed": "Konfiguration konnte nicht auf das Gerät geschrieben werden. Bitte versuchen Sie es erneut.",
+          "setup_date_write_failed": "Einrichtungsdatum konnte nicht auf das Gerät geschrieben werden. Bitte versuchen Sie es erneut.",
+          "verification_timeout": "Zeitüberschreitung beim Warten auf den Messwert. Das Gerät benötigt möglicherweise mehr Zeit zur Stabilisierung.",
+          "verification_anomaly": "Kalibrierung abgeschlossen, aber das Gerät meldet Anomalien: {anomalies}. Überprüfen Sie die Geräteplatzierung.",
+          "verification_failed": "Kalibrierungsergebnis konnte nicht überprüft werden. Bitte überprüfen Sie das Gerät."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Senso4s-Gerät auswählen",
+        "description": "Wählen Sie das einzurichtende Senso4s-Gerät aus.",
+        "data": {
+          "address": "Gerät"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "Senso4s konfigurieren",
+        "description": "Konfigurieren Sie Ihr Senso4s-Gerät ({name}) unter {address}. Einstellungen wurden geladen von: {config_source}.",
+        "data": {
+          "weight_unit": "Gewichtseinheit",
+          "empty_weight_kg": "Leergewicht der Flasche",
+          "gas_capacity_kg": "Gaskapazität",
+          "usage_mode": "Nutzungsmodus",
+          "low_level_threshold": "Warnschwelle für niedrigen Füllstand (%)",
+          "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)"
+        },
+        "data_description": {
+          "weight_unit": "Einheit für die Anzeige von Gewichtswerten",
+          "empty_weight_kg": "Gewicht der leeren Gasflasche ohne Gas (in gewählter Einheit)",
+          "gas_capacity_kg": "Maximale Gaskapazität der Flasche (in gewählter Einheit)",
+          "usage_mode": "Voreingestellter Nutzungsmodus für das Gerät",
+          "low_level_threshold": "Füllstandsprozentsatz, der die Warnung bei niedrigem Gasstand auslöst",
+          "history_poll_interval": "Wie oft der Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' abgerufen wird (0 zum Deaktivieren)"
+        }
+      },
+      "needs_setup": {
+        "title": "Neue Geräteeinrichtung",
+        "description": "Ihr Senso4s-Gerät ({name}) unter {address} muss eingerichtet werden. Geben Sie unten Ihre Gasflaschen-Konfiguration ein.\n\nNach dem Absenden werden Sie durch den Kalibrierungsprozess geführt.",
+        "data": {
+          "weight_unit": "Gewichtseinheit",
+          "empty_weight_kg": "Leergewicht der Flasche",
+          "gas_capacity_kg": "Gaskapazität",
+          "usage_mode": "Nutzungsmodus"
+        },
+        "data_description": {
+          "weight_unit": "Einheit für die Eingabe von Gewichtswerten",
+          "empty_weight_kg": "Gewicht der leeren Gasflasche ohne Gas",
+          "gas_capacity_kg": "Maximale Gaskapazität der Flasche",
+          "usage_mode": "Voreingestellter Nutzungsmodus für das Gerät"
+        }
+      },
+      "remove_cylinder": {
+        "title": "Gasflasche entfernen",
+        "description": "**Entfernen Sie jetzt die Gasflasche von der Waage.**\n\nDie Waage muss für eine korrekte Kalibrierung vollständig leer sein. Stellen Sie sicher, dass nichts auf der Waage steht.\n\nSobald die Flasche entfernt ist, klicken Sie auf Absenden, um die Kalibrierung zu starten."
+      },
+      "replace_cylinder": {
+        "title": "Gasflasche wieder aufstellen",
+        "description": "Kalibrierung abgeschlossen!\n\nStellen Sie die Gasflasche wieder auf die Waage und klicken Sie dann auf Absenden, um die Konfiguration zu schreiben und den Messwert zu überprüfen."
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zum Gerät fehlgeschlagen",
+      "unknown": "Unbekannter Fehler aufgetreten"
+    },
+    "abort": {
+      "already_configured": "Gerät ist bereits konfiguriert",
+      "not_supported": "Gerät ist kein unterstützter Senso4s-Sensor",
+      "no_devices_found": "Keine Senso4s-Geräte gefunden",
+      "connection_failed": "Verbindung zum Gerät fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "calibration_failed": "Kalibrierung fehlgeschlagen. Stellen Sie sicher, dass die Waage leer ist, und versuchen Sie es erneut.",
+      "connection_lost": "Bluetooth-Verbindung wurde während der Einrichtung unterbrochen. Bitte versuchen Sie es erneut.",
+      "config_write_failed": "Konfiguration konnte nicht auf das Gerät geschrieben werden. Bitte versuchen Sie es erneut.",
+      "setup_date_write_failed": "Einrichtungsdatum konnte nicht auf das Gerät geschrieben werden. Bitte versuchen Sie es erneut.",
+      "verification_timeout": "Zeitüberschreitung beim Warten auf den Messwert. Das Gerät benötigt möglicherweise mehr Zeit zur Stabilisierung.",
+      "verification_anomaly": "Kalibrierung abgeschlossen, aber das Gerät meldet Anomalien: {anomalies}. Überprüfen Sie die Geräteplatzierung.",
+      "verification_failed": "Kalibrierungsergebnis konnte nicht überprüft werden. Bitte überprüfen Sie das Gerät."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Senso4s-Optionen",
+        "menu_options": {
+          "refill_tank": "Tank nachfüllen",
+          "recalibrate": "Waage kalibrieren",
+          "settings": "Nur Einstellungen"
+        }
+      },
+      "settings": {
+        "title": "Einstellungen",
+        "description": "Konfigurieren Sie die Home Assistant-Einstellungen für dieses Gerät. Diese Einstellungen wirken sich nicht auf das Gerät selbst aus.",
+        "data": {
+          "weight_unit": "Gewichtseinheit",
+          "low_level_threshold": "Warnschwelle für niedrigen Füllstand (%)",
+          "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)"
+        },
+        "data_description": {
+          "weight_unit": "Einheit für die Eingabe und Anzeige von Gewichtswerten",
+          "low_level_threshold": "Füllstandsprozentsatz, der die Warnung bei niedrigem Gasstand auslöst",
+          "history_poll_interval": "Wie oft der Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' abgerufen wird (0 zum Deaktivieren)"
+        }
+      },
+      "refill_tank": {
+        "title": "Tank nachfüllen",
+        "description": "Verwenden Sie dies, wenn Sie Ihre Gasflasche mit der gleichen Größe ersetzt oder nachgefüllt haben.\n\n**Stellen Sie Ihren vollen Tank auf die Waage, bevor Sie absenden.**\n\nDies aktualisiert das Gerät mit einem neuen Messstartdatum.",
+        "data": {
+          "weight_unit": "Gewichtseinheit",
+          "low_level_threshold": "Warnschwelle für niedrigen Füllstand (%)",
+          "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)"
+        },
+        "data_description": {
+          "weight_unit": "Einheit für die Eingabe und Anzeige von Gewichtswerten",
+          "low_level_threshold": "Füllstandsprozentsatz, der die Warnung bei niedrigem Gasstand auslöst",
+          "history_poll_interval": "Wie oft der Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' abgerufen wird (0 zum Deaktivieren)"
+        }
+      },
+      "recalibrate": {
+        "title": "Waage kalibrieren",
+        "description": "Verwenden Sie dies beim Wechsel zu einer anderen Tankgröße oder bei ungenauen Messwerten.\n\n**Entfernen Sie die Gasflasche von der Waage, bevor Sie absenden.**",
+        "data": {
+          "weight_unit": "Gewichtseinheit",
+          "empty_weight_kg": "Leergewicht der Flasche",
+          "gas_capacity_kg": "Gaskapazität",
+          "usage_mode": "Nutzungsmodus",
+          "low_level_threshold": "Warnschwelle für niedrigen Füllstand (%)",
+          "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)"
+        },
+        "data_description": {
+          "weight_unit": "Einheit für die Eingabe und Anzeige von Gewichtswerten",
+          "empty_weight_kg": "Gewicht der leeren Gasflasche ohne Gas",
+          "gas_capacity_kg": "Maximale Gaskapazität der Flasche",
+          "usage_mode": "Voreingestellter Nutzungsmodus für das Gerät",
+          "low_level_threshold": "Füllstandsprozentsatz, der die Warnung bei niedrigem Gasstand auslöst",
+          "history_poll_interval": "Wie oft der Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' abgerufen wird (0 zum Deaktivieren)"
+        }
+      },
+      "recalibrate_replace": {
+        "title": "Gasflasche wieder aufstellen",
+        "description": "Kalibrierung abgeschlossen!\n\nStellen Sie die Gasflasche wieder auf die Waage und klicken Sie dann auf Absenden, um die Konfiguration zu schreiben und den Messwert zu überprüfen."
+      }
+    },
+    "abort": {
+      "connection_failed": "Verbindung zum Gerät fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "calibration_failed": "Kalibrierung fehlgeschlagen. Stellen Sie sicher, dass die Waage leer ist, und versuchen Sie es erneut.",
+      "config_write_failed": "Konfiguration konnte nicht auf das Gerät geschrieben werden. Bitte versuchen Sie es erneut.",
+      "setup_date_write_failed": "Einrichtungsdatum konnte nicht auf das Gerät geschrieben werden. Bitte versuchen Sie es erneut.",
+      "verification_timeout": "Zeitüberschreitung beim Warten auf den Messwert. Das Gerät benötigt möglicherweise mehr Zeit zur Stabilisierung.",
+      "verification_anomaly": "Einrichtung abgeschlossen, aber das Gerät meldet Anomalien: {anomalies}. Überprüfen Sie die Geräteplatzierung.",
+      "verification_failed": "Einrichtungsergebnis konnte nicht überprüft werden. Bitte überprüfen Sie das Gerät."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "gas_level": {
+        "name": "Füllstand"
+      },
+      "gas_remaining": {
+        "name": "Restgas"
+      },
+      "battery": {
+        "name": "Batterie"
+      },
+      "usage_mode": {
+        "name": "Nutzungsmodus"
+      },
+      "estimated_empty": {
+        "name": "Voraussichtlich leer"
+      },
+      "last_setup": {
+        "name": "Letztes Setup"
+      }
+    },
+    "binary_sensor": {
+      "needs_calibration": {
+        "name": "Kalibrierung erforderlich"
+      },
+      "has_error": {
+        "name": "Fehler"
+      },
+      "has_anomaly": {
+        "name": "Anomalie"
+      },
+      "low_gas": {
+        "name": "Niedriger Gasstand"
+      },
+      "temperature_anomaly": {
+        "name": "Temperaturanomalie"
+      },
+      "incline_anomaly": {
+        "name": "Neigungsanomalie"
+      },
+      "motion_anomaly": {
+        "name": "Bewegungsanomalie"
+      }
+    }
+  },
+  "services": {
+    "calibrate": {
+      "name": "Kalibrieren",
+      "description": "WARNUNG: Gasflasche zuerst entfernen! Die Waage muss zum Kalibrieren leer sein."
+    },
+    "refresh_history": {
+      "name": "Verlauf aktualisieren",
+      "description": "Verbrauchsverlauf vom Gerät abrufen"
+    },
+    "write_config": {
+      "name": "Konfiguration schreiben",
+      "description": "Flaschenkonfiguration auf das Gerät schreiben"
+    },
+    "set_setup_date": {
+      "name": "Einrichtungsdatum festlegen",
+      "description": "Messstartdatum auf dem Gerät festlegen"
+    }
+  }
+}

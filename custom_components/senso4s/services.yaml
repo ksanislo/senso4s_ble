@@ -1,0 +1,76 @@
+calibrate:
+  name: Calibrate
+  description: "WARNING: Remove the gas cylinder from the scale BEFORE calibrating! The scale must be empty to calibrate correctly."
+  target:
+    device:
+      integration: senso4s
+
+refresh_history:
+  name: Refresh History
+  description: Refresh the consumption history data from the device. Requires an active BLE connection.
+  target:
+    device:
+      integration: senso4s
+
+write_config:
+  name: Write Configuration
+  description: Write cylinder configuration to the device.
+  target:
+    device:
+      integration: senso4s
+  fields:
+    empty_weight_kg:
+      name: Empty Cylinder Weight
+      description: Weight of the empty gas cylinder in kilograms
+      required: false
+      example: 10.0
+      selector:
+        number:
+          min: 1
+          max: 50
+          step: 0.1
+          unit_of_measurement: kg
+    gas_capacity_kg:
+      name: Gas Capacity
+      description: Maximum gas capacity in kilograms
+      required: false
+      example: 11.0
+      selector:
+        number:
+          min: 1
+          max: 50
+          step: 0.1
+          unit_of_measurement: kg
+    usage_mode:
+      name: Usage Mode
+      description: Usage mode preset (1=BBQ, 2=Camping, 3=Caravanning, 4=Heating, 5=Household)
+      required: false
+      example: 5
+      selector:
+        select:
+          options:
+            - label: BBQ
+              value: "1"
+            - label: Camping
+              value: "2"
+            - label: Caravanning
+              value: "3"
+            - label: Heating
+              value: "4"
+            - label: Household
+              value: "5"
+
+set_setup_date:
+  name: Set Setup Date
+  description: Set the measurement start date/time on the device. This resets the history tracking.
+  target:
+    device:
+      integration: senso4s
+  fields:
+    datetime:
+      name: Date/Time
+      description: The date and time to set. If not provided, uses current time.
+      required: false
+      example: "2024-01-15 10:30:00"
+      selector:
+        datetime:

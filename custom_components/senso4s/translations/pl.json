@@ -1,0 +1,244 @@
+{
+  "issues": {
+    "needs_calibration": {
+      "title": "Senso4s wymaga kalibracji",
+      "description": "Urządzenie '{device_name}' wymaga kalibracji. Kliknij 'Rozpocznij naprawę', aby rozpocząć proces kalibracji z przewodnikiem. Waga musi być pusta (butla usunięta) podczas kalibracji.",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Wymagana kalibracja",
+            "description": "Twoja waga Senso4s musi zostać skalibrowana, aby dokładnie mierzyć poziom gazu.\n\n**Co dzieje się podczas kalibracji:**\n1. Usuniesz butlę gazową z wagi\n2. Waga skalibruje się będąc pustą\n3. Umieścisz butlę z powrotem na wadze\n4. Konfiguracja zostanie zapisana\n\nKliknij Wyślij, gdy będziesz gotowy, aby rozpocząć."
+          },
+          "remove_cylinder": {
+            "title": "Usuń butlę gazową",
+            "description": "**Usuń teraz butlę gazową z wagi.**\n\nWaga musi być całkowicie pusta, aby kalibracja działała poprawnie. Upewnij się, że nic nie znajduje się na wadze.\n\nPo usunięciu butli kliknij Wyślij, aby rozpocząć kalibrację."
+          },
+          "replace_tank": {
+            "title": "Umieść butlę gazową",
+            "description": "Kalibracja zakończona!\n\nUmieść butlę gazową z powrotem na wadze, a następnie kliknij Wyślij, aby zapisać konfigurację i zweryfikować odczyt."
+          }
+        },
+        "abort": {
+          "device_not_found": "Nie znaleziono urządzenia. Integracja mogła zostać usunięta.",
+          "no_bluetooth_connection": "Brak dostępnego połączenia Bluetooth. Upewnij się, że urządzenie jest włączone i znajduje się w zasięgu.",
+          "connection_failed": "Nie udało się połączyć z urządzeniem. Spróbuj ponownie.",
+          "connection_lost": "Połączenie Bluetooth zostało utracone podczas kalibracji. Spróbuj ponownie.",
+          "calibration_failed": "Kalibracja nie powiodła się. Upewnij się, że waga jest pusta i spróbuj ponownie.",
+          "config_write_failed": "Nie udało się zapisać konfiguracji na urządzeniu. Spróbuj ponownie.",
+          "setup_date_write_failed": "Nie udało się zapisać daty konfiguracji na urządzeniu. Spróbuj ponownie.",
+          "verification_timeout": "Przekroczono limit czasu oczekiwania na odczyt poziomu. Urządzenie może potrzebować więcej czasu na stabilizację.",
+          "verification_anomaly": "Kalibracja zakończona, ale urządzenie zgłasza anomalie: {anomalies}. Sprawdź położenie urządzenia.",
+          "verification_failed": "Nie udało się zweryfikować wyniku kalibracji. Sprawdź urządzenie."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Wybierz urządzenie Senso4s",
+        "description": "Wybierz urządzenie Senso4s do skonfigurowania.",
+        "data": {
+          "address": "Urządzenie"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "Skonfiguruj Senso4s",
+        "description": "Skonfiguruj urządzenie Senso4s ({name}) pod adresem {address}. Ustawienia załadowane z: {config_source}.",
+        "data": {
+          "weight_unit": "Jednostka wagi",
+          "empty_weight_kg": "Waga pustej butli",
+          "gas_capacity_kg": "Pojemność gazu",
+          "usage_mode": "Tryb użytkowania",
+          "low_level_threshold": "Próg ostrzeżenia o niskim poziomie (%)",
+          "history_poll_interval": "Interwał odświeżania historii (minuty)"
+        },
+        "data_description": {
+          "weight_unit": "Jednostka do wyświetlania wartości wagi",
+          "empty_weight_kg": "Waga pustej butli gazowej bez gazu (w wybranej jednostce)",
+          "gas_capacity_kg": "Maksymalna pojemność gazu butli (w wybranej jednostce)",
+          "usage_mode": "Predefiniowany tryb użytkowania urządzenia",
+          "low_level_threshold": "Procent poziomu gazu, który wyzwala ostrzeżenie o niskim poziomie",
+          "history_poll_interval": "Jak często pobierać historię zużycia do obliczenia 'Szacowane opróżnienie' (0 aby wyłączyć)"
+        }
+      },
+      "needs_setup": {
+        "title": "Konfiguracja nowego urządzenia",
+        "description": "Twoje urządzenie Senso4s ({name}) pod adresem {address} wymaga początkowej konfiguracji. Wprowadź poniżej konfigurację butli gazowej.\n\nPo wysłaniu zostaniesz przeprowadzony przez proces kalibracji.",
+        "data": {
+          "weight_unit": "Jednostka wagi",
+          "empty_weight_kg": "Waga pustej butli",
+          "gas_capacity_kg": "Pojemność gazu",
+          "usage_mode": "Tryb użytkowania"
+        },
+        "data_description": {
+          "weight_unit": "Jednostka do wprowadzania wartości wagi",
+          "empty_weight_kg": "Waga pustej butli gazowej bez gazu",
+          "gas_capacity_kg": "Maksymalna pojemność gazu butli",
+          "usage_mode": "Predefiniowany tryb użytkowania urządzenia"
+        }
+      },
+      "remove_cylinder": {
+        "title": "Usuń butlę gazową",
+        "description": "**Usuń teraz butlę gazową z wagi.**\n\nWaga musi być całkowicie pusta, aby kalibracja działała poprawnie. Upewnij się, że nic nie znajduje się na wadze.\n\nPo usunięciu butli kliknij Wyślij, aby rozpocząć kalibrację."
+      },
+      "replace_cylinder": {
+        "title": "Umieść butlę gazową",
+        "description": "Kalibracja zakończona!\n\nUmieść butlę gazową z powrotem na wadze, a następnie kliknij Wyślij, aby zapisać konfigurację i zweryfikować odczyt."
+      }
+    },
+    "error": {
+      "cannot_connect": "Nie udało się połączyć z urządzeniem",
+      "unknown": "Wystąpił nieznany błąd"
+    },
+    "abort": {
+      "already_configured": "Urządzenie jest już skonfigurowane",
+      "not_supported": "Urządzenie nie jest obsługiwanym czujnikiem Senso4s",
+      "no_devices_found": "Nie znaleziono urządzeń Senso4s",
+      "connection_failed": "Nie udało się połączyć z urządzeniem. Spróbuj ponownie.",
+      "calibration_failed": "Kalibracja nie powiodła się. Upewnij się, że waga jest pusta i spróbuj ponownie.",
+      "connection_lost": "Połączenie Bluetooth zostało utracone podczas konfiguracji. Spróbuj ponownie.",
+      "config_write_failed": "Nie udało się zapisać konfiguracji na urządzeniu. Spróbuj ponownie.",
+      "setup_date_write_failed": "Nie udało się zapisać daty konfiguracji na urządzeniu. Spróbuj ponownie.",
+      "verification_timeout": "Przekroczono limit czasu oczekiwania na odczyt poziomu. Urządzenie może potrzebować więcej czasu na stabilizację.",
+      "verification_anomaly": "Kalibracja zakończona, ale urządzenie zgłasza anomalie: {anomalies}. Sprawdź położenie urządzenia.",
+      "verification_failed": "Nie udało się zweryfikować wyniku kalibracji. Sprawdź urządzenie."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opcje Senso4s",
+        "menu_options": {
+          "refill_tank": "Uzupełnij butlę",
+          "recalibrate": "Kalibruj wagę",
+          "settings": "Tylko ustawienia"
+        }
+      },
+      "settings": {
+        "title": "Ustawienia",
+        "description": "Skonfiguruj ustawienia Home Assistant dla tego urządzenia. Te ustawienia nie wpływają na samo urządzenie.",
+        "data": {
+          "weight_unit": "Jednostka wagi",
+          "low_level_threshold": "Próg ostrzeżenia o niskim poziomie (%)",
+          "history_poll_interval": "Interwał odświeżania historii (minuty)"
+        },
+        "data_description": {
+          "weight_unit": "Jednostka do wprowadzania i wyświetlania wartości wagi",
+          "low_level_threshold": "Procent poziomu gazu, który wyzwala ostrzeżenie o niskim poziomie",
+          "history_poll_interval": "Jak często pobierać historię zużycia do obliczenia 'Szacowane opróżnienie' (0 aby wyłączyć)"
+        }
+      },
+      "refill_tank": {
+        "title": "Uzupełnij butlę",
+        "description": "Użyj tego, gdy wymieniłeś lub napełniłeś butlę gazową o tym samym rozmiarze.\n\n**Umieść pełną butlę na wadze przed wysłaniem.**\n\nTo zaktualizuje urządzenie nową datą rozpoczęcia pomiaru.",
+        "data": {
+          "weight_unit": "Jednostka wagi",
+          "low_level_threshold": "Próg ostrzeżenia o niskim poziomie (%)",
+          "history_poll_interval": "Interwał odświeżania historii (minuty)"
+        },
+        "data_description": {
+          "weight_unit": "Jednostka do wprowadzania i wyświetlania wartości wagi",
+          "low_level_threshold": "Procent poziomu gazu, który wyzwala ostrzeżenie o niskim poziomie",
+          "history_poll_interval": "Jak często pobierać historię zużycia do obliczenia 'Szacowane opróżnienie' (0 aby wyłączyć)"
+        }
+      },
+      "recalibrate": {
+        "title": "Kalibruj wagę",
+        "description": "Użyj tego przy zmianie na inny rozmiar butli lub gdy odczyty są niedokładne.\n\n**Usuń butlę gazową z wagi przed wysłaniem.**",
+        "data": {
+          "weight_unit": "Jednostka wagi",
+          "empty_weight_kg": "Waga pustej butli",
+          "gas_capacity_kg": "Pojemność gazu",
+          "usage_mode": "Tryb użytkowania",
+          "low_level_threshold": "Próg ostrzeżenia o niskim poziomie (%)",
+          "history_poll_interval": "Interwał odświeżania historii (minuty)"
+        },
+        "data_description": {
+          "weight_unit": "Jednostka do wprowadzania i wyświetlania wartości wagi",
+          "empty_weight_kg": "Waga pustej butli gazowej bez gazu",
+          "gas_capacity_kg": "Maksymalna pojemność gazu butli",
+          "usage_mode": "Predefiniowany tryb użytkowania urządzenia",
+          "low_level_threshold": "Procent poziomu gazu, który wyzwala ostrzeżenie o niskim poziomie",
+          "history_poll_interval": "Jak często pobierać historię zużycia do obliczenia 'Szacowane opróżnienie' (0 aby wyłączyć)"
+        }
+      },
+      "recalibrate_replace": {
+        "title": "Umieść butlę gazową",
+        "description": "Kalibracja zakończona!\n\nUmieść butlę gazową z powrotem na wadze, a następnie kliknij Wyślij, aby zapisać konfigurację i zweryfikować odczyt."
+      }
+    },
+    "abort": {
+      "connection_failed": "Nie udało się połączyć z urządzeniem. Spróbuj ponownie.",
+      "calibration_failed": "Kalibracja nie powiodła się. Upewnij się, że waga jest pusta i spróbuj ponownie.",
+      "config_write_failed": "Nie udało się zapisać konfiguracji na urządzeniu. Spróbuj ponownie.",
+      "setup_date_write_failed": "Nie udało się zapisać daty konfiguracji na urządzeniu. Spróbuj ponownie.",
+      "verification_timeout": "Przekroczono limit czasu oczekiwania na odczyt poziomu. Urządzenie może potrzebować więcej czasu na stabilizację.",
+      "verification_anomaly": "Konfiguracja zakończona, ale urządzenie zgłasza anomalie: {anomalies}. Sprawdź położenie urządzenia.",
+      "verification_failed": "Nie udało się zweryfikować wyniku konfiguracji. Sprawdź urządzenie."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "gas_level": {
+        "name": "Poziom gazu"
+      },
+      "gas_remaining": {
+        "name": "Pozostały gaz"
+      },
+      "battery": {
+        "name": "Bateria"
+      },
+      "usage_mode": {
+        "name": "Tryb użytkowania"
+      },
+      "estimated_empty": {
+        "name": "Szacowane opróżnienie"
+      },
+      "last_setup": {
+        "name": "Ostatnia konfiguracja"
+      }
+    },
+    "binary_sensor": {
+      "needs_calibration": {
+        "name": "Wymaga kalibracji"
+      },
+      "has_error": {
+        "name": "Błąd"
+      },
+      "has_anomaly": {
+        "name": "Anomalia"
+      },
+      "low_gas": {
+        "name": "Niski poziom gazu"
+      },
+      "temperature_anomaly": {
+        "name": "Anomalia temperatury"
+      },
+      "incline_anomaly": {
+        "name": "Anomalia nachylenia"
+      },
+      "motion_anomaly": {
+        "name": "Anomalia ruchu"
+      }
+    }
+  },
+  "services": {
+    "calibrate": {
+      "name": "Kalibruj",
+      "description": "UWAGA: Najpierw usuń butlę gazową! Waga musi być pusta do kalibracji."
+    },
+    "refresh_history": {
+      "name": "Odśwież historię",
+      "description": "Pobierz historię zużycia z urządzenia"
+    },
+    "write_config": {
+      "name": "Zapisz konfigurację",
+      "description": "Zapisz konfigurację butli na urządzeniu"
+    },
+    "set_setup_date": {
+      "name": "Ustaw datę konfiguracji",
+      "description": "Ustaw datę rozpoczęcia pomiaru na urządzeniu"
+    }
+  }
+}

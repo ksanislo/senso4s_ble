@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv
+.claude/
+CLAUDE.md
+*.egg-info/
+.eggs/
+dist/
+build/
+senso4s.zip

@@ -1,0 +1,23 @@
+{
+  "domain": "senso4s",
+  "name": "Senso4s Gas Cylinder Sensor",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": ["bluetooth"],
+  "documentation": "https://github.com/ksanislo/senso4s_ble",
+  "bluetooth": [
+    {
+      "local_name": "SENSO4S"
+    },
+    {
+      "manufacturer_id": 89
+    },
+    {
+      "manufacturer_id": 2508
+    }
+  ],
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/ksanislo/senso4s_ble/issues",
+  "requirements": ["bleak>=0.21.0", "bleak-retry-connector>=3.0.0"],
+  "version": "1.2.0"
+}
