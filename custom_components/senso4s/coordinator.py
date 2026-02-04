@@ -89,6 +89,7 @@ class Senso4sDataUpdateCoordinator:
         self.data: Senso4sDeviceData = Senso4sDeviceData()
         self.data.gas_capacity_kg = self.gas_capacity_kg
         self.data.empty_weight_kg = self.empty_weight_kg
+        self.data.usage_mode = self.usage_mode
 
         # History data (from active connection)
         self.history: list[HistoryRecord] = []

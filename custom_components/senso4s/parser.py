@@ -3,8 +3,10 @@ from __future__ import annotations
 
 import logging
 import struct
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Optional
+
+from homeassistant.util import dt as dt_util
 
 from .const import (
     CYCLE_DURATION_MINUTES,
@@ -173,8 +175,8 @@ def parse_setup_date(data: bytes) -> Optional[datetime]:
     second = data[6]
 
     try:
-        # Return timezone-aware datetime (UTC) for Home Assistant compatibility
-        return datetime(year, month, day, hour, minute, second, tzinfo=timezone.utc)
+        # Device stores local time, not UTC
+        return datetime(year, month, day, hour, minute, second, tzinfo=dt_util.DEFAULT_TIME_ZONE)
     except ValueError:
         return None
 
@@ -263,12 +265,15 @@ def build_setup_date(dt: datetime) -> bytes:
     Returns:
         7 bytes for writing to characteristic
     """
+    # Convert to local time since device stores local time
+    local_dt = dt_util.as_local(dt)
+
     data = bytearray(7)
-    struct.pack_into("<H", data, 0, dt.year)
-    data[2] = dt.month
-    data[3] = dt.day
-    data[4] = dt.hour
-    data[5] = dt.minute
+    struct.pack_into("<H", data, 0, local_dt.year)
+    data[2] = local_dt.month
+    data[3] = local_dt.day
+    data[4] = local_dt.hour
+    data[5] = local_dt.minute
     data[6] = 0  # Seconds always 0
 
     return bytes(data)
