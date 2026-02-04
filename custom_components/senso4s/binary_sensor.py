@@ -34,13 +34,6 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         icon="mdi:alert-circle",
     ),
     BinarySensorEntityDescription(
-        key="has_anomaly",
-        translation_key="has_anomaly",
-        device_class=BinarySensorDeviceClass.PROBLEM,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        icon="mdi:alert",
-    ),
-    BinarySensorEntityDescription(
         key="low_gas",
         translation_key="low_gas",
         device_class=BinarySensorDeviceClass.GAS,
@@ -49,12 +42,22 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
 )
 
 # Sensors only available on Plus models (which have internal sensors)
+# Disabled by default as they're diagnostic - users can enable if needed
 PLUS_MODEL_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
+    BinarySensorEntityDescription(
+        key="has_anomaly",
+        translation_key="has_anomaly",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        icon="mdi:alert",
+    ),
     BinarySensorEntityDescription(
         key="temperature_anomaly",
         translation_key="temperature_anomaly",
         device_class=BinarySensorDeviceClass.PROBLEM,
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
         icon="mdi:thermometer-alert",
     ),
     BinarySensorEntityDescription(
@@ -62,6 +65,7 @@ PLUS_MODEL_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         translation_key="incline_anomaly",
         device_class=BinarySensorDeviceClass.PROBLEM,
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
         icon="mdi:angle-acute",
     ),
     BinarySensorEntityDescription(
@@ -69,6 +73,7 @@ PLUS_MODEL_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         translation_key="motion_anomaly",
         device_class=BinarySensorDeviceClass.VIBRATION,
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
         icon="mdi:vibrate",
     ),
 )
