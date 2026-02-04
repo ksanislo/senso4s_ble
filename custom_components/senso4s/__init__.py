@@ -253,6 +253,18 @@ async def _async_refresh_history_if_stale(
             await client.disconnect()
 
 
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Migrate old entry to current version."""
+    _LOGGER.debug("Migrating from version %s.%s", entry.version, entry.minor_version)
+
+    if entry.version > 1:
+        # Future version - can't downgrade
+        return False
+
+    # Version 1 is current - no migration needed
+    return True
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Senso4s from a config entry."""
     address: str = entry.data[CONF_ADDRESS]

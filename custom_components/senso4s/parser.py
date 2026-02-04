@@ -120,7 +120,7 @@ def parse_manufacturer_data(
         has_error=has_error,
         error_code=error_code,
         anomalies=anomalies,
-        last_seen=datetime.now(),
+        last_seen=dt_util.now(),
     )
 
 
