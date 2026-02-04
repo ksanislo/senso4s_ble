@@ -85,7 +85,6 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
         """Initialize the config flow."""
         self._discovery_info: BluetoothServiceInfoBleak | None = None
         self._discovered_devices: dict[str, BluetoothServiceInfoBleak] = {}
-        self._device_config: Optional[CylinderConfig] = None
         self._client: Optional[Senso4sBLEClient] = None
         # User-entered config for unconfigured devices
         self._user_config: dict[str, Any] = {}

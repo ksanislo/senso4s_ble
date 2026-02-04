@@ -8,12 +8,6 @@ from typing import Any, Optional
 from homeassistant.components import bluetooth
 from homeassistant.util import dt as dt_util
 from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
-from homeassistant.components.bluetooth.passive_update_processor import (
-    PassiveBluetoothDataProcessor,
-    PassiveBluetoothDataUpdate,
-    PassiveBluetoothEntityKey,
-    PassiveBluetoothProcessorEntity,
-)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 

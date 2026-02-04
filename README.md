@@ -101,13 +101,6 @@ The integration will automatically discover Senso4s devices broadcasting via Blu
 | Incline Anomaly | True when device is tilted |
 | Motion Anomaly | True when motion is detected |
 
-### Buttons
-
-| Entity | Description |
-|--------|-------------|
-| Calibrate | Trigger device calibration |
-| Refresh History | Fetch consumption history from device |
-
 ## Services
 
 ### `senso4s.calibrate`

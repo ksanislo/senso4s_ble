@@ -1,7 +1,6 @@
 """Sensor platform for Senso4s integration."""
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Any, Optional
 
 from homeassistant.components.sensor import (

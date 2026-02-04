@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime  # For type hints only
 from typing import Callable, Optional
 
 from bleak import BleakClient
@@ -11,6 +11,7 @@ from bleak.exc import BleakError
 from bleak_retry_connector import establish_connection
 
 from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
+from homeassistant.util import dt as dt_util
 
 from .const import (
     CALIBRATION_LEVEL_WAIT_TIMEOUT,
@@ -204,15 +205,15 @@ class Senso4sBLEClient:
             return []
 
         collected_data = bytearray()
-        last_receive_time = datetime.now()
-        start_time = datetime.now()
+        last_receive_time = dt_util.now()
+        start_time = dt_util.now()
 
         def notification_handler(_sender: int, data: bytearray) -> None:
             nonlocal last_receive_time
             _LOGGER.debug("BLE RX [HISTORY]: %s", data.hex(" ") if data else "(empty)")
             if data:
                 collected_data.extend(data)
-                last_receive_time = datetime.now()
+                last_receive_time = dt_util.now()
 
         try:
             _LOGGER.debug("BLE: Starting notifications on HISTORY characteristic")
@@ -226,7 +227,7 @@ class Senso4sBLEClient:
             # Wait for data with timeout after last received chunk
             while True:
                 await asyncio.sleep(0.1)
-                now = datetime.now()
+                now = dt_util.now()
                 elapsed_since_data = (now - last_receive_time).total_seconds()
                 elapsed_total = (now - start_time).total_seconds()
 
