@@ -6,7 +6,6 @@ __pycache__/
 .env
 .venv
 .claude/
-CLAUDE.md
 *.egg-info/
 .eggs/
 dist/
