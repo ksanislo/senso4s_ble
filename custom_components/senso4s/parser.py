@@ -176,7 +176,7 @@ def parse_setup_date(data: bytes) -> Optional[datetime]:
 
     try:
         # Device stores local time, not UTC
-        return datetime(year, month, day, hour, minute, second, tzinfo=dt_util.DEFAULT_TIME_ZONE)
+        return datetime(year, month, day, hour, minute, second, tzinfo=dt_util.get_default_time_zone())
     except ValueError:
         return None
 
