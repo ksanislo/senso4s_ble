@@ -64,11 +64,23 @@ The integration will automatically discover Senso4s devices broadcasting via Blu
 
 1. Go to **Settings** → **Devices & Services**
 2. Click on the discovered Senso4s device
-3. Configure the cylinder parameters:
-   - **Empty Cylinder Weight**: Weight of the empty cylinder (kg)
-   - **Gas Capacity**: Maximum gas the cylinder holds (kg)
+3. Follow the prompts to configure your cylinder
+
+If the device has already been configured (e.g., via the OEM app), the integration will import the existing settings automatically. For a new unconfigured device, you will be guided through initial setup and calibration (see below).
+
+### Initial Setup (New Device)
+
+When adding an unconfigured device for the first time:
+
+1. Enter your cylinder configuration:
+   - **Weight Unit**: kg or lb (weights will display in your chosen unit)
+   - **Empty Cylinder Weight**: Weight of the empty cylinder
+   - **Gas Capacity**: Maximum gas the cylinder holds
    - **Usage Mode**: BBQ, Camping, Caravanning, Heating, or Household
-   - **Low Level Threshold**: Percentage that triggers the low gas warning
+2. **Remove the gas cylinder** from the scale when prompted — the scale must be completely empty
+3. Wait for calibration to complete automatically
+4. **Place the cylinder back** on the scale when prompted
+5. The integration verifies a valid reading before finishing setup
 
 ### Manual Setup
 
@@ -76,6 +88,47 @@ The integration will automatically discover Senso4s devices broadcasting via Blu
 2. Click **Add Integration**
 3. Search for "Senso4s"
 4. Select your device from the list
+
+## Device Options
+
+Access the options menu from **Settings** → **Devices & Services** → **Senso4s** → **Configure**. The menu offers three choices:
+
+### Refill Tank
+
+Use this when you have **refilled or replaced your gas cylinder with the same size tank**. This resets the measurement start date, which is needed for accurate consumption history and estimated empty calculations.
+
+1. **Place the full tank on the scale** before submitting
+2. Optionally adjust display settings:
+   - **Weight Unit**: kg or lb
+   - **Low Level Threshold**: Percentage (5–50%) that triggers the low gas warning
+   - **History Poll Interval**: How often to fetch consumption history (0 to disable, up to 1440 minutes)
+3. The integration writes the new start date to the device and verifies a valid level reading
+
+No calibration is performed — cylinder configuration (empty weight, gas capacity, usage mode) stays unchanged.
+
+### Recalibrate Scale
+
+Use this when **switching to a different tank size** or if **readings are inaccurate**. This performs a full calibration and lets you update the cylinder configuration.
+
+1. **Remove the gas cylinder** from the scale before submitting — the scale must be completely empty
+2. Enter your cylinder configuration (all fields can be changed):
+   - **Weight Unit**: kg or lb
+   - **Empty Cylinder Weight**: Weight of the empty cylinder
+   - **Gas Capacity**: Maximum gas the cylinder holds
+   - **Usage Mode**: BBQ, Camping, Caravanning, Heating, or Household
+   - **Low Level Threshold**: Percentage (5–50%) that triggers the low gas warning
+   - **History Poll Interval**: How often to fetch consumption history (0 to disable, up to 1440 minutes)
+3. Wait for calibration to complete automatically
+4. **Place the cylinder back** on the scale when prompted
+5. The integration writes the new configuration, resets the measurement start date, and verifies a valid level reading
+
+### Settings Only
+
+Use this to change display settings without performing calibration or writing to the device:
+
+- **Weight Unit**: kg or lb
+- **Low Level Threshold**: Percentage (5–50%) that triggers the low gas warning
+- **History Poll Interval**: How often to fetch consumption history (0 to disable, up to 1440 minutes)
 
 ## Entities
 
@@ -149,11 +202,16 @@ Set the measurement start date on the device, resetting history.
 
 ### Needs Calibration
 
-When the "Needs Calibration" sensor is on:
-1. **Remove the gas cylinder from the scale** (scale must be empty!)
-2. Press the "Calibrate" button or call the calibrate service
-3. Wait for calibration to complete
-4. Place the gas cylinder back on the scale
+When the "Needs Calibration" sensor turns on, Home Assistant will automatically create a **repair issue** that walks you through the calibration process:
+
+1. Go to **Settings** → **System** → **Repairs** and open the "Calibration Required" issue
+2. **Remove the gas cylinder from the scale** — the scale must be completely empty
+3. Follow the guided steps: the integration connects, calibrates, then asks you to replace the cylinder
+4. The integration verifies a valid reading before closing the repair
+
+You can also calibrate manually at any time:
+- **Options menu**: Go to the device's **Configure** page and choose **Recalibrate Scale** (see [Device Options](#device-options) above)
+- **Service call**: Call `senso4s.calibrate` (useful for automations — ensure the cylinder is removed first)
 
 ### Inaccurate Readings
 
