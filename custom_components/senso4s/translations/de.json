@@ -2,7 +2,6 @@
   "issues": {
     "needs_calibration": {
       "title": "Senso4s erfordert Kalibrierung",
-      "description": "Gerät '{device_name}' muss kalibriert werden. Klicken Sie auf 'Reparatur starten', um den geführten Kalibrierungsprozess zu beginnen. Die Waage muss während der Kalibrierung leer sein (Flasche entfernt).",
       "fix_flow": {
         "step": {
           "init": {

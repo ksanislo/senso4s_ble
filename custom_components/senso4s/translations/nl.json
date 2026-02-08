@@ -2,7 +2,6 @@
   "issues": {
     "needs_calibration": {
       "title": "Senso4s vereist kalibratie",
-      "description": "Apparaat '{device_name}' heeft kalibratie nodig. Klik op 'Reparatie starten' om het begeleide kalibratieproces te starten. De weegschaal moet leeg zijn (fles verwijderd) tijdens de kalibratie.",
       "fix_flow": {
         "step": {
           "init": {

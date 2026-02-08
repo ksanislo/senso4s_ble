@@ -1,24 +1,38 @@
 calibrate:
   name: Calibrate
   description: "WARNING: Remove the gas cylinder from the scale BEFORE calibrating! The scale must be empty to calibrate correctly."
-  target:
-    device:
-      integration: senso4s
+  fields:
+    device_id:
+      name: Device
+      description: The Senso4s device to calibrate
+      required: true
+      selector:
+        device:
+          integration: senso4s
 
 refresh_history:
   name: Refresh History
   description: Refresh the consumption history data from the device. Requires an active BLE connection.
-  target:
-    device:
-      integration: senso4s
+  fields:
+    device_id:
+      name: Device
+      description: The Senso4s device to refresh history from
+      required: true
+      selector:
+        device:
+          integration: senso4s
 
 write_config:
   name: Write Configuration
   description: Write cylinder configuration to the device.
-  target:
-    device:
-      integration: senso4s
   fields:
+    device_id:
+      name: Device
+      description: The Senso4s device to write configuration to
+      required: true
+      selector:
+        device:
+          integration: senso4s
     empty_weight_kg:
       name: Empty Cylinder Weight
       description: Weight of the empty gas cylinder in kilograms
@@ -63,10 +77,14 @@ write_config:
 set_setup_date:
   name: Set Setup Date
   description: Set the measurement start date/time on the device. This resets the history tracking.
-  target:
-    device:
-      integration: senso4s
   fields:
+    device_id:
+      name: Device
+      description: The Senso4s device to set the setup date on
+      required: true
+      selector:
+        device:
+          integration: senso4s
     datetime:
       name: Date/Time
       description: The date and time to set. If not provided, uses current time.

@@ -2,7 +2,6 @@
   "issues": {
     "needs_calibration": {
       "title": "Senso4s richiede calibrazione",
-      "description": "Il dispositivo '{device_name}' necessita di calibrazione. Clicca su 'Avvia riparazione' per iniziare il processo di calibrazione guidato. La bilancia deve essere vuota (bombola rimossa) durante la calibrazione.",
       "fix_flow": {
         "step": {
           "init": {

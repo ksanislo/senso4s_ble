@@ -2,7 +2,6 @@
   "issues": {
     "needs_calibration": {
       "title": "Senso4s wymaga kalibracji",
-      "description": "Urządzenie '{device_name}' wymaga kalibracji. Kliknij 'Rozpocznij naprawę', aby rozpocząć proces kalibracji z przewodnikiem. Waga musi być pusta (butla usunięta) podczas kalibracji.",
       "fix_flow": {
         "step": {
           "init": {

@@ -2,7 +2,6 @@
   "issues": {
     "needs_calibration": {
       "title": "Senso4s 需要校准",
-      "description": "设备 '{device_name}' 需要校准。点击「开始修复」以启动引导式校准流程。校准期间秤必须为空（气瓶已移除）。",
       "fix_flow": {
         "step": {
           "init": {

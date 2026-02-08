@@ -2,7 +2,6 @@
   "issues": {
     "needs_calibration": {
       "title": "Senso4s requires calibration",
-      "description": "Device '{device_name}' needs calibration. Click 'Start Repair' to begin the guided calibration process. The scale must be empty (cylinder removed) during calibration.",
       "fix_flow": {
         "step": {
           "init": {
