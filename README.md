@@ -1,5 +1,9 @@
 # Senso4s Home Assistant Integration
 
+[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
+[![GitHub Release](https://img.shields.io/github/v/release/ksanislo/senso4s_ble)](https://github.com/ksanislo/senso4s_ble/releases)
+[![License](https://img.shields.io/github/license/ksanislo/senso4s_ble)](LICENSE)
+
 A Home Assistant integration for the Senso4s LP/Propane Gas Cylinder Level Sensor.
 
 ## Features
