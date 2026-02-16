@@ -24,10 +24,8 @@ A Home Assistant integration for the Senso4s LP/Propane Gas Cylinder Level Senso
 
 1. Open HACS in Home Assistant
 2. Click on "Integrations"
-3. Click the three dots in the top right corner
-4. Select "Custom repositories"
-5. Add `https://github.com/ksanislo/senso4s_ble` and select "Integration" as the category
-6. Search for "Senso4s" and install
+3. Search for "Senso4s" and install
+4. Restart Home Assistant
 
 ### Manual Installation
 
@@ -162,7 +160,7 @@ Calibrate the scale sensor. **WARNING: The gas cylinder must be REMOVED from the
 
 | Field | Description |
 |-------|-------------|
-| entry_id | Config entry ID of the device |
+| device_id | The Senso4s device to calibrate |
 
 ### `senso4s.refresh_history`
 
@@ -170,7 +168,7 @@ Fetch consumption history from the device via BLE connection.
 
 | Field | Description |
 |-------|-------------|
-| entry_id | Config entry ID of the device |
+| device_id | The Senso4s device to refresh history from |
 
 ### `senso4s.write_config`
 
@@ -178,7 +176,7 @@ Write cylinder configuration to the device.
 
 | Field | Description |
 |-------|-------------|
-| entry_id | Config entry ID |
+| device_id | The Senso4s device to write configuration to |
 | empty_weight_kg | Empty cylinder weight (optional) |
 | gas_capacity_kg | Gas capacity (optional) |
 | usage_mode | Usage mode 1-5 (optional) |
@@ -189,7 +187,7 @@ Set the measurement start date on the device, resetting history.
 
 | Field | Description |
 |-------|-------------|
-| entry_id | Config entry ID |
+| device_id | The Senso4s device to set the date on |
 | datetime | Date/time to set (optional, defaults to now) |
 
 ## Troubleshooting
