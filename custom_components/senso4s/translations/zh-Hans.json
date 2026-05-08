@@ -196,6 +196,9 @@
       },
       "last_setup": {
         "name": "上次设置"
+      },
+      "rssi": {
+        "name": "信号强度"
       }
     },
     "binary_sensor": {

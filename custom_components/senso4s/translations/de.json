@@ -196,6 +196,9 @@
       },
       "last_setup": {
         "name": "Letztes Setup"
+      },
+      "rssi": {
+        "name": "Signalstärke"
       }
     },
     "binary_sensor": {
