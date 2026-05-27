@@ -11,3 +11,5 @@ __pycache__/
 dist/
 build/
 senso4s.zip
+Senso4s_*.pdf
+*.pdf
