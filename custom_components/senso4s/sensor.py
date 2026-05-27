@@ -15,6 +15,7 @@
 """Sensor platform for Senso4s integration."""
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Any, Optional
 
 from homeassistant.components.sensor import (
@@ -29,8 +30,10 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import DeviceInfo, EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN, USAGE_MODE_NAMES
+from .const import AVAILABILITY_TIMEOUT_MINUTES, DOMAIN, USAGE_MODE_NAMES
 from .coordinator import Senso4sDataUpdateCoordinator
 
 SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
@@ -85,6 +88,22 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
+    SensorEntityDescription(
+        key="empty_weight",
+        translation_key="empty_weight",
+        native_unit_of_measurement=UnitOfMass.KILOGRAMS,
+        device_class=SensorDeviceClass.WEIGHT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:weight-kilogram",
+    ),
+    SensorEntityDescription(
+        key="gas_capacity",
+        translation_key="gas_capacity",
+        native_unit_of_measurement=UnitOfMass.KILOGRAMS,
+        device_class=SensorDeviceClass.WEIGHT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:propane-tank",
+    ),
 )
 
 
@@ -137,6 +156,20 @@ class Senso4sSensorEntity(SensorEntity):
                 self._handle_coordinator_update,
             )
         )
+        # Re-evaluate availability periodically so entities transition to
+        # unavailable when advertisements stop arriving.
+        self.async_on_remove(
+            async_track_time_interval(
+                self.hass,
+                self._handle_periodic_refresh,
+                timedelta(minutes=5),
+            )
+        )
+
+    @callback
+    def _handle_periodic_refresh(self, _now: Any) -> None:
+        """Force HA to re-read the `available` property."""
+        self.async_write_ha_state()
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -146,6 +179,13 @@ class Senso4sSensorEntity(SensorEntity):
     @property
     def available(self) -> bool:
         """Return True if entity is available."""
+        last_seen = self.coordinator.data.last_seen
+        if last_seen is None:
+            return False
+        if (dt_util.now() - last_seen) > timedelta(
+            minutes=AVAILABILITY_TIMEOUT_MINUTES
+        ):
+            return False
         if self.entity_description.key in ("gas_level", "gas_remaining"):
             return self.coordinator.data.is_available
         return True
@@ -162,6 +202,11 @@ class Senso4sSensorEntity(SensorEntity):
             return None
 
         if key == "gas_remaining":
+            # History records carry mass in dag (10 g) units. Prefer the most
+            # recent history value when available — the advertised level byte
+            # is only whole-percent resolution.
+            if self.coordinator.history:
+                return round(self.coordinator.history[-1].remaining_gas_kg, 2)
             if data.gas_remaining_kg is not None:
                 return round(data.gas_remaining_kg, 2)
             return None
@@ -183,6 +228,12 @@ class Senso4sSensorEntity(SensorEntity):
             if service_info is not None:
                 return getattr(service_info, "rssi", None)
             return None
+
+        if key == "empty_weight":
+            return self.coordinator.empty_weight_kg
+
+        if key == "gas_capacity":
+            return self.coordinator.gas_capacity_kg
 
         return None
 

@@ -199,6 +199,12 @@
       },
       "rssi": {
         "name": "信号强度"
+      },
+      "empty_weight": {
+        "name": "空瓶重量"
+      },
+      "gas_capacity": {
+        "name": "气体容量"
       }
     },
     "binary_sensor": {

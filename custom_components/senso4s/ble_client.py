@@ -288,7 +288,12 @@ class Senso4sBLEClient:
         def notification_handler(_sender: int, data: bytearray) -> None:
             nonlocal result
             _LOGGER.debug("BLE RX [CALIBRATION]: %s", data.hex(" ") if data else "(empty)")
-            if data and len(data) > 0 and data[0] != 1:
+            if data and len(data) > 0:
+                # Per protocol §3.4 the result byte after zeroing is:
+                #   0x00         = success
+                #   0x01         = unknown scenario (BASIC and PLUS)
+                #   0x10/20/40   = anomaly bits in upper nibble (PLUS only)
+                # Accept any value here; success vs failure is decided below.
                 result = data[0]
                 event.set()
 
@@ -308,11 +313,16 @@ class Senso4sBLEClient:
 
             try:
                 await asyncio.wait_for(event.wait(), timeout=timeout)
-                if result is not None:
+                # Protocol §3.4: 0x00 = success, anything else = failure.
+                # On failure, the upper nibble carries the warning bits
+                # (0x40=MOTION, 0x20=INCLINE, 0x10=TEMP) for PLUS, while a
+                # bare 0x01 means generic "unknown scenario".
+                if result == 0:
                     success = True
-                    # Parse anomaly flags
+                elif result is not None:
+                    upper = (result >> 4) & 0x0F
                     for anomaly in AnomalyType:
-                        if result & anomaly.value:
+                        if upper & anomaly.value:
                             anomalies.append(anomaly)
             except asyncio.TimeoutError:
                 _LOGGER.warning("Calibration timed out")

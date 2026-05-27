@@ -225,6 +225,12 @@
       },
       "rssi": {
         "name": "Signal Strength"
+      },
+      "empty_weight": {
+        "name": "Empty Cylinder Weight"
+      },
+      "gas_capacity": {
+        "name": "Gas Capacity"
       }
     },
     "binary_sensor": {

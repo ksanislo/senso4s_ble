@@ -199,6 +199,12 @@
       },
       "rssi": {
         "name": "Уровень сигнала"
+      },
+      "empty_weight": {
+        "name": "Вес пустого баллона"
+      },
+      "gas_capacity": {
+        "name": "Ёмкость газа"
       }
     },
     "binary_sensor": {

@@ -53,7 +53,7 @@ LB_TO_KG: Final = 0.453592
 DEFAULT_EMPTY_WEIGHT: Final = 10.0
 DEFAULT_GAS_CAPACITY: Final = 11.0
 DEFAULT_USAGE_MODE: Final = 5  # Household
-DEFAULT_LOW_LEVEL_THRESHOLD: Final = 20
+DEFAULT_LOW_LEVEL_THRESHOLD: Final = 10
 DEFAULT_WEIGHT_UNIT: Final = UNIT_KG
 DEFAULT_HISTORY_POLL_INTERVAL: Final = 30  # minutes, 0 = disabled
 
@@ -69,9 +69,12 @@ def lb_to_kg(lb: float) -> float:
 
 # Timing
 CYCLE_DURATION_MINUTES: Final = 15
-UPDATE_INTERVAL_SECONDS: Final = 60
 CONNECTION_TIMEOUT: Final = 30.0
 NOTIFICATION_TIMEOUT: Final = 5.0
+# Entities go unavailable after this many minutes without an advertisement.
+# Device emits an ad every ~500 ms, but the underlying values only change on
+# 15-min cycles; ~2 cycles of silence is a confident "out of range" signal.
+AVAILABILITY_TIMEOUT_MINUTES: Final = 35
 
 
 class UsageMode(IntEnum):
@@ -117,21 +120,20 @@ ANOMALY_NAMES: Final = {
 
 
 class DeviceError(IntEnum):
-    """Device error codes."""
+    """Device error codes from D2 / CHARACTERISTIC 1.1 (protocol §2.3)."""
 
-    MEASUREMENT = 251
-    SCALE = 252
-    SENSOR = 253
-    BATTERY = 254
-    NEEDS_CALIBRATION = 255
+    SETUP_ERROR = 0xFC  # 252 — weight/capacity out of allowed range
+    BATTERY_EMPTY = 0xFE  # 254 — replace batteries
+    NOT_READY = 0xFF  # 255 — fresh device, batteries replaced, or zeroing failed
 
 
 ERROR_DESCRIPTIONS: Final = {
-    DeviceError.MEASUREMENT: "Measurement error - check cylinder placement",
-    DeviceError.SCALE: "Scale error - device malfunction",
-    DeviceError.SENSOR: "Sensor error - device malfunction",
-    DeviceError.BATTERY: "Battery critically low",
-    DeviceError.NEEDS_CALIBRATION: "Calibration required",
+    DeviceError.SETUP_ERROR: (
+        "Setup error - check cylinder weight (3-45 kg) and gas capacity "
+        "(up to 30 kg)"
+    ),
+    DeviceError.BATTERY_EMPTY: "Batteries empty - replacement required",
+    DeviceError.NOT_READY: "Device not ready - zeroing required",
 }
 
 # Repair issue IDs

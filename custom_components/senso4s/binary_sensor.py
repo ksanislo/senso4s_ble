@@ -15,6 +15,7 @@
 """Binary sensor platform for Senso4s integration."""
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Any
 
 from homeassistant.components.binary_sensor import (
@@ -27,8 +28,10 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import DeviceInfo, EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN, AnomalyType
+from .const import AVAILABILITY_TIMEOUT_MINUTES, DOMAIN, AnomalyType
 from .coordinator import Senso4sDataUpdateCoordinator
 
 # Sensors available on all models
@@ -85,7 +88,7 @@ PLUS_MODEL_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
         key="motion_anomaly",
         translation_key="motion_anomaly",
-        device_class=BinarySensorDeviceClass.VIBRATION,
+        device_class=BinarySensorDeviceClass.PROBLEM,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         icon="mdi:vibrate",
@@ -148,11 +151,35 @@ class Senso4sBinarySensorEntity(BinarySensorEntity):
                 self._handle_coordinator_update,
             )
         )
+        # Re-evaluate availability periodically so entities transition to
+        # unavailable when advertisements stop arriving.
+        self.async_on_remove(
+            async_track_time_interval(
+                self.hass,
+                self._handle_periodic_refresh,
+                timedelta(minutes=5),
+            )
+        )
+
+    @callback
+    def _handle_periodic_refresh(self, _now: Any) -> None:
+        """Force HA to re-read the `available` property."""
+        self.async_write_ha_state()
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         self.async_write_ha_state()
+
+    @property
+    def available(self) -> bool:
+        """Return True if entity is available."""
+        last_seen = self.coordinator.data.last_seen
+        if last_seen is None:
+            return False
+        return (dt_util.now() - last_seen) <= timedelta(
+            minutes=AVAILABILITY_TIMEOUT_MINUTES
+        )
 
     @property
     def is_on(self) -> bool | None:

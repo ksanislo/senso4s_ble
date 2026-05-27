@@ -199,6 +199,12 @@
       },
       "rssi": {
         "name": "Signalstärke"
+      },
+      "empty_weight": {
+        "name": "Leeres Flaschengewicht"
+      },
+      "gas_capacity": {
+        "name": "Gaskapazität"
       }
     },
     "binary_sensor": {

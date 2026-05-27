@@ -199,6 +199,12 @@
       },
       "rssi": {
         "name": "Signaalsterkte"
+      },
+      "empty_weight": {
+        "name": "Leeg flesgewicht"
+      },
+      "gas_capacity": {
+        "name": "Gascapaciteit"
       }
     },
     "binary_sensor": {

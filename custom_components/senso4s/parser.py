@@ -79,8 +79,12 @@ def parse_manufacturer_data(
         mac_bytes.hex(":"),
     )
 
-    # Parse model type (bit 7 of flags)
-    is_plus = (flags_byte >> 4) != 0x8
+    # Parse model + warning flags (upper nibble of D1, per protocol §2.2.2)
+    # Upper nibble == 0b1000 → BASIC device (no warning bits possible).
+    # Upper nibble  < 0b1000 → PLUS device; bits 0-2 carry warning flags:
+    #   0b0100 = MOTION, 0b0010 = INCLINE, 0b0001 = TEMPERATURE.
+    model_nibble = flags_byte >> 4
+    is_plus = model_nibble < 0x8
 
     # Parse usage mode (lower nibble)
     usage_value = flags_byte & 0x0F
@@ -90,11 +94,8 @@ def parse_manufacturer_data(
     if not is_plus and usage_mode == UsageMode.CARAVANNING:
         usage_mode = UsageMode.HOUSEHOLD
 
-    # Parse battery (round up to nearest 5)
-    battery = battery_raw
-    if battery % 5 != 0:
-        battery = (battery // 5) * 5 + 5
-    battery = min(100, max(0, battery))
+    # Battery is integer percent (protocol §2.5).
+    battery = min(100, max(0, battery_raw))
 
     # Parse MAC address
     mac_address = ":".join(f"{b:02X}" for b in mac_bytes)
@@ -106,18 +107,29 @@ def parse_manufacturer_data(
     error_code: Optional[int] = None
     anomalies: list[AnomalyType] = []
 
+    # Steady-state anomalies live in the upper nibble of D1 (PLUS only).
+    if is_plus and model_nibble != 0:
+        for anomaly in AnomalyType:
+            if model_nibble & anomaly.value:
+                anomalies.append(anomaly)
+
     if level_byte == 255:
+        # "Not ready" per protocol §2.3: untouched device, fresh batteries, or
+        # zeroing failed. Triggers our existing repair flow.
         needs_calibration = True
         gas_level = -1
-    elif 251 <= level_byte <= 254:
+    elif level_byte in (0xFC, 0xFE):
+        # 0xFC = setup error (weight/capacity out of allowed range)
+        # 0xFE = empty batteries (replace required)
         has_error = True
         error_code = level_byte
         gas_level = -1
     elif 241 <= level_byte <= 247:
-        # Anomaly codes - extract anomaly flags
+        # Cycle-startup anomaly flags (§2.3) — PLUS only. Lower nibble has the
+        # same TEMPERATURE/INCLINE/MOTION bit pattern as D1's upper nibble.
         anomaly_flags = level_byte - 240
         for anomaly in AnomalyType:
-            if anomaly_flags & anomaly.value:
+            if anomaly_flags & anomaly.value and anomaly not in anomalies:
                 anomalies.append(anomaly)
         gas_level = -1
     elif level_byte > 100:
@@ -151,8 +163,8 @@ def parse_cylinder_config(data: bytes) -> Optional[CylinderConfig]:
     if len(data) != 5:
         return None
 
-    empty_weight_dag = struct.unpack("<h", data[0:2])[0]
-    gas_capacity_dag = struct.unpack("<h", data[2:4])[0]
+    empty_weight_dag = struct.unpack("<H", data[0:2])[0]
+    gas_capacity_dag = struct.unpack("<H", data[2:4])[0]
     usage_value = data[4]
 
     usage_mode = UsageMode.from_value(usage_value)
@@ -186,11 +198,11 @@ def parse_setup_date(data: bytes) -> Optional[datetime]:
     day = data[3]
     hour = data[4]
     minute = data[5]
-    second = data[6]
+    # data[6] is documented as a "constant" byte (protocol §3.5) — not seconds.
 
     try:
         # Device stores local time, not UTC
-        return datetime(year, month, day, hour, minute, second, tzinfo=dt_util.get_default_time_zone())
+        return datetime(year, month, day, hour, minute, tzinfo=dt_util.get_default_time_zone())
     except ValueError:
         return None
 
@@ -217,8 +229,8 @@ def parse_history_data(
 
     for i in range(0, len(data), 4):
         chunk = data[i : i + 4]
-        mass_dag = struct.unpack("<h", chunk[0:2])[0]
-        cycles = struct.unpack("<h", chunk[2:4])[0]
+        mass_dag = struct.unpack("<H", chunk[0:2])[0]
+        cycles = struct.unpack("<H", chunk[2:4])[0]
 
         # First record with non-zero cycle - add initial point at zero
         if i == 0 and cycles != 0:
@@ -262,8 +274,8 @@ def build_cylinder_config(
     capacity_dag = int(gas_capacity_kg * 100)
 
     data = bytearray(5)
-    struct.pack_into("<h", data, 0, empty_dag)
-    struct.pack_into("<h", data, 2, capacity_dag)
+    struct.pack_into("<H", data, 0, empty_dag)
+    struct.pack_into("<H", data, 2, capacity_dag)
     data[4] = usage_mode.value
 
     return bytes(data)
@@ -293,25 +305,3 @@ def build_setup_date(dt: datetime) -> bytes:
     return bytes(data)
 
 
-def decode_anomaly_level(level: int) -> list[AnomalyType]:
-    """
-    Decode anomaly flags from special level values.
-
-    Level values 241-247 encode anomalies:
-    - The lower nibble of (level - 240) contains flags
-
-    Args:
-        level: Level value from device
-
-    Returns:
-        List of detected anomalies
-    """
-    if not (241 <= level <= 247):
-        return []
-
-    flags = level - 240
-    anomalies: list[AnomalyType] = []
-    for anomaly in AnomalyType:
-        if flags & anomaly.value:
-            anomalies.append(anomaly)
-    return anomalies
