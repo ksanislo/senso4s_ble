@@ -42,24 +42,8 @@
         }
       },
       "bluetooth_confirm": {
-        "title": "Configureer Senso4s",
-        "description": "Configureer uw Senso4s-apparaat ({name}) op {address}. Instellingen geladen van: {config_source}.",
-        "data": {
-          "weight_unit": "Gewichtseenheid",
-          "empty_weight_kg": "Gewicht lege fles",
-          "gas_capacity_kg": "Gascapaciteit",
-          "usage_mode": "Gebruiksmodus",
-          "low_level_threshold": "Waarschuwingsdrempel laag niveau (%)",
-          "history_poll_interval": "Geschiedenis verversingsinterval (minuten)"
-        },
-        "data_description": {
-          "weight_unit": "Eenheid voor het weergeven van gewichtswaarden",
-          "empty_weight_kg": "Gewicht van de lege gasfles zonder gas (in geselecteerde eenheid)",
-          "gas_capacity_kg": "Maximale gascapaciteit van de fles (in geselecteerde eenheid)",
-          "usage_mode": "Vooraf ingestelde gebruiksmodus voor het apparaat",
-          "low_level_threshold": "Gasniveaupercentage dat de waarschuwing voor laag gas activeert",
-          "history_poll_interval": "Hoe vaak verbruiksgeschiedenis ophalen voor berekening 'Geschat leeg' (0 om uit te schakelen)"
-        }
+        "title": "Senso4s-apparaat toevoegen",
+        "description": "Senso4s-apparaat {name} op {address} toevoegen aan Home Assistant?"
       },
       "needs_setup": {
         "title": "Nieuw apparaat instellen",

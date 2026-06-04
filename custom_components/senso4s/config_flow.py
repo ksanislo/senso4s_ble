@@ -130,22 +130,30 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
 
         self._discovery_info = discovery_info
 
-        device_data = process_service_info(discovery_info)
-        if device_data:
-            self.context["title_placeholders"] = {
-                "name": discovery_info.name,
-                "address": discovery_info.address,
-            }
+        self.context["title_placeholders"] = {
+            "name": discovery_info.name,
+            "address": discovery_info.address,
+        }
 
         return await self.async_step_bluetooth_confirm()
 
     async def async_step_bluetooth_confirm(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Check if device is configured and handle accordingly."""
+        """Confirm the discovered device, then run setup."""
         assert self._discovery_info is not None
 
-        # Connect to device and check if configured
+        if user_input is None:
+            return self.async_show_form(
+                step_id="bluetooth_confirm",
+                data_schema=vol.Schema({}),
+                description_placeholders={
+                    "name": self._discovery_info.name,
+                    "address": self._discovery_info.address,
+                },
+            )
+
+        # User confirmed — connect to device and check if configured
         self._client = Senso4sBLEClient(self._discovery_info)
 
         try:

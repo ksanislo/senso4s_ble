@@ -42,24 +42,8 @@
         }
       },
       "bluetooth_confirm": {
-        "title": "配置 Senso4s",
-        "description": "配置您的 Senso4s 设备 ({name})，地址：{address}。设置已从以下位置加载：{config_source}。",
-        "data": {
-          "weight_unit": "重量单位",
-          "empty_weight_kg": "空罐重量",
-          "gas_capacity_kg": "气体容量",
-          "usage_mode": "使用模式",
-          "low_level_threshold": "低液位警告阈值 (%)",
-          "history_poll_interval": "历史记录刷新间隔（分钟）"
-        },
-        "data_description": {
-          "weight_unit": "显示重量值的单位",
-          "empty_weight_kg": "空气瓶不含气体的重量（以选定单位计）",
-          "gas_capacity_kg": "气瓶的最大气体容量（以选定单位计）",
-          "usage_mode": "设备的预设使用模式",
-          "low_level_threshold": "触发低气量警告的气体液位百分比",
-          "history_poll_interval": "获取消耗历史记录以计算'预计用完'的频率（0 表示禁用）"
-        }
+        "title": "添加 Senso4s 设备",
+        "description": "将 Senso4s 设备 {name}（位于 {address}）添加到 Home Assistant？"
       },
       "needs_setup": {
         "title": "新设备设置",

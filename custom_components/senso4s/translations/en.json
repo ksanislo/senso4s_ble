@@ -42,24 +42,8 @@
         }
       },
       "bluetooth_confirm": {
-        "title": "Configure Senso4s",
-        "description": "Configure your Senso4s device ({name}) at {address}. Settings were loaded from: {config_source}.",
-        "data": {
-          "weight_unit": "Weight unit",
-          "empty_weight_kg": "Empty cylinder weight",
-          "gas_capacity_kg": "Gas capacity",
-          "usage_mode": "Usage mode",
-          "low_level_threshold": "Low level warning threshold (%)",
-          "history_poll_interval": "History refresh interval (minutes)"
-        },
-        "data_description": {
-          "weight_unit": "Unit for displaying weight values",
-          "empty_weight_kg": "Weight of the empty gas cylinder without gas (in selected unit)",
-          "gas_capacity_kg": "Maximum gas capacity of the cylinder (in selected unit)",
-          "usage_mode": "Preset usage mode for the device",
-          "low_level_threshold": "Gas level percentage that triggers low gas warning",
-          "history_poll_interval": "How often to fetch consumption history for 'Estimated Empty' calculation (0 to disable)"
-        }
+        "title": "Add Senso4s device",
+        "description": "Add the Senso4s device {name} at {address} to Home Assistant?"
       },
       "needs_setup": {
         "title": "New Device Setup",

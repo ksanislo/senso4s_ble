@@ -42,24 +42,8 @@
         }
       },
       "bluetooth_confirm": {
-        "title": "Senso4s konfigurieren",
-        "description": "Konfigurieren Sie Ihr Senso4s-Gerät ({name}) unter {address}. Einstellungen wurden geladen von: {config_source}.",
-        "data": {
-          "weight_unit": "Gewichtseinheit",
-          "empty_weight_kg": "Leergewicht der Flasche",
-          "gas_capacity_kg": "Gaskapazität",
-          "usage_mode": "Nutzungsmodus",
-          "low_level_threshold": "Warnschwelle für niedrigen Füllstand (%)",
-          "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)"
-        },
-        "data_description": {
-          "weight_unit": "Einheit für die Anzeige von Gewichtswerten",
-          "empty_weight_kg": "Gewicht der leeren Gasflasche ohne Gas (in gewählter Einheit)",
-          "gas_capacity_kg": "Maximale Gaskapazität der Flasche (in gewählter Einheit)",
-          "usage_mode": "Voreingestellter Nutzungsmodus für das Gerät",
-          "low_level_threshold": "Füllstandsprozentsatz, der die Warnung bei niedrigem Gasstand auslöst",
-          "history_poll_interval": "Wie oft der Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' abgerufen wird (0 zum Deaktivieren)"
-        }
+        "title": "Senso4s-Gerät hinzufügen",
+        "description": "Senso4s-Gerät {name} bei {address} zu Home Assistant hinzufügen?"
       },
       "needs_setup": {
         "title": "Neue Geräteeinrichtung",

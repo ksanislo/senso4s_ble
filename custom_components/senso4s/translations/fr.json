@@ -42,24 +42,8 @@
         }
       },
       "bluetooth_confirm": {
-        "title": "Configurer Senso4s",
-        "description": "Configurez votre appareil Senso4s ({name}) à l'adresse {address}. Paramètres chargés depuis : {config_source}.",
-        "data": {
-          "weight_unit": "Unité de poids",
-          "empty_weight_kg": "Poids de la bouteille vide",
-          "gas_capacity_kg": "Capacité de gaz",
-          "usage_mode": "Mode d'utilisation",
-          "low_level_threshold": "Seuil d'avertissement niveau bas (%)",
-          "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)"
-        },
-        "data_description": {
-          "weight_unit": "Unité pour l'affichage des valeurs de poids",
-          "empty_weight_kg": "Poids de la bouteille de gaz vide sans gaz (dans l'unité sélectionnée)",
-          "gas_capacity_kg": "Capacité maximale de gaz de la bouteille (dans l'unité sélectionnée)",
-          "usage_mode": "Mode d'utilisation prédéfini pour l'appareil",
-          "low_level_threshold": "Pourcentage de niveau de gaz déclenchant l'avertissement de gaz bas",
-          "history_poll_interval": "Fréquence de récupération de l'historique de consommation pour le calcul 'Estimé vide' (0 pour désactiver)"
-        }
+        "title": "Ajouter l'appareil Senso4s",
+        "description": "Ajouter l'appareil Senso4s {name} à {address} à Home Assistant ?"
       },
       "needs_setup": {
         "title": "Configuration du nouvel appareil",
