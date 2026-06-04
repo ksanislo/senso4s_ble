@@ -441,10 +441,11 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
         if not self._discovered_devices:
             return self.async_abort(reason="no_devices_found")
 
-        device_options = {
-            address: f"{info.name} ({address})"
-            for address, info in self._discovered_devices.items()
-        }
+        device_options = {}
+        for address, info in self._discovered_devices.items():
+            rssi = getattr(info, "rssi", None)
+            rssi_part = f" · {rssi} dBm" if rssi is not None else ""
+            device_options[address] = f"{info.name} ({address}){rssi_part}"
 
         return self.async_show_form(
             step_id="user",
