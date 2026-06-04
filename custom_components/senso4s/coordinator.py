@@ -294,7 +294,10 @@ class Senso4sDataUpdateCoordinator:
 
     @property
     def estimated_empty_date(self) -> Optional[datetime]:
-        """Calculate estimated empty date based on consumption rate."""
+        """Predict when the cylinder will run dry via least-squares
+        regression of mass against time over the last 10 history records,
+        extrapolated from the most recent record's timestamp.
+        """
         if len(self.history) < 2:
             _LOGGER.debug(
                 "Estimated empty: not enough history (%d records, need at least 2). "
@@ -303,56 +306,58 @@ class Senso4sDataUpdateCoordinator:
             )
             return None
 
-        # Get consumption rate from recent history
-        recent = self.history[-10:]  # Last 10 records
-        if len(recent) < 2:
-            _LOGGER.debug("Estimated empty: recent history too short")
+        recent = self.history[-min(10, len(self.history)):]
+        n = len(recent)
+
+        # x = seconds since the first record in the window (proportional to
+        # cumulative cycle index, since records are spaced in 15-min ticks).
+        # y = remaining mass (kg). Linear regression handles non-uniform
+        # spacing correctly when the device collapsed flat runs.
+        base_t = recent[0].timestamp
+        xs = [(r.timestamp - base_t).total_seconds() for r in recent]
+        ys = [r.remaining_gas_kg for r in recent]
+
+        sum_x = sum(xs)
+        sum_y = sum(ys)
+        sum_xy = sum(x * y for x, y in zip(xs, ys))
+        sum_xx = sum(x * x for x in xs)
+
+        denom = n * sum_xx - sum_x * sum_x
+        if denom <= 0:
+            _LOGGER.debug(
+                "Estimated empty: degenerate window (denom=%.2f, n=%d)",
+                denom,
+                n,
+            )
             return None
 
-        first = recent[0]
-        last = recent[-1]
-
-        time_delta = (last.timestamp - first.timestamp).total_seconds()
-        if time_delta <= 0:
-            _LOGGER.debug("Estimated empty: time_delta <= 0")
+        slope = (n * sum_xy - sum_x * sum_y) / denom  # kg/sec (negative when consuming)
+        if slope >= 0:
+            _LOGGER.debug(
+                "Estimated empty: slope >= 0, not consuming (slope=%.6g kg/s)",
+                slope,
+            )
             return None
 
-        mass_delta = first.remaining_gas_kg - last.remaining_gas_kg
-        if mass_delta <= 0:
-            _LOGGER.debug(
-                "Estimated empty: no consumption detected (mass_delta=%.2f kg)",
-                mass_delta,
-            )
-            return None  # Not consuming
+        last_mass = ys[-1]
+        if last_mass <= 0:
+            _LOGGER.debug("Estimated empty: last recorded mass <= 0 (%s)", last_mass)
+            return None
 
-        # Calculate consumption rate (kg per second)
-        rate_per_second = mass_delta / time_delta
-        rate_per_day = rate_per_second * 86400
-
+        seconds_until_empty = -last_mass / slope
+        estimated = recent[-1].timestamp + timedelta(seconds=seconds_until_empty)
         _LOGGER.debug(
-            "Estimated empty: consumption rate=%.3f kg/day over %.1f hours",
-            rate_per_day,
-            time_delta / 3600,
+            "Estimated empty: n=%d, slope=%.6g kg/s (%.3f kg/day), "
+            "last_mass=%.3f kg @ %s, seconds_until_empty=%.0f → %s",
+            n,
+            slope,
+            slope * 86400,
+            last_mass,
+            recent[-1].timestamp,
+            seconds_until_empty,
+            estimated,
         )
-
-        # Time to empty
-        if self.data.gas_remaining_kg is not None and rate_per_second > 0:
-            seconds_to_empty = self.data.gas_remaining_kg / rate_per_second
-            estimated = dt_util.now() + timedelta(seconds=seconds_to_empty)
-            _LOGGER.debug(
-                "Estimated empty: %.2f kg remaining at %.3f kg/day = %s",
-                self.data.gas_remaining_kg,
-                rate_per_day,
-                estimated,
-            )
-            return estimated
-
-        _LOGGER.debug(
-            "Estimated empty: gas_remaining_kg=%s, rate=%s",
-            self.data.gas_remaining_kg,
-            rate_per_second,
-        )
-        return None
+        return estimated
 
 
 def process_service_info(
