@@ -437,7 +437,9 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
             await self.async_set_unique_id(address, raise_on_progress=False)
             self._abort_if_unique_id_configured()
             self._discovery_info = self._discovered_devices[address]
-            return await self.async_step_bluetooth_confirm()
+            # User picked this device explicitly — skip the confirm form
+            # and proceed straight to the setup work.
+            return await self.async_step_bluetooth_confirm(user_input={})
 
         current_addresses = self._async_current_ids()
         for discovery_info in async_discovered_service_info(self.hass):
