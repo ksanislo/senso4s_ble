@@ -308,13 +308,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 _async_refresh_history_if_stale(hass, entry, coordinator)
             )
 
-    # Register for bluetooth updates
+    # Register for bluetooth updates. connectable=False means "accept adverts
+    # regardless of connectable state" — without it the matcher defaults to
+    # requiring connectable=True and silently drops the non-connectable adverts
+    # the proxy emits in the moments after an active connection cycle, leaving
+    # the integration starved of updates.
     entry.async_on_unload(
         bluetooth.async_register_callback(
             hass,
             _async_update_callback,
-            bluetooth.BluetoothCallbackMatcher(address=address),
-            BluetoothScanningMode.PASSIVE,
+            bluetooth.BluetoothCallbackMatcher(address=address, connectable=False),
+            BluetoothScanningMode.ACTIVE,
         )
     )
 
