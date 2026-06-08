@@ -227,9 +227,15 @@ class Senso4sSensorEntity(SensorEntity):
             return self.coordinator.last_known_setup_date
 
         if key == "rssi":
-            service_info = self.coordinator.service_info
-            if service_info is not None:
-                return getattr(service_info, "rssi", None)
+            # Read fresh from HA's bluetooth cache — that gets updated on
+            # every advert the scanner sees, whereas coordinator.service_info
+            # only updates when our callback fires (which habluetooth dedupe
+            # suppresses for byte-identical broadcasts).
+            info = bluetooth.async_last_service_info(
+                self.hass, self.coordinator.address, connectable=False
+            )
+            if info is not None:
+                return info.rssi
             return None
 
         if key == "empty_weight":
