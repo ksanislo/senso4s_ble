@@ -18,6 +18,7 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import Any
 
+from homeassistant.components import bluetooth
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
@@ -29,9 +30,8 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import DeviceInfo, EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_time_interval
-from homeassistant.util import dt as dt_util
 
-from .const import AVAILABILITY_TIMEOUT_MINUTES, DOMAIN, AnomalyType
+from .const import DOMAIN, AnomalyType
 from .coordinator import Senso4sDataUpdateCoordinator
 
 # Sensors available on all models
@@ -173,12 +173,13 @@ class Senso4sBinarySensorEntity(BinarySensorEntity):
 
     @property
     def available(self) -> bool:
-        """Return True if entity is available."""
-        last_seen = self.coordinator.data.last_seen
-        if last_seen is None:
-            return False
-        return (dt_util.now() - last_seen) <= timedelta(
-            minutes=AVAILABILITY_TIMEOUT_MINUTES
+        """Return True if entity is available.
+
+        Defers to HA's per-device bluetooth tracker (counts every advert the
+        scanner sees, including ones habluetooth dedupes for steady values).
+        """
+        return bluetooth.async_address_present(
+            self.hass, self.coordinator.address, connectable=False
         )
 
     @property

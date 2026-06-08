@@ -71,10 +71,6 @@ def lb_to_kg(lb: float) -> float:
 CYCLE_DURATION_MINUTES: Final = 15
 CONNECTION_TIMEOUT: Final = 30.0
 NOTIFICATION_TIMEOUT: Final = 5.0
-# Entities go unavailable after this many minutes without an advertisement.
-# Device emits an ad every ~500 ms, but the underlying values only change on
-# 15-min cycles; ~2 cycles of silence is a confident "out of range" signal.
-AVAILABILITY_TIMEOUT_MINUTES: Final = 35
 
 
 class UsageMode(IntEnum):

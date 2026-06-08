@@ -18,6 +18,7 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import Any, Optional
 
+from homeassistant.components import bluetooth
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -31,9 +32,8 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import DeviceInfo, EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_time_interval
-from homeassistant.util import dt as dt_util
 
-from .const import AVAILABILITY_TIMEOUT_MINUTES, DOMAIN, USAGE_MODE_NAMES
+from .const import DOMAIN, USAGE_MODE_NAMES
 from .coordinator import Senso4sDataUpdateCoordinator
 
 SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
@@ -178,12 +178,15 @@ class Senso4sSensorEntity(SensorEntity):
 
     @property
     def available(self) -> bool:
-        """Return True if entity is available."""
-        last_seen = self.coordinator.data.last_seen
-        if last_seen is None:
-            return False
-        if (dt_util.now() - last_seen) > timedelta(
-            minutes=AVAILABILITY_TIMEOUT_MINUTES
+        """Return True if entity is available.
+
+        Defers to HA's per-device bluetooth tracker, which counts every advert
+        the scanner sees regardless of whether the payload bytes changed.
+        Using our own last_seen would falsely flip to unavailable whenever the
+        device's reading was steady and habluetooth deduped the broadcasts.
+        """
+        if not bluetooth.async_address_present(
+            self.hass, self.coordinator.address, connectable=False
         ):
             return False
         if self.entity_description.key in ("gas_level", "gas_remaining"):
