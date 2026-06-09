@@ -6,236 +6,237 @@
 
 A Home Assistant integration for the Senso4s LP/Propane Gas Cylinder Level Sensor.
 
+## How it works
+
+Live data (gas level, battery, usage mode, anomaly flags) is parsed from BLE
+advertisements the device broadcasts continuously. The integration also makes
+brief active GATT connections when it needs to read consumption history,
+write cylinder configuration, set the measurement start date, or zero the
+scale ("calibration"). These connections are short, and the device only
+allows one connected client at a time — the OEM app and Home Assistant can
+both work with the same device, just not at the exact same moment.
+
+Configurable from the integration options:
+
+- **History refresh interval** (minutes; default 15 to match the device's
+  measurement cycle, `0` disables)
+- **Low-gas warning threshold** (percentage; default 10)
+- **Weight unit** (kg or lb)
+
 ## Features
 
-- **Passive BLE Monitoring**: Receives real-time updates from BLE advertisements without connecting to the device
-- **Gas Level Tracking**: Monitor remaining gas percentage and calculated remaining weight
-- **Battery Monitoring**: Track device battery level
-- **Anomaly Detection**: Alerts for temperature, incline, and motion anomalies
-- **Calibration Support**: Calibrate the scale directly from Home Assistant
-- **Consumption History**: View historical gas usage data
-- **Estimated Empty Date**: Calculate when the tank will be empty based on consumption rate
-- **OEM App Compatible**: Works alongside the official Senso4s app—use either for calibration and configuration
+- Real-time gas level and remaining-weight tracking
+- Battery monitoring
+- Anomaly detection on Plus models (temperature, incline, motion)
+- Calibration / zeroing from Home Assistant
+- Consumption history with predicted empty date
+- Compatible with the official Senso4s mobile app — either can configure or
+  zero the device
 
 ## Supported Devices
 
-- Senso4s Standard Model
-- Senso4s Plus Model (supports Caravanning mode)
+- Senso4s Basic
+- Senso4s Plus (adds Caravanning mode and the three anomaly sensors)
 
 ## Installation
 
-### HACS (Recommended)
+### HACS (recommended)
 
 1. Open HACS in Home Assistant
-2. Click on "Integrations"
-3. Search for "Senso4s" and install
-4. Restart Home Assistant
+2. Search for **Senso4s** and install
+3. Restart Home Assistant
 
-### Manual Installation
+### Manual
 
-1. Copy the `custom_components/senso4s` folder from this repository to your Home Assistant `config/custom_components` directory
-2. Restart Home Assistant
-
-**Repository structure:**
-```
-custom_components/
-└── senso4s/
-    ├── __init__.py
-    ├── binary_sensor.py
-    ├── ble_client.py
-    ├── config_flow.py
-    ├── const.py
-    ├── coordinator.py
-    ├── diagnostics.py
-    ├── manifest.json
-    ├── models.py
-    ├── parser.py
-    ├── repairs.py
-    ├── sensor.py
-    ├── services.yaml
-    ├── strings.json
-    └── translations/
-        └── en.json
-```
+Copy `custom_components/senso4s/` from this repository into your Home Assistant
+`config/custom_components/` directory, then restart Home Assistant.
 
 ## Configuration
 
-### Automatic Discovery
+### Automatic discovery
 
-The integration will automatically discover Senso4s devices broadcasting via Bluetooth. When a device is found:
+The device shows up in **Settings → Devices & Services → Discovered**
+when Home Assistant sees its advertisements. Click **Configure**, confirm
+you want to add it, and follow the prompts.
 
-1. Go to **Settings** → **Devices & Services**
-2. Click on the discovered Senso4s device
-3. Follow the prompts to configure your cylinder
+If the device was already configured (for example via the OEM app), the
+integration imports the existing settings. If it has never been configured,
+the integration walks you through a guided setup that includes zeroing the
+empty scale and verifying a valid reading.
 
-If the device has already been configured (e.g., via the OEM app), the integration will import the existing settings automatically. For a new unconfigured device, you will be guided through initial setup and calibration (see below).
+### Manual add
 
-### Initial Setup (New Device)
+**Settings → Devices & Services → + Add Integration → Senso4s** opens a
+picker showing every Senso4s device currently in range, with each one's
+RSSI displayed so you can tell adjacent units apart. Picking a device adds
+it directly — no extra confirmation step.
 
-When adding an unconfigured device for the first time:
+### Initial setup for a new device
 
 1. Enter your cylinder configuration:
-   - **Weight Unit**: kg or lb (weights will display in your chosen unit)
-   - **Empty Cylinder Weight**: Weight of the empty cylinder
-   - **Gas Capacity**: Maximum gas the cylinder holds
-   - **Usage Mode**: BBQ, Camping, Caravanning, Heating, or Household
-2. **Remove the gas cylinder** from the scale when prompted — the scale must be completely empty
-3. Wait for calibration to complete automatically
-4. **Place the cylinder back** on the scale when prompted
+   - **Weight Unit**: kg or lb
+   - **Empty Cylinder Weight**: weight of the cylinder without gas
+   - **Gas Capacity**: maximum gas it can hold
+   - **Usage Mode**: BBQ, Camping, Caravanning (Plus only), Heating, or Household
+2. When prompted, **remove the cylinder from the scale** — it must be empty
+   for zeroing to work
+3. Wait for zeroing to complete
+4. When prompted, **place the cylinder back on the scale**
 5. The integration verifies a valid reading before finishing setup
 
-### Manual Setup
+## Device options
 
-1. Go to **Settings** → **Devices & Services**
-2. Click **Add Integration**
-3. Search for "Senso4s"
-4. Select your device from the list
-
-## Device Options
-
-Access the options menu from **Settings** → **Devices & Services** → **Senso4s** → **Configure**. The menu offers three choices:
+**Settings → Devices & Services → Senso4s → Configure** has three modes.
 
 ### Refill Tank
 
-Use this when you have **refilled or replaced your gas cylinder with the same size tank**. This resets the measurement start date, which is needed for accurate consumption history and estimated empty calculations.
+Use when you have refilled or replaced the cylinder with the same-size tank.
+Resets the measurement start date used by consumption history and Estimated
+Empty.
 
-1. **Place the full tank on the scale** before submitting
-2. Optionally adjust display settings:
-   - **Weight Unit**: kg or lb
-   - **Low Level Threshold**: Percentage (5–50%) that triggers the low gas warning
-   - **History Poll Interval**: How often to fetch consumption history (0 to disable, up to 1440 minutes)
-3. The integration writes the new start date to the device and verifies a valid level reading
-
-No calibration is performed — cylinder configuration (empty weight, gas capacity, usage mode) stays unchanged.
+- Place the **full tank on the scale** before submitting
+- Optionally adjust display settings (weight unit, low-gas threshold, history
+  refresh interval)
+- Cylinder configuration (empty weight, gas capacity, usage mode) is
+  unchanged
 
 ### Recalibrate Scale
 
-Use this when **switching to a different tank size** or if **readings are inaccurate**. This performs a full calibration and lets you update the cylinder configuration.
+Use when switching to a different tank size or when readings are inaccurate.
+Performs a full zeroing and lets you update the cylinder configuration.
 
-1. **Remove the gas cylinder** from the scale before submitting — the scale must be completely empty
-2. Enter your cylinder configuration (all fields can be changed):
-   - **Weight Unit**: kg or lb
-   - **Empty Cylinder Weight**: Weight of the empty cylinder
-   - **Gas Capacity**: Maximum gas the cylinder holds
-   - **Usage Mode**: BBQ, Camping, Caravanning, Heating, or Household
-   - **Low Level Threshold**: Percentage (5–50%) that triggers the low gas warning
-   - **History Poll Interval**: How often to fetch consumption history (0 to disable, up to 1440 minutes)
-3. Wait for calibration to complete automatically
-4. **Place the cylinder back** on the scale when prompted
-5. The integration writes the new configuration, resets the measurement start date, and verifies a valid level reading
+- **Remove the cylinder from the scale** before submitting
+- Enter the new cylinder configuration
+- Replace the cylinder when prompted
+- The integration writes the new configuration, resets the measurement start
+  date, and verifies a valid reading
 
 ### Settings Only
 
-Use this to change display settings without performing calibration or writing to the device:
+Change display settings without touching the device:
 
-- **Weight Unit**: kg or lb
-- **Low Level Threshold**: Percentage (5–50%) that triggers the low gas warning
-- **History Poll Interval**: How often to fetch consumption history (0 to disable, up to 1440 minutes)
+- Weight Unit
+- Low Level Threshold
+- History Refresh Interval
 
 ## Entities
 
 ### Sensors
 
 | Entity | Description |
-|--------|-------------|
-| Gas Level | Current gas level percentage (0-100%) |
-| Gas Remaining | Calculated remaining gas in kg |
+|---|---|
+| Gas Level | Current gas level (0–100%) |
+| Gas Remaining | Calculated remaining mass in kg or lb |
 | Battery | Device battery level |
 | Usage Mode | Current usage mode preset |
-| Estimated Empty | Predicted date/time when tank will be empty |
+| Estimated Empty | Predicted date/time the tank will run dry |
+| Last Setup | When the current measurement cycle was started |
+| Signal Strength | RSSI of the most recent advertisement (diagnostic) |
+| Empty Cylinder Weight | Configured empty weight (diagnostic) |
+| Gas Capacity | Configured gas capacity (diagnostic) |
 
-### Binary Sensors
+### Binary sensors
 
 | Entity | Description |
-|--------|-------------|
-| Needs Calibration | True when device requires calibration |
-| Error | True when device reports an error |
-| Anomaly | True when any anomaly is detected |
-| Low Gas | True when gas level is below threshold |
-| Temperature Anomaly | True when temperature is out of range |
-| Incline Anomaly | True when device is tilted |
-| Motion Anomaly | True when motion is detected |
+|---|---|
+| Needs Calibration | True when the device reports it needs zeroing |
+| Error | True when the device reports an error |
+| Low Gas | True when gas level is at or below the threshold |
+| Anomaly (Plus only) | True when any anomaly is active |
+| Temperature Anomaly (Plus only) | Temperature outside operating range |
+| Incline Anomaly (Plus only) | Tilt > 6° |
+| Motion Anomaly (Plus only) | Motion detected during measurement |
+
+The four Plus-only anomaly binary sensors are created for Plus devices but
+disabled by default — enable them in the entity registry if you want them.
 
 ## Services
 
 ### `senso4s.calibrate`
 
-Calibrate the scale sensor. **WARNING: The gas cylinder must be REMOVED from the scale before calibrating!**
+Zero the scale. **The cylinder must be removed from the scale before
+calling this.**
 
 | Field | Description |
-|-------|-------------|
-| device_id | The Senso4s device to calibrate |
+|---|---|
+| device_id | The Senso4s device to zero |
 
 ### `senso4s.refresh_history`
 
-Fetch consumption history from the device via BLE connection.
+Fetch consumption history from the device via an active connection.
 
 | Field | Description |
-|-------|-------------|
-| device_id | The Senso4s device to refresh history from |
+|---|---|
+| device_id | The Senso4s device to refresh from |
 
 ### `senso4s.write_config`
 
 Write cylinder configuration to the device.
 
 | Field | Description |
-|-------|-------------|
-| device_id | The Senso4s device to write configuration to |
+|---|---|
+| device_id | The device to write to |
 | empty_weight_kg | Empty cylinder weight (optional) |
 | gas_capacity_kg | Gas capacity (optional) |
-| usage_mode | Usage mode 1-5 (optional) |
+| usage_mode | Usage mode 1–5 (optional) |
 
 ### `senso4s.set_setup_date`
 
 Set the measurement start date on the device, resetting history.
 
 | Field | Description |
-|-------|-------------|
-| device_id | The Senso4s device to set the date on |
-| datetime | Date/time to set (optional, defaults to now) |
+|---|---|
+| device_id | The device to set the date on |
+| datetime | Date/time to set (optional; defaults to now) |
 
 ## Troubleshooting
 
-### Device Not Found
+### Device not found
 
-- Ensure Bluetooth is enabled on your Home Assistant host
-- Check that the Senso4s device is powered on and in range
-- The device broadcasts every few seconds; wait a moment and try again
+- Make sure Bluetooth is enabled on the Home Assistant host or a Bluetooth
+  proxy is online
+- Confirm the device is powered on and within range
+- The device advertises continuously every 500 ms; if Home Assistant's
+  Bluetooth panel sees it but the integration doesn't, try a full HA restart
 
-### Needs Calibration
+### Needs calibration
 
-When the "Needs Calibration" sensor turns on, Home Assistant will automatically create a **repair issue** that walks you through the calibration process:
+When the **Needs Calibration** binary sensor turns on, Home Assistant
+creates a **Calibration Required** repair issue. To resolve:
 
-1. Go to **Settings** → **System** → **Repairs** and open the "Calibration Required" issue
-2. **Remove the gas cylinder from the scale** — the scale must be completely empty
-3. Follow the guided steps: the integration connects, calibrates, then asks you to replace the cylinder
-4. The integration verifies a valid reading before closing the repair
+1. **Settings → System → Repairs**, open the issue
+2. Remove the cylinder from the scale when prompted
+3. Follow the guided zeroing flow; the integration replaces the cylinder
+   for you and verifies a valid reading
 
-You can also calibrate manually at any time:
-- **Options menu**: Go to the device's **Configure** page and choose **Recalibrate Scale** (see [Device Options](#device-options) above)
-- **Service call**: Call `senso4s.calibrate` (useful for automations — ensure the cylinder is removed first)
+You can also rezero at any time via the **Recalibrate Scale** option, or
+by calling the `senso4s.calibrate` service (make sure the cylinder is
+removed first).
 
-### Inaccurate Readings
+### Inaccurate readings
 
-- Verify the empty cylinder weight and gas capacity are correctly configured
-- Ensure the device is on a level surface
-- Check for motion or incline anomalies
+- Confirm the empty cylinder weight and gas capacity match the actual tank
+- Make sure the device is on a level surface
+- Check for active motion or incline anomalies on a Plus model
 
-### Connection Failures
+### Connection failures
 
-- BLE connections can be unreliable; the integration will retry automatically
-- Ensure no other device is connected to the sensor
-- Move the Home Assistant Bluetooth adapter closer to the sensor
+- BLE connections can be unreliable; the integration retries on the next
+  cycle
+- Confirm no other device (mobile app, second proxy) is connected to the
+  sensor
+- If your setup uses an ESPHome BLE proxy, ensure `bluetooth_proxy: active:
+  true` is set so active connections can pass through
 
-## Common Cylinder Sizes
+## Common cylinder sizes
 
-| Size | Empty Weight (kg) | Gas Capacity (kg) |
-|------|-------------------|-------------------|
-| 5 kg | 5-7 | 5 |
-| 11 kg | 10-12 | 11 |
-| 15 kg | 14-16 | 15 |
-| 33 kg | 28-32 | 33 |
+| Size | Empty weight (kg) | Gas capacity (kg) |
+|---|---|---|
+| 5 kg | 5–7 | 5 |
+| 11 kg | 10–12 | 11 |
+| 15 kg | 14–16 | 15 |
+| 33 kg | 28–32 | 33 |
 
 ## License
 
-This integration is provided under the Apache License 2.0. See [LICENSE](LICENSE) for details.
+Apache License 2.0 — see [LICENSE](LICENSE).
