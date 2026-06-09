@@ -15,7 +15,7 @@
 """Binary sensor platform for Senso4s integration."""
 from __future__ import annotations
 
-from datetime import timedelta
+from time import monotonic
 from typing import Any
 
 from homeassistant.components import bluetooth
@@ -24,44 +24,57 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
+from homeassistant.components.bluetooth.passive_update_processor import (
+    PassiveBluetoothDataProcessor,
+    PassiveBluetoothDataUpdate,
+    PassiveBluetoothEntityKey,
+    PassiveBluetoothProcessorEntity,
+)
+from datetime import timedelta
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import DeviceInfo, EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_time_interval
 
-from .const import DOMAIN, AnomalyType
-from .coordinator import Senso4sDataUpdateCoordinator
+from .const import (
+    AVAILABILITY_TIMEOUT_MINUTES,
+    CONF_IS_PLUS,
+    DOMAIN,
+    MANUFACTURER,
+    AnomalyType,
+)
+from .coordinator import Senso4sCoordinator
+from .models import Senso4sDeviceData
 
-# Sensors available on all models
-BINARY_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
-    BinarySensorEntityDescription(
+
+BINARY_SENSOR_DESCRIPTIONS: dict[str, BinarySensorEntityDescription] = {
+    "needs_calibration": BinarySensorEntityDescription(
         key="needs_calibration",
         translation_key="needs_calibration",
         device_class=BinarySensorDeviceClass.PROBLEM,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:scale-balance",
     ),
-    BinarySensorEntityDescription(
+    "has_error": BinarySensorEntityDescription(
         key="has_error",
         translation_key="has_error",
         device_class=BinarySensorDeviceClass.PROBLEM,
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:alert-circle",
     ),
-    BinarySensorEntityDescription(
+    "low_gas": BinarySensorEntityDescription(
         key="low_gas",
         translation_key="low_gas",
         device_class=BinarySensorDeviceClass.GAS,
         icon="mdi:propane-tank-outline",
     ),
-)
+}
 
-# Sensors only available on Plus models (which have internal sensors)
-# Disabled by default as they're diagnostic - users can enable if needed
-PLUS_MODEL_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
-    BinarySensorEntityDescription(
+# Only meaningful on PLUS models; disabled by default.
+PLUS_MODEL_DESCRIPTIONS: dict[str, BinarySensorEntityDescription] = {
+    "has_anomaly": BinarySensorEntityDescription(
         key="has_anomaly",
         translation_key="has_anomaly",
         device_class=BinarySensorDeviceClass.PROBLEM,
@@ -69,7 +82,7 @@ PLUS_MODEL_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         icon="mdi:alert",
     ),
-    BinarySensorEntityDescription(
+    "temperature_anomaly": BinarySensorEntityDescription(
         key="temperature_anomaly",
         translation_key="temperature_anomaly",
         device_class=BinarySensorDeviceClass.PROBLEM,
@@ -77,7 +90,7 @@ PLUS_MODEL_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         icon="mdi:thermometer-alert",
     ),
-    BinarySensorEntityDescription(
+    "incline_anomaly": BinarySensorEntityDescription(
         key="incline_anomaly",
         translation_key="incline_anomaly",
         device_class=BinarySensorDeviceClass.PROBLEM,
@@ -85,7 +98,7 @@ PLUS_MODEL_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         icon="mdi:angle-acute",
     ),
-    BinarySensorEntityDescription(
+    "motion_anomaly": BinarySensorEntityDescription(
         key="motion_anomaly",
         translation_key="motion_anomaly",
         device_class=BinarySensorDeviceClass.PROBLEM,
@@ -93,7 +106,40 @@ PLUS_MODEL_SENSOR_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         icon="mdi:vibrate",
     ),
-)
+}
+
+
+def _build_data_update(
+    coordinator: Senso4sCoordinator,
+    is_plus_entry: bool,
+    data: Senso4sDeviceData,
+) -> PassiveBluetoothDataUpdate[Any]:
+    """Convert the coordinator's snapshot into a PassiveBluetoothDataUpdate."""
+    address = coordinator.address
+    device_info = DeviceInfo(
+        identifiers={(DOMAIN, address)},
+        name=coordinator.device_name,
+        manufacturer=MANUFACTURER,
+        model="Senso4s PLUS" if data.is_plus_model else "Senso4s BASIC",
+        configuration_url="https://github.com/ksanislo/senso4s_ble",
+    )
+
+    descriptions = dict(BINARY_SENSOR_DESCRIPTIONS)
+    if is_plus_entry:
+        descriptions.update(PLUS_MODEL_DESCRIPTIONS)
+
+    return PassiveBluetoothDataUpdate(
+        devices={None: device_info},
+        entity_descriptions={
+            PassiveBluetoothEntityKey(key, None): desc
+            for key, desc in descriptions.items()
+        },
+        entity_data={},  # Values are computed live in the entity.
+        entity_names={
+            PassiveBluetoothEntityKey(key, None): None
+            for key in descriptions
+        },
+    )
 
 
 async def async_setup_entry(
@@ -102,135 +148,125 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Senso4s binary sensors from a config entry."""
-    coordinator: Senso4sDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: Senso4sCoordinator = hass.data[DOMAIN][entry.entry_id]
+    # Driven by entry.data (set at config-flow creation, backfilled on first
+    # load for pre-rc8 entries) so it's independent of advert timing.
+    is_plus_entry = bool(entry.data.get(CONF_IS_PLUS, False))
 
-    entities: list[Senso4sBinarySensorEntity] = []
+    processor = PassiveBluetoothDataProcessor(
+        update_method=lambda data: _build_data_update(
+            coordinator, is_plus_entry, data
+        ),
+        restore_key=f"{entry.entry_id}_binary_sensor",
+    )
+    entry.async_on_unload(
+        processor.async_add_entities_listener(
+            Senso4sBinarySensorEntity, async_add_entities
+        )
+    )
+    entry.async_on_unload(
+        coordinator.async_register_processor(processor, BinarySensorEntityDescription)
+    )
 
-    # Add sensors available on all models
-    for description in BINARY_SENSOR_DESCRIPTIONS:
-        entities.append(Senso4sBinarySensorEntity(coordinator, description))
-
-    # Add Plus-only sensors if this is a Plus model (which has internal sensors)
-    # Default to False if we don't have data yet - HA can add sensors later,
-    # but removing them requires user interaction
-    is_plus = coordinator.data.is_plus_model if coordinator.data.mac_address else False
-    if is_plus:
-        for description in PLUS_MODEL_SENSOR_DESCRIPTIONS:
-            entities.append(Senso4sBinarySensorEntity(coordinator, description))
-
-    async_add_entities(entities)
+    # Seed an initial update so entities render immediately on cache-warm starts.
+    processor.async_handle_update(coordinator.data, was_available=True)
 
 
-class Senso4sBinarySensorEntity(BinarySensorEntity):
-    """Representation of a Senso4s binary sensor."""
-
-    _attr_has_entity_name = True
-    _attr_should_poll = False
+class Senso4sBinarySensorEntity(
+    PassiveBluetoothProcessorEntity[
+        PassiveBluetoothDataProcessor[Any, Senso4sDeviceData]
+    ],
+    BinarySensorEntity,
+):
+    """Senso4s binary sensor backed by the bluetooth processor framework."""
 
     def __init__(
         self,
-        coordinator: Senso4sDataUpdateCoordinator,
+        processor: PassiveBluetoothDataProcessor[Any, Senso4sDeviceData],
+        entity_key: PassiveBluetoothEntityKey,
         description: BinarySensorEntityDescription,
+        context: Any = None,
     ) -> None:
-        """Initialize the binary sensor."""
-        self.coordinator = coordinator
-        self.entity_description = description
+        super().__init__(processor, entity_key, description, context)
+        address = processor.coordinator.address
+        # Preserve pre-rc8 unique_id format and add our domain identifier
+        # alongside the framework's bluetooth-domain one. See sensor.py.
+        self._attr_unique_id = f"{address}_{entity_key.key}"
+        merged = dict(self._attr_device_info or {})
+        identifiers = set(merged.get("identifiers", set()))
+        identifiers.add((DOMAIN, address))
+        merged["identifiers"] = identifiers
+        self._attr_device_info = merged
 
-        self._attr_unique_id = f"{coordinator.address}_{description.key}"
-        self._attr_device_info = DeviceInfo(**coordinator.device_info)
+    @property
+    def _coordinator(self) -> Senso4sCoordinator:
+        return self.processor.coordinator  # type: ignore[return-value]
 
     async def async_added_to_hass(self) -> None:
-        """Run when entity is added to hass."""
+        # See sensor.py for the rationale.
         await super().async_added_to_hass()
-
-        # Subscribe to coordinator updates
-        self.async_on_remove(
-            async_dispatcher_connect(
-                self.hass,
-                f"{DOMAIN}_{self.coordinator.address}_update",
-                self._handle_coordinator_update,
-            )
-        )
-        # Re-evaluate availability periodically so entities transition to
-        # unavailable when advertisements stop arriving.
         self.async_on_remove(
             async_track_time_interval(
                 self.hass,
-                self._handle_periodic_refresh,
-                timedelta(minutes=5),
+                self._async_force_state_refresh,
+                timedelta(minutes=1),
             )
         )
 
     @callback
-    def _handle_periodic_refresh(self, _now: Any) -> None:
-        """Force HA to re-read the `available` property."""
-        self.async_write_ha_state()
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle updated data from the coordinator."""
+    def _async_force_state_refresh(self, _now: Any) -> None:
         self.async_write_ha_state()
 
     @property
     def available(self) -> bool:
-        """Return True if entity is available.
-
-        Defers to HA's per-device bluetooth tracker (counts every advert the
-        scanner sees, including ones habluetooth dedupes for steady values).
-        """
-        return bluetooth.async_address_present(
-            self.hass, self.coordinator.address, connectable=False
+        # See sensor.py for the rationale.
+        info = bluetooth.async_last_service_info(
+            self.hass, self._coordinator.address, connectable=False
         )
+        if info is None:
+            return False
+        age = monotonic() - info.time
+        return age <= AVAILABILITY_TIMEOUT_MINUTES * 60
 
     @property
     def is_on(self) -> bool | None:
-        """Return true if the binary sensor is on."""
-        data = self.coordinator.data
-        key = self.entity_description.key
+        coord = self._coordinator
+        data = coord.data
+        key = self.entity_key.key
 
         if key == "needs_calibration":
             return data.needs_calibration
-
         if key == "has_error":
             return data.has_error
-
         if key == "has_anomaly":
             return data.has_anomaly
-
         if key == "low_gas":
-            if data.gas_level_percent >= 0:
-                return data.gas_level_percent <= self.coordinator.low_level_threshold
+            if 0 <= data.gas_level_percent <= 100:
+                return data.gas_level_percent <= coord.low_level_threshold
             return None
-
         if key == "temperature_anomaly":
             return AnomalyType.TEMPERATURE in data.anomalies
-
         if key == "incline_anomaly":
             return AnomalyType.INCLINE in data.anomalies
-
         if key == "motion_anomaly":
             return AnomalyType.MOTION in data.anomalies
-
         return None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Return extra state attributes."""
-        data = self.coordinator.data
-        key = self.entity_description.key
-
+        coord = self._coordinator
+        data = coord.data
+        key = self.entity_key.key
         attrs: dict[str, Any] = {}
 
         if key == "has_error":
             if data.error_code is not None:
                 attrs["error_code"] = data.error_code
                 attrs["error_description"] = data.error_description
-
-        if key == "has_anomaly":
+        elif key == "has_anomaly":
             if data.anomalies:
                 attrs["anomalies"] = data.anomaly_names
-
-        if key == "low_gas":
-            attrs["threshold"] = self.coordinator.low_level_threshold
+        elif key == "low_gas":
+            attrs["threshold"] = coord.low_level_threshold
 
         return attrs

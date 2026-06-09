@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Data coordinator for Senso4s integration."""
+"""Senso4s ActiveBluetoothProcessorCoordinator."""
 from __future__ import annotations
 
 import logging
@@ -20,10 +20,17 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
 from homeassistant.components import bluetooth
-from homeassistant.util import dt as dt_util
-from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
+from homeassistant.components.bluetooth import (
+    BluetoothScanningMode,
+    BluetoothServiceInfoBleak,
+)
+from homeassistant.components.bluetooth.active_update_processor import (
+    ActiveBluetoothProcessorCoordinator,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.util import dt as dt_util
 
 from .const import (
     CONF_EMPTY_WEIGHT,
@@ -50,9 +57,11 @@ from .parser import parse_manufacturer_data
 
 _LOGGER = logging.getLogger(__name__)
 
+PROOF_OF_LIFE_INTERVAL = timedelta(seconds=30)
 
-class Senso4sDataUpdateCoordinator:
-    """Coordinator for Senso4s device data updates."""
+
+class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData]):
+    """ActiveBluetooth coordinator for a single Senso4s device."""
 
     def __init__(
         self,
@@ -60,12 +69,10 @@ class Senso4sDataUpdateCoordinator:
         entry: ConfigEntry,
         address: str,
     ) -> None:
-        """Initialize the coordinator."""
         self.hass = hass
         self.entry = entry
         self.address = address
 
-        # Configuration
         self.empty_weight_kg: float = entry.options.get(
             CONF_EMPTY_WEIGHT,
             entry.data.get(CONF_EMPTY_WEIGHT, DEFAULT_EMPTY_WEIGHT),
@@ -93,46 +100,52 @@ class Senso4sDataUpdateCoordinator:
             entry.data.get(CONF_HISTORY_POLL_INTERVAL, DEFAULT_HISTORY_POLL_INTERVAL),
         )
 
-        # Current device data
         self.data: Senso4sDeviceData = Senso4sDeviceData()
         self.data.gas_capacity_kg = self.gas_capacity_kg
         self.data.empty_weight_kg = self.empty_weight_kg
         self.data.usage_mode = self.usage_mode
 
-        # History data (from active connection)
         self.history: list[HistoryRecord] = []
         self.last_history_update: Optional[datetime] = None
 
-        # Last known setup date (for change detection)
-        # Restore from config entry data if available
         last_setup_str = entry.data.get(CONF_LAST_SETUP_DATE)
         self._last_known_setup_date: Optional[datetime] = None
         if last_setup_str:
             try:
                 dt = datetime.fromisoformat(last_setup_str)
-                # Ensure timezone-aware (assume UTC if missing)
                 if dt.tzinfo is None:
                     dt = dt.replace(tzinfo=timezone.utc)
                 self._last_known_setup_date = dt
             except (ValueError, TypeError):
                 pass
 
-        # Service info for active connections
-        self._service_info: Optional[BluetoothServiceInfoBleak] = None
+        self._poll_in_flight = False
+        self._last_proof_of_life_time: Optional[float] = None
+        self._cancel_proof_of_life: Any = None
 
-        # Listeners
-        self._listeners: list = []
+        super().__init__(
+            hass=hass,
+            logger=_LOGGER,
+            address=address,
+            mode=BluetoothScanningMode.ACTIVE,
+            update_method=self._update_method,
+            needs_poll_method=self._needs_poll,
+            poll_method=self._async_poll_history,
+            connectable=True,
+        )
 
     @property
     def device_name(self) -> str:
-        """Get device name."""
-        # Use a friendly name with last 4 chars of MAC for uniqueness
         suffix = self.address[-5:].replace(":", "")
         return f"Senso4s Gas Sensor ({suffix})"
 
     @property
+    def name(self) -> str:
+        # PassiveBluetoothProcessorEntity reads this for the device registry name.
+        return self.device_name
+
+    @property
     def device_info(self) -> dict[str, Any]:
-        """Get device info for Home Assistant."""
         model = "Senso4s PLUS" if self.data.is_plus_model else "Senso4s BASIC"
         return {
             "identifiers": {(DOMAIN, self.address)},
@@ -145,25 +158,170 @@ class Senso4sDataUpdateCoordinator:
 
     @property
     def service_info(self) -> Optional[BluetoothServiceInfoBleak]:
-        """Get current service info."""
-        return self._service_info
+        return self._last_service_info
 
     @property
     def last_known_setup_date(self) -> Optional[datetime]:
-        """Get the last known setup date."""
         return self._last_known_setup_date
 
+    @callback
+    def async_start_proof_of_life(self) -> None:
+        if self._cancel_proof_of_life is not None:
+            return
+        self._cancel_proof_of_life = async_track_time_interval(
+            self.hass, self._async_proof_of_life_tick, PROOF_OF_LIFE_INTERVAL
+        )
+
+    @callback
+    def async_stop_proof_of_life(self) -> None:
+        if self._cancel_proof_of_life is not None:
+            self._cancel_proof_of_life()
+            self._cancel_proof_of_life = None
+
+    @callback
+    def _async_proof_of_life_tick(self, _now: Any) -> None:
+        info = bluetooth.async_last_service_info(
+            self.hass, self.address, connectable=False
+        )
+        if info is None:
+            _LOGGER.debug(
+                "BLE RX [SCANNER] %s: no advertisement cached", self.address
+            )
+            return
+        cur = info.time
+        if (
+            self._last_proof_of_life_time is not None
+            and cur == self._last_proof_of_life_time
+        ):
+            _LOGGER.debug(
+                "BLE RX [SCANNER] %s: device silent — no new advertisement "
+                "in the last %.0fs",
+                self.address,
+                PROOF_OF_LIFE_INTERVAL.total_seconds(),
+            )
+            return
+        gap = (
+            cur - self._last_proof_of_life_time
+            if self._last_proof_of_life_time is not None
+            else 0.0
+        )
+        mfr_hex = " ".join(
+            f"{mid:04x}:{bytes(payload).hex()}"
+            for mid, payload in info.manufacturer_data.items()
+        )
+        _LOGGER.debug(
+            "BLE RX [SCANNER] from %s via %s (RSSI: %s dBm, %.1fs since "
+            "previous): %s",
+            info.address,
+            info.source,
+            getattr(info, "rssi", "?"),
+            gap,
+            mfr_hex,
+        )
+        self._last_proof_of_life_time = cur
+
+    @callback
+    def _update_method(
+        self, service_info: BluetoothServiceInfoBleak
+    ) -> Senso4sDeviceData:
+        mfr_hex = " ".join(
+            f"{mid:04x}:{bytes(payload).hex()}"
+            for mid, payload in service_info.manufacturer_data.items()
+        )
+        _LOGGER.debug(
+            "BLE RX [DISPATCH] from %s via %s (RSSI: %s dBm): %s",
+            service_info.address,
+            service_info.source,
+            getattr(service_info, "rssi", "?"),
+            mfr_hex,
+        )
+
+        for mfr_id, mfr_data in service_info.manufacturer_data.items():
+            parsed = parse_manufacturer_data(
+                mfr_id, bytes(mfr_data), service_info.name
+            )
+            if parsed is None:
+                continue
+            self.data.mac_address = parsed.mac_address
+            self.data.name = parsed.name or self.data.name
+            self.data.gas_level_percent = parsed.gas_level_percent
+            self.data.battery_percent = parsed.battery_percent
+            self.data.usage_mode = parsed.usage_mode
+            self.data.is_plus_model = parsed.is_plus_model
+            self.data.needs_calibration = parsed.needs_calibration
+            self.data.has_error = parsed.has_error
+            self.data.error_code = parsed.error_code
+            self.data.anomalies = parsed.anomalies
+            self.data.last_seen = dt_util.now()
+            self.data.gas_capacity_kg = self.gas_capacity_kg
+            self.data.empty_weight_kg = self.empty_weight_kg
+            _LOGGER.debug(
+                "BLE RX [PARSED] level=%s%% battery=%d%% mode=%s model=%s "
+                "needs_cal=%s has_error=%s anomalies=%s",
+                self.data.gas_level_percent
+                if self.data.gas_level_percent >= 0
+                else "N/A",
+                self.data.battery_percent,
+                self.data.usage_mode.name,
+                "PLUS" if self.data.is_plus_model else "BASIC",
+                self.data.needs_calibration,
+                self.data.has_error,
+                self.data.anomaly_names if self.data.anomalies else "none",
+            )
+            break
+        return self.data
+
+    @callback
+    def _needs_poll(
+        self,
+        service_info: BluetoothServiceInfoBleak,
+        seconds_since_last_poll: float | None,
+    ) -> bool:
+        if self.hass.is_stopping:
+            return False
+        if self._poll_in_flight:
+            return False
+        if self.history_poll_interval <= 0:
+            return False
+        if seconds_since_last_poll is None:
+            return True
+        return seconds_since_last_poll >= self.history_poll_interval * 60
+
+    async def _async_poll_history(
+        self, last_service_info: BluetoothServiceInfoBleak
+    ) -> Senso4sDeviceData:
+        from .ble_client import Senso4sBLEClient
+
+        self._poll_in_flight = True
+        client = Senso4sBLEClient(last_service_info)
+        try:
+            if not await client.connect():
+                _LOGGER.debug("Poll: connect failed for %s", self.address)
+                return self.data
+
+            setup_date = await client.read_setup_date()
+            if setup_date is None and self._last_known_setup_date is not None:
+                setup_date = self._last_known_setup_date
+            if setup_date is None:
+                _LOGGER.debug(
+                    "Poll: no setup date available; skipping history read"
+                )
+                return self.data
+
+            self.update_setup_date(setup_date)
+            history = await client.read_history(setup_date)
+            self.update_history(history)
+        finally:
+            await client.disconnect()
+            self._poll_in_flight = False
+        return self.data
+
     def update_setup_date(self, setup_date: Optional[datetime]) -> bool:
-        """Update the setup date and return True if it changed."""
         if setup_date is None:
             return False
-
-        # Check if this is a new date
         if self._last_known_setup_date is None:
             self._last_known_setup_date = setup_date
             return True
-
-        # Compare dates (allow 1 second tolerance for rounding)
         if abs((setup_date - self._last_known_setup_date).total_seconds()) > 1:
             _LOGGER.debug(
                 "Setup date changed: %s -> %s",
@@ -172,70 +330,23 @@ class Senso4sDataUpdateCoordinator:
             )
             self._last_known_setup_date = setup_date
             return True
-
         return False
 
-    def update_from_advertisement(
-        self, service_info: BluetoothServiceInfoBleak
-    ) -> bool:
-        """Update data from BLE advertisement."""
-        self._service_info = service_info
-
-        # Log raw advertisement receipt
-        rssi = getattr(service_info, "rssi", None)
+    def update_history(self, history: list[HistoryRecord]) -> None:
+        self.history = history
+        self.last_history_update = dt_util.now()
         _LOGGER.debug(
-            "BLE RX [ADVERTISEMENT] from %s (RSSI: %s dBm): %d manufacturer data entries",
-            service_info.address,
-            rssi if rssi is not None else "N/A",
-            len(service_info.manufacturer_data),
+            "History updated: %d records, first=%s, last=%s",
+            len(history),
+            history[0].timestamp if history else None,
+            history[-1].timestamp if history else None,
         )
-
-        # Parse manufacturer data
-        for mfr_id, mfr_data in service_info.manufacturer_data.items():
-            mfr_bytes = bytes(mfr_data)
+        if history:
             _LOGGER.debug(
-                "BLE RX [MFR_DATA] mfr_id=0x%04X (%d): %s (%d bytes)",
-                mfr_id,
-                mfr_id,
-                mfr_bytes.hex(" "),
-                len(mfr_bytes),
+                "History gas values: first=%.2f kg, last=%.2f kg",
+                history[0].remaining_gas_kg,
+                history[-1].remaining_gas_kg,
             )
-
-            parsed = parse_manufacturer_data(mfr_id, mfr_bytes, service_info.name)
-            if parsed is not None:
-                # Merge parsed data with current data
-                self.data.mac_address = parsed.mac_address
-                self.data.name = parsed.name or self.data.name
-                self.data.gas_level_percent = parsed.gas_level_percent
-                self.data.battery_percent = parsed.battery_percent
-                self.data.usage_mode = parsed.usage_mode
-                self.data.is_plus_model = parsed.is_plus_model
-                self.data.needs_calibration = parsed.needs_calibration
-                self.data.has_error = parsed.has_error
-                self.data.error_code = parsed.error_code
-                self.data.anomalies = parsed.anomalies
-                self.data.last_seen = dt_util.now()
-
-                # Keep configured values
-                self.data.gas_capacity_kg = self.gas_capacity_kg
-                self.data.empty_weight_kg = self.empty_weight_kg
-
-                _LOGGER.debug(
-                    "BLE RX [PARSED] level=%s%%, battery=%d%%, "
-                    "gas_remaining=%.2f kg, mode=%s, model=%s, "
-                    "needs_cal=%s, has_error=%s, anomalies=%s",
-                    self.data.gas_level_percent if self.data.gas_level_percent >= 0 else "N/A",
-                    self.data.battery_percent,
-                    self.data.gas_remaining_kg or 0,
-                    self.data.usage_mode.name,
-                    "PLUS" if self.data.is_plus_model else "BASIC",
-                    self.data.needs_calibration,
-                    self.data.has_error,
-                    self.data.anomaly_names if self.data.anomalies else "none",
-                )
-                return True
-
-        return False
 
     def update_config(
         self,
@@ -246,7 +357,6 @@ class Senso4sDataUpdateCoordinator:
         weight_unit: Optional[str] = None,
         history_poll_interval: Optional[int] = None,
     ) -> None:
-        """Update configuration values."""
         if empty_weight_kg is not None:
             self.empty_weight_kg = empty_weight_kg
             self.data.empty_weight_kg = empty_weight_kg
@@ -264,55 +374,26 @@ class Senso4sDataUpdateCoordinator:
 
     @property
     def use_pounds(self) -> bool:
-        """Return True if user prefers pounds."""
         return self.weight_unit == UNIT_LB
 
     def get_display_weight(self, kg_value: Optional[float]) -> Optional[float]:
-        """Convert kg value to user's preferred unit."""
         if kg_value is None:
             return None
         if self.use_pounds:
             return round(kg_to_lb(kg_value), 2)
         return round(kg_value, 2)
 
-    def update_history(self, history: list[HistoryRecord]) -> None:
-        """Update history data."""
-        self.history = history
-        self.last_history_update = dt_util.now()
-        _LOGGER.debug(
-            "History updated: %d records, first=%s, last=%s",
-            len(history),
-            history[0].timestamp if history else None,
-            history[-1].timestamp if history else None,
-        )
-        if history:
-            _LOGGER.debug(
-                "History gas values: first=%.2f kg, last=%.2f kg",
-                history[0].remaining_gas_kg,
-                history[-1].remaining_gas_kg,
-            )
-
     @property
     def estimated_empty_date(self) -> Optional[datetime]:
-        """Predict when the cylinder will run dry via least-squares
-        regression of mass against time over the last 10 history records,
-        extrapolated from the most recent record's timestamp.
-        """
         if len(self.history) < 2:
             _LOGGER.debug(
-                "Estimated empty: not enough history (%d records, need at least 2). "
-                "Use 'Refresh History' button to fetch history from device.",
+                "Estimated empty: not enough history (%d records, need 2+)",
                 len(self.history),
             )
             return None
 
         recent = self.history[-min(10, len(self.history)):]
         n = len(recent)
-
-        # x = seconds since the first record in the window (proportional to
-        # cumulative cycle index, since records are spaced in 15-min ticks).
-        # y = remaining mass (kg). Linear regression handles non-uniform
-        # spacing correctly when the device collapsed flat runs.
         base_t = recent[0].timestamp
         xs = [(r.timestamp - base_t).total_seconds() for r in recent]
         ys = [r.remaining_gas_kg for r in recent]
@@ -331,7 +412,7 @@ class Senso4sDataUpdateCoordinator:
             )
             return None
 
-        slope = (n * sum_xy - sum_x * sum_y) / denom  # kg/sec (negative when consuming)
+        slope = (n * sum_xy - sum_x * sum_y) / denom
         if slope >= 0:
             _LOGGER.debug(
                 "Estimated empty: slope >= 0, not consuming (slope=%.6g kg/s)",
@@ -347,14 +428,11 @@ class Senso4sDataUpdateCoordinator:
         seconds_until_empty = -last_mass / slope
         estimated = recent[-1].timestamp + timedelta(seconds=seconds_until_empty)
         _LOGGER.debug(
-            "Estimated empty: n=%d, slope=%.6g kg/s (%.3f kg/day), "
-            "last_mass=%.3f kg @ %s, seconds_until_empty=%.0f → %s",
+            "Estimated empty: n=%d, slope=%.6g kg/s, last_mass=%.3f kg @ %s → %s",
             n,
             slope,
-            slope * 86400,
             last_mass,
             recent[-1].timestamp,
-            seconds_until_empty,
             estimated,
         )
         return estimated
@@ -363,7 +441,7 @@ class Senso4sDataUpdateCoordinator:
 def process_service_info(
     service_info: BluetoothServiceInfoBleak,
 ) -> Optional[Senso4sDeviceData]:
-    """Process service info and extract device data."""
+    """Parse a service_info into Senso4sDeviceData (used by config flow)."""
     for mfr_id, mfr_data in service_info.manufacturer_data.items():
         parsed = parse_manufacturer_data(mfr_id, bytes(mfr_data), service_info.name)
         if parsed is not None:

@@ -37,6 +37,7 @@ from .const import (
     CONF_EMPTY_WEIGHT,
     CONF_GAS_CAPACITY,
     CONF_HISTORY_POLL_INTERVAL,
+    CONF_IS_PLUS,
     CONF_LAST_SETUP_DATE,
     CONF_LOW_LEVEL_THRESHOLD,
     CONF_USAGE_MODE,
@@ -193,6 +194,9 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
                         CONF_LOW_LEVEL_THRESHOLD: DEFAULT_LOW_LEVEL_THRESHOLD,
                         CONF_WEIGHT_UNIT: DEFAULT_WEIGHT_UNIT,
                         CONF_HISTORY_POLL_INTERVAL: DEFAULT_HISTORY_POLL_INTERVAL,
+                        CONF_IS_PLUS: bool(
+                            device_data and device_data.is_plus_model
+                        ),
                     }
                     if setup_date:
                         data[CONF_LAST_SETUP_DATE] = setup_date.isoformat()
@@ -409,6 +413,7 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
             await self._cleanup_client()
 
             # Create the config entry
+            device_data = process_service_info(self._discovery_info)
             return self.async_create_entry(
                 title=f"Senso4s ({self._discovery_info.address[-5:].replace(':', '')})",
                 data={
@@ -420,6 +425,9 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
                     CONF_WEIGHT_UNIT: self._user_config[CONF_WEIGHT_UNIT],
                     CONF_HISTORY_POLL_INTERVAL: DEFAULT_HISTORY_POLL_INTERVAL,
                     CONF_LAST_SETUP_DATE: self._user_config.get(CONF_LAST_SETUP_DATE, ""),
+                    CONF_IS_PLUS: bool(
+                        device_data and device_data.is_plus_model
+                    ),
                 },
             )
 

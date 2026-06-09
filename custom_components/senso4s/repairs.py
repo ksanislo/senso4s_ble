@@ -32,7 +32,7 @@ from .const import (
 )
 
 if TYPE_CHECKING:
-    from .coordinator import Senso4sDataUpdateCoordinator
+    from .coordinator import Senso4sCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -214,7 +214,7 @@ class CalibrationRepairFlow(RepairsFlow):
 
     def _get_coordinator(self):
         """Get the coordinator for this entry."""
-        from .coordinator import Senso4sDataUpdateCoordinator
+        from .coordinator import Senso4sCoordinator
 
         if DOMAIN not in self.hass.data:
             return None

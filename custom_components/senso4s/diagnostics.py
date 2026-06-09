@@ -23,7 +23,7 @@ from homeassistant.const import CONF_ADDRESS
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN, USAGE_MODE_NAMES
-from .coordinator import Senso4sDataUpdateCoordinator
+from .coordinator import Senso4sCoordinator
 
 # Keys to redact from diagnostics for privacy
 TO_REDACT = {CONF_ADDRESS, "address", "mac_address"}
@@ -33,7 +33,7 @@ async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, entry: ConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
-    coordinator: Senso4sDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: Senso4sCoordinator = hass.data[DOMAIN][entry.entry_id]
     data = coordinator.data
 
     diagnostics_data = {

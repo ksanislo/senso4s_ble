@@ -39,7 +39,8 @@ CONF_USAGE_MODE: Final = "usage_mode"
 CONF_LOW_LEVEL_THRESHOLD: Final = "low_level_threshold"
 CONF_WEIGHT_UNIT: Final = "weight_unit"
 CONF_HISTORY_POLL_INTERVAL: Final = "history_poll_interval"
-CONF_LAST_SETUP_DATE: Final = "last_setup_date"  # ISO format string for persistence
+CONF_LAST_SETUP_DATE: Final = "last_setup_date"  # ISO format string
+CONF_IS_PLUS: Final = "is_plus_model"
 
 # Weight units
 UNIT_KG: Final = "kg"
@@ -55,7 +56,7 @@ DEFAULT_GAS_CAPACITY: Final = 11.0
 DEFAULT_USAGE_MODE: Final = 5  # Household
 DEFAULT_LOW_LEVEL_THRESHOLD: Final = 10
 DEFAULT_WEIGHT_UNIT: Final = UNIT_KG
-DEFAULT_HISTORY_POLL_INTERVAL: Final = 30  # minutes, 0 = disabled
+DEFAULT_HISTORY_POLL_INTERVAL: Final = 15  # minutes; matches device cycle. 0 disables.
 
 
 def kg_to_lb(kg: float) -> float:
@@ -71,6 +72,9 @@ def lb_to_kg(lb: float) -> float:
 CYCLE_DURATION_MINUTES: Final = 15
 CONNECTION_TIMEOUT: Final = 30.0
 NOTIFICATION_TIMEOUT: Final = 5.0
+# Four 15-min cycles of slack before flipping unavailable. Overrides
+# habluetooth's auto-tuned (~60s) tracker.
+AVAILABILITY_TIMEOUT_MINUTES: Final = 60
 
 
 class UsageMode(IntEnum):
