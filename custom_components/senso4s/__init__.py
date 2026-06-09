@@ -200,6 +200,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_on_unload(coordinator.async_start())
     coordinator.async_start_proof_of_life()
     entry.async_on_unload(coordinator.async_stop_proof_of_life)
+    coordinator.async_start_periodic_poll()
+    entry.async_on_unload(coordinator.async_stop_periodic_poll)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     await _async_setup_services(hass)

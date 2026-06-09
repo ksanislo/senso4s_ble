@@ -122,6 +122,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         self._poll_in_flight = False
         self._last_proof_of_life_time: Optional[float] = None
         self._cancel_proof_of_life: Any = None
+        self._cancel_periodic_poll: Any = None
 
         super().__init__(
             hass=hass,
@@ -177,6 +178,34 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         if self._cancel_proof_of_life is not None:
             self._cancel_proof_of_life()
             self._cancel_proof_of_life = None
+
+    @callback
+    def async_start_periodic_poll(self) -> None:
+        # The framework only invokes _needs_poll on dispatched adverts.
+        # habluetooth dedupe means a steady-reading device produces zero
+        # dispatches and would never refresh history without this timer.
+        if self._cancel_periodic_poll is not None:
+            self._cancel_periodic_poll()
+            self._cancel_periodic_poll = None
+        if self.history_poll_interval <= 0:
+            return
+        self._cancel_periodic_poll = async_track_time_interval(
+            self.hass,
+            self._async_periodic_poll_tick,
+            timedelta(minutes=self.history_poll_interval),
+        )
+
+    @callback
+    def async_stop_periodic_poll(self) -> None:
+        if self._cancel_periodic_poll is not None:
+            self._cancel_periodic_poll()
+            self._cancel_periodic_poll = None
+
+    @callback
+    def _async_periodic_poll_tick(self, _now: Any) -> None:
+        if self._last_service_info is None or self._poll_in_flight:
+            return
+        self._debounced_poll.async_schedule_call()
 
     @callback
     def _async_proof_of_life_tick(self, _now: Any) -> None:
@@ -369,8 +398,12 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             self.low_level_threshold = low_level_threshold
         if weight_unit is not None:
             self.weight_unit = weight_unit
-        if history_poll_interval is not None:
+        if (
+            history_poll_interval is not None
+            and history_poll_interval != self.history_poll_interval
+        ):
             self.history_poll_interval = history_poll_interval
+            self.async_start_periodic_poll()
 
     @property
     def use_pounds(self) -> bool:
