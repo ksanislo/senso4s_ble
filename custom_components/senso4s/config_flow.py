@@ -186,6 +186,7 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
                         config.usage_mode.name,
                     )
 
+                    device_data = process_service_info(self._discovery_info)
                     data = {
                         CONF_ADDRESS: self._discovery_info.address,
                         CONF_EMPTY_WEIGHT: round(config.empty_weight_kg, 2),
