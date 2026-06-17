@@ -112,7 +112,7 @@ def _check_and_sync_usage_mode(
     try:
         hass.config_entries.async_update_entry(entry, options=new_options)
     except Exception as err:
-        _LOGGER.warning("Failed to persist usage mode change: %s", err)
+        _LOGGER.warning("[%s] Failed to persist usage mode change: %s", coordinator.address, err)
 
 
 async def _async_check_and_sync_config(
@@ -125,7 +125,7 @@ async def _async_check_and_sync_config(
     try:
         setup_date = await client.read_setup_date()
     except Exception as err:
-        _LOGGER.debug("Failed to read setup date for sync check: %s", err)
+        _LOGGER.debug("[%s] Failed to read setup date for sync check: %s", coordinator.address, err)
         return None
     if setup_date is None:
         return None
@@ -141,7 +141,7 @@ async def _async_check_and_sync_config(
     try:
         config = await client.read_config()
     except Exception as err:
-        _LOGGER.warning("Failed to read config after setup date change: %s", err)
+        _LOGGER.warning("[%s] Failed to read config after setup date change: %s", coordinator.address, err)
         return setup_date
     if config is None:
         return setup_date
@@ -161,7 +161,7 @@ async def _async_check_and_sync_config(
             entry, data=new_data, options=new_options
         )
     except Exception as err:
-        _LOGGER.warning("Failed to persist config entry update: %s", err)
+        _LOGGER.warning("[%s] Failed to persist config entry update: %s", coordinator.address, err)
     coordinator.last_history_update = None
     return setup_date
 

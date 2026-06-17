@@ -212,9 +212,9 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             if self._passive_history:
                 self._last_passive_pct = self._passive_history[-1]["pct"]
                 _LOGGER.debug(
-                    "Loaded %d passive history points for %s (last pct=%d)",
-                    len(self._passive_history),
+                    "[%s] Loaded %d passive history points (last pct=%d)",
                     self.address,
+                    len(self._passive_history),
                     self._last_passive_pct,
                 )
 
@@ -235,8 +235,9 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             > self._last_passive_pct + REFILL_THRESHOLD_PERCENT
         ):
             _LOGGER.debug(
-                "Passive history: refill detected (%d%% -> %d%%), "
+                "[%s] Passive history: refill detected (%d%% -> %d%%), "
                 "resetting window",
+                self.address,
                 self._last_passive_pct,
                 gas_level_percent,
             )
@@ -252,9 +253,9 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         self._last_passive_pct = gas_level_percent
 
         _LOGGER.debug(
-            "Passive history: recorded %d%% for %s (%d points)",
-            gas_level_percent,
+            "[%s] Passive history: recorded %d%% (%d points)",
             self.address,
+            gas_level_percent,
             len(self._passive_history),
         )
         self.hass.async_create_task(
@@ -268,7 +269,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         )
         if info is None:
             _LOGGER.debug(
-                "BLE RX [SCANNER] %s: no advertisement cached", self.address
+                "[%s] BLE RX [SCANNER] no advertisement cached", self.address
             )
             return
         cur = info.time
@@ -277,7 +278,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             and cur == self._last_proof_of_life_time
         ):
             _LOGGER.debug(
-                "BLE RX [SCANNER] %s: device silent — no new advertisement "
+                "[%s] BLE RX [SCANNER] device silent — no new advertisement "
                 "in the last %.0fs",
                 self.address,
                 PROOF_OF_LIFE_INTERVAL.total_seconds(),
@@ -293,9 +294,9 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             for mid, payload in info.manufacturer_data.items()
         )
         _LOGGER.debug(
-            "BLE RX [SCANNER] from %s via %s (RSSI: %s dBm, %.1fs since "
+            "[%s] BLE RX [SCANNER] via %s (RSSI: %s dBm, %.1fs since "
             "previous): %s",
-            info.address,
+            self.address,
             info.source,
             getattr(info, "rssi", "?"),
             gap,
@@ -328,8 +329,8 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             for mid, payload in service_info.manufacturer_data.items()
         )
         _LOGGER.debug(
-            "BLE RX [DISPATCH] from %s via %s (RSSI: %s dBm): %s",
-            service_info.address,
+            "[%s] BLE RX [DISPATCH] via %s (RSSI: %s dBm): %s",
+            self.address,
             service_info.source,
             getattr(service_info, "rssi", "?"),
             mfr_hex,
@@ -355,8 +356,9 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             self.data.gas_capacity_kg = self.gas_capacity_kg
             self.data.empty_weight_kg = self.empty_weight_kg
             _LOGGER.debug(
-                "BLE RX [PARSED] level=%s%% battery=%d%% mode=%s model=%s "
+                "[%s] BLE RX [PARSED] level=%s%% battery=%d%% mode=%s model=%s "
                 "needs_cal=%s has_error=%s anomalies=%s",
+                self.address,
                 self.data.gas_level_percent
                 if self.data.gas_level_percent >= 0
                 else "N/A",
@@ -403,7 +405,9 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         client = Senso4sBLEClient(last_service_info)
         try:
             if not await client.connect():
-                _LOGGER.debug("Poll: connect failed for %s", self.address)
+                _LOGGER.debug(
+                    "[%s] Poll: connect failed", self.address
+                )
                 return self.data
 
             setup_date = await client.read_setup_date()
@@ -411,7 +415,8 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
                 setup_date = self._last_known_setup_date
             if setup_date is None:
                 _LOGGER.debug(
-                    "Poll: no setup date available; skipping history read"
+                    "[%s] Poll: no setup date available; skipping history read",
+                    self.address,
                 )
                 return self.data
 
@@ -432,7 +437,8 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             return True
         if abs((setup_date - self._last_known_setup_date).total_seconds()) > 1:
             _LOGGER.debug(
-                "Setup date changed: %s -> %s",
+                "[%s] Setup date changed: %s -> %s",
+                self.address,
                 self._last_known_setup_date,
                 setup_date,
             )
@@ -444,14 +450,16 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         self.history = history
         self.last_history_update = dt_util.now()
         _LOGGER.debug(
-            "History updated: %d records, first=%s, last=%s",
+            "[%s] History updated: %d records, first=%s, last=%s",
+            self.address,
             len(history),
             history[0].timestamp if history else None,
             history[-1].timestamp if history else None,
         )
         if history:
             _LOGGER.debug(
-                "History gas values: first=%.2f kg, last=%.2f kg",
+                "[%s] History gas values: first=%.2f kg, last=%.2f kg",
+                self.address,
                 history[0].remaining_gas_kg,
                 history[-1].remaining_gas_kg,
             )
@@ -510,7 +518,8 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         n = len(timestamps)
         if n < 2:
             _LOGGER.debug(
-                "Estimated empty [%s]: not enough data (%d points, need 2+)",
+                "[%s] Estimated empty [%s]: not enough data (%d points, need 2+)",
+                self.address,
                 label,
                 n,
             )
@@ -528,7 +537,8 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         denom = n * sum_xx - sum_x * sum_x
         if denom <= 0:
             _LOGGER.debug(
-                "Estimated empty [%s]: degenerate window (denom=%.2f, n=%d)",
+                "[%s] Estimated empty [%s]: degenerate window (denom=%.2f, n=%d)",
+                self.address,
                 label,
                 denom,
                 n,
@@ -538,7 +548,9 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         slope = (n * sum_xy - sum_x * sum_y) / denom
         if slope >= 0:
             _LOGGER.debug(
-                "Estimated empty [%s]: slope >= 0, not consuming (slope=%.6g kg/s)",
+                "[%s] Estimated empty [%s]: slope >= 0, not consuming "
+                "(slope=%.6g kg/s)",
+                self.address,
                 label,
                 slope,
             )
@@ -547,7 +559,8 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         last_mass = ys[-1]
         if last_mass <= 0:
             _LOGGER.debug(
-                "Estimated empty [%s]: last recorded mass <= 0 (%s)",
+                "[%s] Estimated empty [%s]: last recorded mass <= 0 (%s)",
+                self.address,
                 label,
                 last_mass,
             )
@@ -556,8 +569,9 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         seconds_until_empty = -last_mass / slope
         estimated = timestamps[-1] + timedelta(seconds=seconds_until_empty)
         _LOGGER.debug(
-            "Estimated empty [%s]: n=%d, slope=%.6g kg/s, last_mass=%.3f kg "
+            "[%s] Estimated empty [%s]: n=%d, slope=%.6g kg/s, last_mass=%.3f kg "
             "@ %s → %s",
+            self.address,
             label,
             n,
             slope,
@@ -594,7 +608,9 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             )
 
         _LOGGER.debug(
-            "Estimated empty: no data available (active=%d records, passive=%d points)",
+            "[%s] Estimated empty: no data available "
+            "(active=%d records, passive=%d points)",
+            self.address,
             len(self.history),
             len(self._passive_history),
         )

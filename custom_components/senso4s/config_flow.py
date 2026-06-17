@@ -80,7 +80,7 @@ def _is_senso4s_device(service_info: BluetoothServiceInfoBleak) -> bool:
 
     if matched_mfr_id is not None or matched_name:
         _LOGGER.debug(
-            "Senso4s device detected - address: %s, name: %s, "
+            "[%s] Senso4s device detected - name: %s, "
             "matched_by_mfr_id: %s, matched_by_name: %s",
             service_info.address,
             service_info.name,
@@ -119,9 +119,9 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle the bluetooth discovery step."""
         _LOGGER.debug(
-            "Bluetooth discovery triggered for %s (%s)",
-            discovery_info.name,
+            "[%s] Bluetooth discovery triggered (name: %s)",
             discovery_info.address,
+            discovery_info.name,
         )
 
         await self.async_set_unique_id(discovery_info.address)
@@ -179,7 +179,7 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
 
                 if config and config.gas_capacity_kg > 0:
                     _LOGGER.info(
-                        "Auto-adding configured device %s: "
+                        "[%s] Auto-adding configured device: "
                         "empty_weight=%.2f kg, gas_capacity=%.2f kg, mode=%s",
                         self._discovery_info.address,
                         config.empty_weight_kg,
@@ -210,7 +210,8 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
                 else:
                     # Config read failed but device says configured - use defaults
                     _LOGGER.warning(
-                        "Device reports configured but config read failed, using defaults"
+                        "[%s] Device reports configured but config read failed",
+                        self._discovery_info.address,
                     )
                     await self._cleanup_client()
                     return self.async_abort(reason="cannot_connect")
@@ -218,14 +219,14 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
             else:
                 # Device is NOT configured - need guided setup
                 _LOGGER.info(
-                    "Device %s needs initial setup (setup date is all zeros)",
+                    "[%s] Device needs initial setup (setup date is all zeros)",
                     self._discovery_info.address,
                 )
                 # Keep client connected for the setup flow
                 return await self.async_step_needs_setup()
 
         except Exception as err:
-            _LOGGER.exception("Error during device check: %s", err)
+            _LOGGER.exception("[%s] Error during device check: %s", self._discovery_info.address, err)
             await self._cleanup_client()
             return self.async_abort(reason="cannot_connect")
 
@@ -324,12 +325,12 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
 
             if anomalies:
                 anomaly_names = [ANOMALY_NAMES.get(a, str(a)) for a in anomalies]
-                _LOGGER.info("Calibration completed with anomalies: %s", anomaly_names)
+                _LOGGER.info("[%s] Calibration completed with anomalies: %s", self._discovery_info.address, anomaly_names)
 
             return await self.async_step_replace_cylinder()
 
         except Exception as err:
-            _LOGGER.exception("Error during calibration: %s", err)
+            _LOGGER.exception("[%s] Error during calibration: %s", self._discovery_info.address, err)
             await self._cleanup_client()
             return self.async_abort(reason="calibration_failed")
 
@@ -376,7 +377,7 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
             return await self.async_step_verify()
 
         except Exception as err:
-            _LOGGER.exception("Error writing config: %s", err)
+            _LOGGER.exception("[%s] Error writing config: %s", self._discovery_info.address, err)
             await self._cleanup_client()
             return self.async_abort(reason="config_write_failed")
 
@@ -395,7 +396,7 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
 
             if anomalies:
                 anomaly_names = [ANOMALY_NAMES.get(a, str(a)) for a in anomalies]
-                _LOGGER.warning("Verification reported anomalies: %s", anomaly_names)
+                _LOGGER.warning("[%s] Verification reported anomalies: %s", self._discovery_info.address, anomaly_names)
                 await self._cleanup_client()
                 return self.async_abort(
                     reason="verification_anomaly",
@@ -407,7 +408,7 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
                 return self.async_abort(reason="verification_timeout")
 
             _LOGGER.info(
-                "Setup successful for %s, level: %d%%",
+                "[%s] Setup successful, level: %d%%",
                 self._discovery_info.address,
                 level,
             )
@@ -434,7 +435,7 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
             )
 
         except Exception as err:
-            _LOGGER.exception("Error during verification: %s", err)
+            _LOGGER.exception("[%s] Error during verification: %s", self._discovery_info.address, err)
             await self._cleanup_client()
             return self.async_abort(reason="verification_failed")
 
@@ -782,7 +783,7 @@ class Senso4sOptionsFlow(OptionsFlow):
             return self._save_options_entry()
 
         except Exception as err:
-            _LOGGER.exception("Error during refill: %s", err)
+            _LOGGER.exception("[%s] Error during refill: %s", self.config_entry.data.get(CONF_ADDRESS, "?"), err)
             await self._cleanup_client()
             return self.async_abort(reason="connection_failed")
 
@@ -818,7 +819,7 @@ class Senso4sOptionsFlow(OptionsFlow):
             return await self.async_step_recalibrate_replace()
 
         except Exception as err:
-            _LOGGER.exception("Error during calibration: %s", err)
+            _LOGGER.exception("[%s] Error during calibration: %s", self.config_entry.data.get(CONF_ADDRESS, "?"), err)
             await self._cleanup_client()
             return self.async_abort(reason="calibration_failed")
 
@@ -896,6 +897,6 @@ class Senso4sOptionsFlow(OptionsFlow):
             return self._save_options_entry()
 
         except Exception as err:
-            _LOGGER.exception("Error during recalibrate write: %s", err)
+            _LOGGER.exception("[%s] Error during recalibrate write: %s", self.config_entry.data.get(CONF_ADDRESS, "?"), err)
             await self._cleanup_client()
             return self.async_abort(reason="connection_failed")

@@ -99,13 +99,15 @@ class CalibrationRepairFlow(RepairsFlow):
 
             if anomalies:
                 anomaly_names = [ANOMALY_NAMES.get(a, str(a)) for a in anomalies]
-                _LOGGER.info("Calibration completed with anomalies: %s", anomaly_names)
+                _LOGGER.info(
+                    "[%s] Calibration completed with anomalies: %s",
+                    coordinator.address, anomaly_names,
+                )
 
-            # Calibration succeeded, proceed to replace tank step
             return await self.async_step_replace_tank()
 
         except Exception as err:
-            _LOGGER.exception("Error during calibration: %s", err)
+            _LOGGER.exception("[%s] Error during calibration: %s", self._entry_id, err)
             if self._client:
                 await self._client.disconnect()
                 self._client = None
@@ -155,7 +157,7 @@ class CalibrationRepairFlow(RepairsFlow):
             return await self.async_step_verify()
 
         except Exception as err:
-            _LOGGER.exception("Error writing config: %s", err)
+            _LOGGER.exception("[%s] Error writing config: %s", self._entry_id, err)
             await self._cleanup()
             return self.async_abort(reason="config_write_failed")
 
@@ -177,7 +179,10 @@ class CalibrationRepairFlow(RepairsFlow):
 
             if anomalies:
                 anomaly_names = [ANOMALY_NAMES.get(a, str(a)) for a in anomalies]
-                _LOGGER.warning("Calibration verification reported anomalies: %s", anomaly_names)
+                _LOGGER.warning(
+                    "[%s] Calibration verification reported anomalies: %s",
+                    coordinator.address, anomaly_names,
+                )
                 await self._cleanup()
                 return self.async_abort(
                     reason="verification_anomaly",
@@ -189,8 +194,8 @@ class CalibrationRepairFlow(RepairsFlow):
                 return self.async_abort(reason="verification_timeout")
 
             _LOGGER.info(
-                "Calibration successful for %s, level: %d%%",
-                coordinator.device_name,
+                "[%s] Calibration successful, level: %d%%",
+                coordinator.address,
                 level,
             )
 
@@ -208,7 +213,7 @@ class CalibrationRepairFlow(RepairsFlow):
             return self.async_create_entry(data={})
 
         except Exception as err:
-            _LOGGER.exception("Error during verification: %s", err)
+            _LOGGER.exception("[%s] Error during verification: %s", self._entry_id, err)
             await self._cleanup()
             return self.async_abort(reason="verification_failed")
 

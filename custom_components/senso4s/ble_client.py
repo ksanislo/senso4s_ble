@@ -65,6 +65,7 @@ class Senso4sBLEClient:
         self._client: Optional[BleakClient] = None
         self._disconnect_callback = disconnect_callback
         self._lock = asyncio.Lock()
+        self._addr = service_info.address
 
     @property
     def is_connected(self) -> bool:
@@ -85,13 +86,11 @@ class Senso4sBLEClient:
                     disconnected_callback=self._on_disconnect,
                     max_attempts=3,
                 )
-                _LOGGER.debug("Connected to %s", self._service_info.address)
+                _LOGGER.debug("[%s] Connected", self._addr)
                 return True
             except (BleakError, TimeoutError) as err:
                 _LOGGER.warning(
-                    "Failed to connect to %s: %s",
-                    self._service_info.address,
-                    err,
+                    "[%s] Failed to connect: %s", self._addr, err
                 )
                 self._client = None
                 return False
@@ -108,7 +107,7 @@ class Senso4sBLEClient:
 
     def _on_disconnect(self, _client: BleakClient) -> None:
         """Handle disconnection."""
-        _LOGGER.debug("Disconnected from %s", self._service_info.address)
+        _LOGGER.debug("[%s] Disconnected", self._addr)
         self._client = None
         if self._disconnect_callback:
             self._disconnect_callback()
@@ -119,20 +118,21 @@ class Senso4sBLEClient:
             return None
 
         try:
-            _LOGGER.debug("BLE: Reading CONFIG characteristic")
+            _LOGGER.debug("[%s] BLE: Reading CONFIG characteristic", self._addr)
             data = await self._client.read_gatt_char(CHAR_CONFIG_UUID)
-            _LOGGER.debug("BLE RX [CONFIG]: %s (%d bytes)", data.hex(" "), len(data))
+            _LOGGER.\1("[%s] BLE RX [CONFIG]: %s (%d bytes)", self._addr, data.hex(" "), len(data))
             config = parse_cylinder_config(data)
             if config:
                 _LOGGER.debug(
-                    "Config: empty_weight=%.2f kg, gas_capacity=%.2f kg, mode=%s",
+                    "[%s] Config: empty_weight=%.2f kg, gas_capacity=%.2f kg, mode=%s",
+                    self._addr,
                     config.empty_weight_kg,
                     config.gas_capacity_kg,
                     config.usage_mode.name,
                 )
             return config
         except BleakError as err:
-            _LOGGER.warning("Failed to read config: %s", err)
+            _LOGGER.\1("[%s] Failed to read config: %s", self._addr, err)
             return None
 
     async def read_setup_date(self) -> Optional[datetime]:
@@ -141,14 +141,14 @@ class Senso4sBLEClient:
             return None
 
         try:
-            _LOGGER.debug("BLE: Reading SETUP_DATE characteristic")
+            _LOGGER.\1("[%s] BLE: Reading SETUP_DATE characteristic", self._addr)
             data = await self._client.read_gatt_char(CHAR_SETUP_DATE_UUID)
-            _LOGGER.debug("BLE RX [SETUP_DATE]: %s (%d bytes)", data.hex(" "), len(data))
+            _LOGGER.\1("[%s] BLE RX [SETUP_DATE]: %s (%d bytes)", self._addr, data.hex(" "), len(data))
             setup_date = parse_setup_date(data)
-            _LOGGER.debug("Setup date: parsed as %s", setup_date)
+            _LOGGER.\1("[%s] Setup date: parsed as %s", self._addr, setup_date)
             return setup_date
         except BleakError as err:
-            _LOGGER.warning("Failed to read setup date: %s", err)
+            _LOGGER.\1("[%s] Failed to read setup date: %s", self._addr, err)
             return None
 
     async def is_device_configured(self) -> Optional[bool]:
@@ -163,23 +163,22 @@ class Senso4sBLEClient:
             return None
 
         try:
-            _LOGGER.debug("BLE: Reading SETUP_DATE to check if configured")
+            _LOGGER.\1("[%s] BLE: Reading SETUP_DATE to check if configured", self._addr)
             data = await self._client.read_gatt_char(CHAR_SETUP_DATE_UUID)
-            _LOGGER.debug("BLE RX [SETUP_DATE]: %s (%d bytes)", data.hex(" "), len(data))
+            _LOGGER.\1("[%s] BLE RX [SETUP_DATE]: %s (%d bytes)", self._addr, data.hex(" "), len(data))
 
             if len(data) != 7:
-                _LOGGER.warning("Setup date has unexpected length: %d", len(data))
+                _LOGGER.\1("[%s] Setup date has unexpected length: %d", self._addr, len(data))
                 return None
 
-            # Check if all zeros (unconfigured)
             if all(b == 0 for b in data):
-                _LOGGER.info("Device is unconfigured (setup date is all zeros)")
+                _LOGGER.\1("[%s] Device is unconfigured (setup date is all zeros)", self._addr)
                 return False
 
-            _LOGGER.debug("Device is configured (setup date has values)")
+            _LOGGER.\1("[%s] Device is configured (setup date has values)", self._addr)
             return True
         except BleakError as err:
-            _LOGGER.warning("Failed to read setup date: %s", err)
+            _LOGGER.\1("[%s] Failed to read setup date: %s", self._addr, err)
             return None
 
     async def read_level(self, timeout: float = NOTIFICATION_TIMEOUT) -> Optional[int]:
@@ -190,25 +189,27 @@ class Senso4sBLEClient:
         result: Optional[int] = None
         event = asyncio.Event()
 
+        addr = self._addr
+
         def notification_handler(_sender: int, data: bytearray) -> None:
             nonlocal result
-            _LOGGER.debug("BLE RX [LEVEL]: %s", data.hex(" ") if data else "(empty)")
+            _LOGGER.\1("[%s] BLE RX [LEVEL]: %s", addr, data.hex(" ") if data else "(empty)")
             if data and len(data) > 0 and data[0] != 255:
                 result = data[0]
                 event.set()
 
         try:
-            _LOGGER.debug("BLE: Starting notifications on LEVEL characteristic")
+            _LOGGER.\1("[%s] BLE: Starting notifications on LEVEL characteristic", self._addr)
             await self._client.start_notify(CHAR_LEVEL_UUID, notification_handler)
             try:
                 await asyncio.wait_for(event.wait(), timeout=timeout)
             except asyncio.TimeoutError:
-                _LOGGER.debug("Timeout waiting for level notification")
+                _LOGGER.\1("[%s] Timeout waiting for level notification", self._addr)
             finally:
                 await self._client.stop_notify(CHAR_LEVEL_UUID)
             return result
         except BleakError as err:
-            _LOGGER.warning("Failed to read level: %s", err)
+            _LOGGER.\1("[%s] Failed to read level: %s", self._addr, err)
             return None
 
     async def read_history(
@@ -221,24 +222,23 @@ class Senso4sBLEClient:
         collected_data = bytearray()
         last_receive_time = dt_util.now()
         start_time = dt_util.now()
+        addr = self._addr
 
         def notification_handler(_sender: int, data: bytearray) -> None:
             nonlocal last_receive_time
-            _LOGGER.debug("BLE RX [HISTORY]: %s", data.hex(" ") if data else "(empty)")
+            _LOGGER.\1("[%s] BLE RX [HISTORY]: %s", addr, data.hex(" ") if data else "(empty)")
             if data:
                 collected_data.extend(data)
                 last_receive_time = dt_util.now()
 
         try:
-            _LOGGER.debug("BLE: Starting notifications on HISTORY characteristic")
+            _LOGGER.\1("[%s] BLE: Starting notifications on HISTORY characteristic", self._addr)
             await self._client.start_notify(CHAR_HISTORY_UUID, notification_handler)
 
-            # Trigger history read
             write_data = bytes([0x00, 0x00])
-            _LOGGER.debug("BLE TX [HISTORY]: %s", write_data.hex(" "))
+            _LOGGER.\1("[%s] BLE TX [HISTORY]: %s", self._addr, write_data.hex(" "))
             await self._client.write_gatt_char(CHAR_HISTORY_UUID, write_data)
 
-            # Wait for data with timeout after last received chunk
             while True:
                 await asyncio.sleep(0.1)
                 now = dt_util.now()
@@ -253,21 +253,23 @@ class Senso4sBLEClient:
             await self._client.stop_notify(CHAR_HISTORY_UUID)
 
             _LOGGER.debug(
-                "History: received %d bytes of raw data: %s",
+                "[%s] History: received %d bytes of raw data: %s",
+                self._addr,
                 len(collected_data),
                 collected_data.hex(" ") if len(collected_data) <= 100 else f"{collected_data[:100].hex(' ')}... (truncated)",
             )
 
             records = parse_history_data(bytes(collected_data), setup_date)
             _LOGGER.debug(
-                "History: parsed %d records from setup_date=%s",
+                "[%s] History: parsed %d records from setup_date=%s",
+                self._addr,
                 len(records),
                 setup_date,
             )
             return records
 
         except BleakError as err:
-            _LOGGER.warning("Failed to read history: %s", err)
+            _LOGGER.\1("[%s] Failed to read history: %s", self._addr, err)
             return []
 
     async def calibrate(
@@ -284,28 +286,23 @@ class Senso4sBLEClient:
 
         result: Optional[int] = None
         event = asyncio.Event()
+        addr = self._addr
 
         def notification_handler(_sender: int, data: bytearray) -> None:
             nonlocal result
-            _LOGGER.debug("BLE RX [CALIBRATION]: %s", data.hex(" ") if data else "(empty)")
+            _LOGGER.\1("[%s] BLE RX [CALIBRATION]: %s", addr, data.hex(" ") if data else "(empty)")
             if data and len(data) > 0:
-                # Per protocol §3.4 the result byte after zeroing is:
-                #   0x00         = success
-                #   0x01         = unknown scenario (BASIC and PLUS)
-                #   0x10/20/40   = anomaly bits in upper nibble (PLUS only)
-                # Accept any value here; success vs failure is decided below.
                 result = data[0]
                 event.set()
 
         try:
-            _LOGGER.debug("BLE: Starting notifications on CALIBRATION characteristic")
+            _LOGGER.\1("[%s] BLE: Starting notifications on CALIBRATION characteristic", self._addr)
             await self._client.start_notify(
                 CHAR_CALIBRATION_UUID, notification_handler
             )
 
-            # Start calibration
             write_data = bytes([0x01])
-            _LOGGER.debug("BLE TX [CALIBRATION]: %s", write_data.hex(" "))
+            _LOGGER.\1("[%s] BLE TX [CALIBRATION]: %s", self._addr, write_data.hex(" "))
             await self._client.write_gatt_char(CHAR_CALIBRATION_UUID, write_data)
 
             success = False
@@ -313,10 +310,6 @@ class Senso4sBLEClient:
 
             try:
                 await asyncio.wait_for(event.wait(), timeout=timeout)
-                # Protocol §3.4: 0x00 = success, anything else = failure.
-                # On failure, the upper nibble carries the warning bits
-                # (0x40=MOTION, 0x20=INCLINE, 0x10=TEMP) for PLUS, while a
-                # bare 0x01 means generic "unknown scenario".
                 if result == 0:
                     success = True
                 elif result is not None:
@@ -325,14 +318,14 @@ class Senso4sBLEClient:
                         if upper & anomaly.value:
                             anomalies.append(anomaly)
             except asyncio.TimeoutError:
-                _LOGGER.warning("Calibration timed out")
+                _LOGGER.\1("[%s] Calibration timed out", self._addr)
 
             await self._client.stop_notify(CHAR_CALIBRATION_UUID)
 
             return success, anomalies
 
         except BleakError as err:
-            _LOGGER.warning("Failed to calibrate: %s", err)
+            _LOGGER.\1("[%s] Failed to calibrate: %s", self._addr, err)
             return False, []
 
     async def write_config(
@@ -349,11 +342,11 @@ class Senso4sBLEClient:
             config_bytes = build_cylinder_config(
                 empty_weight_kg, gas_capacity_kg, usage_mode
             )
-            _LOGGER.debug("BLE TX [CONFIG]: %s", config_bytes.hex(" "))
+            _LOGGER.\1("[%s] BLE TX [CONFIG]: %s", self._addr, config_bytes.hex(" "))
             await self._client.write_gatt_char(CHAR_CONFIG_UUID, config_bytes)
             return True
         except BleakError as err:
-            _LOGGER.warning("Failed to write config: %s", err)
+            _LOGGER.\1("[%s] Failed to write config: %s", self._addr, err)
             return False
 
     async def write_setup_date(self, dt: datetime) -> bool:
@@ -363,11 +356,11 @@ class Senso4sBLEClient:
 
         try:
             date_bytes = build_setup_date(dt)
-            _LOGGER.debug("BLE TX [SETUP_DATE]: %s", date_bytes.hex(" "))
+            _LOGGER.\1("[%s] BLE TX [SETUP_DATE]: %s", self._addr, date_bytes.hex(" "))
             await self._client.write_gatt_char(CHAR_SETUP_DATE_UUID, date_bytes)
             return True
         except BleakError as err:
-            _LOGGER.warning("Failed to write setup date: %s", err)
+            _LOGGER.\1("[%s] Failed to write setup date: %s", self._addr, err)
             return False
 
     async def wait_for_valid_level(
@@ -393,23 +386,24 @@ class Senso4sBLEClient:
 
         result_level: int | None = None
         event = asyncio.Event()
+        addr = self._addr
 
         def notification_handler(_sender: int, data: bytearray) -> None:
             nonlocal result_level
-            _LOGGER.debug("BLE RX [LEVEL]: %s", data.hex(" ") if data else "(empty)")
+            _LOGGER.\1("[%s] BLE RX [LEVEL]: %s", addr, data.hex(" ") if data else "(empty)")
             if data and len(data) > 0:
                 level = data[0]
-                if level != 255:  # Not still-needs-calibration
+                if level != 255:
                     result_level = level
                     event.set()
 
         try:
-            _LOGGER.debug("BLE: Starting notifications on LEVEL characteristic (wait_for_valid_level)")
+            _LOGGER.\1("[%s] BLE: Starting notifications on LEVEL (wait_for_valid_level)", self._addr)
             await self._client.start_notify(CHAR_LEVEL_UUID, notification_handler)
             try:
                 await asyncio.wait_for(event.wait(), timeout=timeout)
             except asyncio.TimeoutError:
-                _LOGGER.debug("Timeout waiting for valid level notification")
+                _LOGGER.\1("[%s] Timeout waiting for valid level notification", self._addr)
                 return False, None, []
             finally:
                 try:
@@ -420,12 +414,9 @@ class Senso4sBLEClient:
             if result_level is None:
                 return False, None, []
 
-            # Interpret the level value
             if 0 <= result_level <= 100:
-                # Normal level
                 return True, result_level, []
             elif 241 <= result_level <= 247:
-                # Anomaly codes - extract flags
                 anomaly_flags = result_level - 240
                 anomalies: list[AnomalyType] = []
                 for anomaly in AnomalyType:
@@ -433,14 +424,12 @@ class Senso4sBLEClient:
                         anomalies.append(anomaly)
                 return False, None, anomalies
             elif 251 <= result_level <= 254:
-                # Error codes
-                _LOGGER.warning("Device reported error code: %d", result_level)
+                _LOGGER.\1("[%s] Device reported error code: %d", self._addr, result_level)
                 return False, None, []
             else:
-                # Unknown value
-                _LOGGER.warning("Device reported unknown level: %d", result_level)
+                _LOGGER.\1("[%s] Device reported unknown level: %d", self._addr, result_level)
                 return False, None, []
 
         except BleakError as err:
-            _LOGGER.warning("Failed to wait for level: %s", err)
+            _LOGGER.\1("[%s] Failed to wait for level: %s", self._addr, err)
             return False, None, []
