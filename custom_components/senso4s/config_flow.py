@@ -773,6 +773,12 @@ class Senso4sOptionsFlow(OptionsFlow):
             # Update the last setup date in config entry
             self._user_input[CONF_LAST_SETUP_DATE] = setup_date.isoformat()
 
+            coordinator = self.hass.data.get(DOMAIN, {}).get(
+                self.config_entry.entry_id
+            )
+            if coordinator:
+                coordinator.async_request_refresh()
+
             return self._save_options_entry()
 
         except Exception as err:
@@ -880,6 +886,12 @@ class Senso4sOptionsFlow(OptionsFlow):
             self._user_input[CONF_GAS_CAPACITY] = gas_capacity
             self._user_input[CONF_WEIGHT_UNIT] = weight_unit  # Keep original for save
             self._user_input[CONF_LAST_SETUP_DATE] = setup_date.isoformat()
+
+            coordinator = self.hass.data.get(DOMAIN, {}).get(
+                self.config_entry.entry_id
+            )
+            if coordinator:
+                coordinator.async_request_refresh()
 
             return self._save_options_entry()
 

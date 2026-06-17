@@ -346,6 +346,7 @@ async def _async_setup_services(hass: HomeAssistant) -> None:
                             coordinator.device_name,
                             [a.name for a in anomalies],
                         )
+                        coordinator.async_request_refresh()
                     else:
                         raise ServiceValidationError(
                             f"Calibration failed for {coordinator.device_name}",
@@ -425,6 +426,7 @@ async def _async_setup_services(hass: HomeAssistant) -> None:
                             gas_capacity_kg=gas_capacity,
                             usage_mode=usage_mode,
                         )
+                        coordinator.async_request_refresh()
                     else:
                         raise ServiceValidationError(
                             f"Failed to write configuration to {coordinator.device_name}",
@@ -459,6 +461,7 @@ async def _async_setup_services(hass: HomeAssistant) -> None:
                             setup_datetime,
                             coordinator.device_name,
                         )
+                        coordinator.async_request_refresh()
                     else:
                         raise ServiceValidationError(
                             f"Failed to set setup date on {coordinator.device_name}",

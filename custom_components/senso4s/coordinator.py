@@ -483,6 +483,13 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         if history_poll_interval is not None:
             self.history_poll_interval = history_poll_interval
 
+    @callback
+    def async_request_refresh(self) -> None:
+        self._last_polled_gas_level = None
+        self.last_history_update = None
+        if self.enable_history_polling:
+            self._debounced_poll.async_schedule_call()
+
     @property
     def use_pounds(self) -> bool:
         return self.weight_unit == UNIT_LB
