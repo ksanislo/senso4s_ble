@@ -622,18 +622,16 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
 
     @property
     def estimated_empty_date(self) -> Optional[datetime]:
-        # Prefer active history when available
-        if self.enable_history_polling and len(self.history) >= 2:
-            recent = self.history[-min(10, len(self.history)):]
-            result = self._regression_empty_estimate(
-                [r.timestamp for r in recent],
-                [r.remaining_gas_kg for r in recent],
-                "active",
-            )
-            if result is not None:
-                return result
+        if self.enable_history_polling:
+            if len(self.history) >= 2:
+                recent = self.history[-min(10, len(self.history)):]
+                return self._regression_empty_estimate(
+                    [r.timestamp for r in recent],
+                    [r.remaining_gas_kg for r in recent],
+                    "active",
+                )
+            return None
 
-        # Fall back to passive history (advert-based percentage tracking)
         if len(self._passive_history) >= 2:
             timestamps = [
                 datetime.fromisoformat(p["t"]) for p in self._passive_history
