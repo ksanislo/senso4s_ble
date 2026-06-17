@@ -268,7 +268,11 @@ async def _async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None
             new_setup_date = datetime.fromisoformat(new_setup_date_str)
         except (ValueError, TypeError):
             new_setup_date = None
-        if new_setup_date and coordinator.update_setup_date(new_setup_date):
+        if new_setup_date and (
+            coordinator._last_known_setup_date is None
+            or new_setup_date > coordinator._last_known_setup_date
+        ):
+            coordinator._last_known_setup_date = new_setup_date
             setup_date_changed = True
 
     coordinator.async_set_updated_data(coordinator.data)

@@ -420,7 +420,9 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
                 )
                 return self.data
 
-            self.update_setup_date(setup_date)
+            if self.update_setup_date(setup_date):
+                await self._sync_config_from_device(client, setup_date)
+
             history = await client.read_history(setup_date)
             self.update_history(history)
             self._last_polled_gas_level = self.data.gas_level_percent
@@ -428,6 +430,43 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             await client.disconnect()
             self._poll_in_flight = False
         return self.data
+
+    async def _sync_config_from_device(
+        self, client, setup_date: datetime
+    ) -> None:
+        """Read cylinder config from device and persist after external change."""
+        config = await client.read_config()
+        if config is None:
+            return
+
+        _LOGGER.info(
+            "[%s] External config change detected: "
+            "empty_weight=%.2f kg, gas_capacity=%.2f kg",
+            self.address,
+            config.empty_weight_kg,
+            config.gas_capacity_kg,
+        )
+        self.update_config(
+            empty_weight_kg=config.empty_weight_kg,
+            gas_capacity_kg=config.gas_capacity_kg,
+        )
+        new_data = {
+            **self.entry.data,
+            CONF_LAST_SETUP_DATE: setup_date.isoformat(),
+        }
+        new_options = {
+            **self.entry.options,
+            CONF_EMPTY_WEIGHT: config.empty_weight_kg,
+            CONF_GAS_CAPACITY: config.gas_capacity_kg,
+        }
+        try:
+            self.hass.config_entries.async_update_entry(
+                self.entry, data=new_data, options=new_options
+            )
+        except Exception as err:
+            _LOGGER.warning(
+                "[%s] Failed to persist config: %s", self.address, err
+            )
 
     def update_setup_date(self, setup_date: Optional[datetime]) -> bool:
         if setup_date is None:
