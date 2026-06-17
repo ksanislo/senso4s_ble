@@ -692,6 +692,15 @@ class Senso4sOptionsFlow(OptionsFlow):
             ),
         }
 
+        if CONF_LAST_SETUP_DATE in self._user_input:
+            new_data = {
+                **self.config_entry.data,
+                CONF_LAST_SETUP_DATE: self._user_input[CONF_LAST_SETUP_DATE],
+            }
+            self.hass.config_entries.async_update_entry(
+                self.config_entry, data=new_data
+            )
+
         return self.async_create_entry(title="", data=data)
 
     async def async_step_init(
@@ -771,14 +780,7 @@ class Senso4sOptionsFlow(OptionsFlow):
             if not success:
                 return self.async_abort(reason="verification_timeout")
 
-            # Update the last setup date in config entry
             self._user_input[CONF_LAST_SETUP_DATE] = setup_date.isoformat()
-
-            coordinator = self.hass.data.get(DOMAIN, {}).get(
-                self.config_entry.entry_id
-            )
-            if coordinator:
-                coordinator.async_request_refresh()
 
             return self._save_options_entry()
 
@@ -882,17 +884,7 @@ class Senso4sOptionsFlow(OptionsFlow):
             if not success:
                 return self.async_abort(reason="verification_timeout")
 
-            # Update values for saving
-            self._user_input[CONF_EMPTY_WEIGHT] = empty_weight
-            self._user_input[CONF_GAS_CAPACITY] = gas_capacity
-            self._user_input[CONF_WEIGHT_UNIT] = weight_unit  # Keep original for save
             self._user_input[CONF_LAST_SETUP_DATE] = setup_date.isoformat()
-
-            coordinator = self.hass.data.get(DOMAIN, {}).get(
-                self.config_entry.entry_id
-            )
-            if coordinator:
-                coordinator.async_request_refresh()
 
             return self._save_options_entry()
 

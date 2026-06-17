@@ -261,6 +261,21 @@ async def _async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None
         history_poll_interval=poll_interval,
     )
 
+    new_setup_date_str = entry.data.get(CONF_LAST_SETUP_DATE)
+    setup_date_changed = False
+    if new_setup_date_str:
+        try:
+            new_setup_date = datetime.fromisoformat(new_setup_date_str)
+        except (ValueError, TypeError):
+            new_setup_date = None
+        if new_setup_date and coordinator.update_setup_date(new_setup_date):
+            setup_date_changed = True
+
+    coordinator.async_set_updated_data(coordinator.data)
+
+    if setup_date_changed:
+        coordinator.async_request_refresh()
+
 
 def _get_coordinators_and_entries_from_service_call(
     hass: HomeAssistant, call: ServiceCall
