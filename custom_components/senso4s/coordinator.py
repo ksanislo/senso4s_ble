@@ -120,6 +120,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
                 pass
 
         self._poll_in_flight = False
+        self._last_polled_gas_level: Optional[int] = None
         self._last_proof_of_life_time: Optional[float] = None
         self._cancel_proof_of_life: Any = None
 
@@ -306,8 +307,13 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             return False
         if self.history_poll_interval <= 0:
             return False
-        # This callback only fires on dispatched adverts (data changed),
-        # which means the device recorded a new measurement — always poll.
+        # Only poll when gas level actually changed — dispatch can fire on
+        # debug-byte or anomaly-flag changes that don't affect history.
+        if (
+            self._last_polled_gas_level is not None
+            and self.data.gas_level_percent == self._last_polled_gas_level
+        ):
+            return False
         return True
 
     async def _async_poll_history(
@@ -334,6 +340,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             self.update_setup_date(setup_date)
             history = await client.read_history(setup_date)
             self.update_history(history)
+            self._last_polled_gas_level = self.data.gas_level_percent
         finally:
             await client.disconnect()
             self._poll_in_flight = False
