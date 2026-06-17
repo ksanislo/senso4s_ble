@@ -38,6 +38,7 @@ CONF_GAS_CAPACITY: Final = "gas_capacity_kg"
 CONF_USAGE_MODE: Final = "usage_mode"
 CONF_LOW_LEVEL_THRESHOLD: Final = "low_level_threshold"
 CONF_WEIGHT_UNIT: Final = "weight_unit"
+CONF_ENABLE_HISTORY_POLLING: Final = "enable_history_polling"
 CONF_HISTORY_POLL_INTERVAL: Final = "history_poll_interval"
 CONF_LAST_SETUP_DATE: Final = "last_setup_date"  # ISO format string
 CONF_IS_PLUS: Final = "is_plus_model"
@@ -67,6 +68,10 @@ def kg_to_lb(kg: float) -> float:
 def lb_to_kg(lb: float) -> float:
     """Convert pounds to kilograms."""
     return lb * LB_TO_KG
+
+# Passive history (advert-based estimated empty)
+PASSIVE_HISTORY_MAX_POINTS: Final = 10
+REFILL_THRESHOLD_PERCENT: Final = 5
 
 # Timing
 CYCLE_DURATION_MINUTES: Final = 15

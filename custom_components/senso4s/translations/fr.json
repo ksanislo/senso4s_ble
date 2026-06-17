@@ -104,12 +104,14 @@
         "data": {
           "weight_unit": "Unité de poids",
           "low_level_threshold": "Seuil d'avertissement niveau bas (%)",
+          "enable_history_polling": "Activer l'interrogation automatique de l'historique",
           "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)"
         },
         "data_description": {
           "weight_unit": "Unité pour la saisie et l'affichage des valeurs de poids",
           "low_level_threshold": "Pourcentage de niveau de gaz déclenchant l'avertissement de gaz bas",
-          "history_poll_interval": "Fréquence de récupération de l'historique de consommation pour le calcul 'Estimé vide' (0 pour désactiver)"
+          "enable_history_polling": "Se connecte à l'appareil pour lire l'historique de consommation pour le calcul 'Estimé vide'. Désactiver avec du matériel Bluetooth passif uniquement.",
+          "history_poll_interval": "Durée maximale entre les actualisations de l'historique — les changements de niveau de gaz déclenchent également une actualisation immédiate"
         }
       },
       "refill_tank": {
@@ -118,12 +120,14 @@
         "data": {
           "weight_unit": "Unité de poids",
           "low_level_threshold": "Seuil d'avertissement niveau bas (%)",
+          "enable_history_polling": "Activer l'interrogation automatique de l'historique",
           "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)"
         },
         "data_description": {
           "weight_unit": "Unité pour la saisie et l'affichage des valeurs de poids",
           "low_level_threshold": "Pourcentage de niveau de gaz déclenchant l'avertissement de gaz bas",
-          "history_poll_interval": "Fréquence de récupération de l'historique de consommation pour le calcul 'Estimé vide' (0 pour désactiver)"
+          "enable_history_polling": "Se connecte à l'appareil pour lire l'historique de consommation pour le calcul 'Estimé vide'. Désactiver avec du matériel Bluetooth passif uniquement.",
+          "history_poll_interval": "Durée maximale entre les actualisations de l'historique — les changements de niveau de gaz déclenchent également une actualisation immédiate"
         }
       },
       "recalibrate": {
@@ -135,6 +139,7 @@
           "gas_capacity_kg": "Capacité de gaz",
           "usage_mode": "Mode d'utilisation",
           "low_level_threshold": "Seuil d'avertissement niveau bas (%)",
+          "enable_history_polling": "Activer l'interrogation automatique de l'historique",
           "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)"
         },
         "data_description": {
@@ -143,7 +148,8 @@
           "gas_capacity_kg": "Capacité maximale de gaz de la bouteille",
           "usage_mode": "Mode d'utilisation prédéfini pour l'appareil",
           "low_level_threshold": "Pourcentage de niveau de gaz déclenchant l'avertissement de gaz bas",
-          "history_poll_interval": "Fréquence de récupération de l'historique de consommation pour le calcul 'Estimé vide' (0 pour désactiver)"
+          "enable_history_polling": "Se connecte à l'appareil pour lire l'historique de consommation pour le calcul 'Estimé vide'. Désactiver avec du matériel Bluetooth passif uniquement.",
+          "history_poll_interval": "Durée maximale entre les actualisations de l'historique — les changements de niveau de gaz déclenchent également une actualisation immédiate"
         }
       },
       "recalibrate_replace": {

@@ -104,12 +104,14 @@
         "data": {
           "weight_unit": "Gewichtseenheid",
           "low_level_threshold": "Waarschuwingsdrempel laag niveau (%)",
+          "enable_history_polling": "Automatische geschiedenisopvraging inschakelen",
           "history_poll_interval": "Geschiedenis verversingsinterval (minuten)"
         },
         "data_description": {
           "weight_unit": "Eenheid voor het invoeren en weergeven van gewichtswaarden",
           "low_level_threshold": "Gasniveaupercentage dat de waarschuwing voor laag gas activeert",
-          "history_poll_interval": "Hoe vaak verbruiksgeschiedenis ophalen voor berekening 'Geschat leeg' (0 om uit te schakelen)"
+          "enable_history_polling": "Maakt verbinding met het apparaat om verbruiksgeschiedenis te lezen voor de berekening 'Geschat leeg'. Uitschakelen bij passieve Bluetooth-hardware.",
+          "history_poll_interval": "Maximale tijd tussen geschiedenisupdates — wijzigingen in gasniveau activeren ook onmiddellijke update"
         }
       },
       "refill_tank": {
@@ -118,12 +120,14 @@
         "data": {
           "weight_unit": "Gewichtseenheid",
           "low_level_threshold": "Waarschuwingsdrempel laag niveau (%)",
+          "enable_history_polling": "Automatische geschiedenisopvraging inschakelen",
           "history_poll_interval": "Geschiedenis verversingsinterval (minuten)"
         },
         "data_description": {
           "weight_unit": "Eenheid voor het invoeren en weergeven van gewichtswaarden",
           "low_level_threshold": "Gasniveaupercentage dat de waarschuwing voor laag gas activeert",
-          "history_poll_interval": "Hoe vaak verbruiksgeschiedenis ophalen voor berekening 'Geschat leeg' (0 om uit te schakelen)"
+          "enable_history_polling": "Maakt verbinding met het apparaat om verbruiksgeschiedenis te lezen voor de berekening 'Geschat leeg'. Uitschakelen bij passieve Bluetooth-hardware.",
+          "history_poll_interval": "Maximale tijd tussen geschiedenisupdates — wijzigingen in gasniveau activeren ook onmiddellijke update"
         }
       },
       "recalibrate": {
@@ -135,6 +139,7 @@
           "gas_capacity_kg": "Gascapaciteit",
           "usage_mode": "Gebruiksmodus",
           "low_level_threshold": "Waarschuwingsdrempel laag niveau (%)",
+          "enable_history_polling": "Automatische geschiedenisopvraging inschakelen",
           "history_poll_interval": "Geschiedenis verversingsinterval (minuten)"
         },
         "data_description": {
@@ -143,7 +148,8 @@
           "gas_capacity_kg": "Maximale gascapaciteit van de fles",
           "usage_mode": "Vooraf ingestelde gebruiksmodus voor het apparaat",
           "low_level_threshold": "Gasniveaupercentage dat de waarschuwing voor laag gas activeert",
-          "history_poll_interval": "Hoe vaak verbruiksgeschiedenis ophalen voor berekening 'Geschat leeg' (0 om uit te schakelen)"
+          "enable_history_polling": "Maakt verbinding met het apparaat om verbruiksgeschiedenis te lezen voor de berekening 'Geschat leeg'. Uitschakelen bij passieve Bluetooth-hardware.",
+          "history_poll_interval": "Maximale tijd tussen geschiedenisupdates — wijzigingen in gasniveau activeren ook onmiddellijke update"
         }
       },
       "recalibrate_replace": {

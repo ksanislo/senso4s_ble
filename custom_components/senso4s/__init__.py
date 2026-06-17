@@ -36,6 +36,7 @@ from homeassistant.util import dt as dt_util
 from .ble_client import Senso4sBLEClient
 from .const import (
     CONF_EMPTY_WEIGHT,
+    CONF_ENABLE_HISTORY_POLLING,
     CONF_GAS_CAPACITY,
     CONF_HISTORY_POLL_INTERVAL,
     CONF_IS_PLUS,
@@ -179,6 +180,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     coordinator = Senso4sCoordinator(hass, entry, address)
 
+    await coordinator.async_load_passive_history()
+
     # Seed from cache so entities render on warm restarts, the backfill
     # below has data to read, and the proof-of-life backstop can trigger
     # an initial history poll without waiting for a dispatch.
@@ -231,6 +234,10 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def _async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Push option changes into the coordinator without a reload."""
     coordinator: Senso4sCoordinator = hass.data[DOMAIN][entry.entry_id]
+    poll_interval = entry.options.get(
+        CONF_HISTORY_POLL_INTERVAL,
+        entry.data.get(CONF_HISTORY_POLL_INTERVAL, DEFAULT_HISTORY_POLL_INTERVAL),
+    )
     coordinator.update_config(
         empty_weight_kg=entry.options.get(
             CONF_EMPTY_WEIGHT, entry.data.get(CONF_EMPTY_WEIGHT)
@@ -247,10 +254,11 @@ async def _async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None
         weight_unit=entry.options.get(
             CONF_WEIGHT_UNIT, entry.data.get(CONF_WEIGHT_UNIT)
         ),
-        history_poll_interval=entry.options.get(
-            CONF_HISTORY_POLL_INTERVAL,
-            entry.data.get(CONF_HISTORY_POLL_INTERVAL, DEFAULT_HISTORY_POLL_INTERVAL),
+        enable_history_polling=entry.options.get(
+            CONF_ENABLE_HISTORY_POLLING,
+            entry.data.get(CONF_ENABLE_HISTORY_POLLING, True),
         ),
+        history_poll_interval=poll_interval,
     )
 
 

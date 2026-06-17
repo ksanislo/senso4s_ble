@@ -104,12 +104,14 @@
         "data": {
           "weight_unit": "Gewichtseinheit",
           "low_level_threshold": "Warnschwelle für niedrigen Füllstand (%)",
+          "enable_history_polling": "Automatische Verlaufsabfrage aktivieren",
           "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)"
         },
         "data_description": {
           "weight_unit": "Einheit für die Eingabe und Anzeige von Gewichtswerten",
           "low_level_threshold": "Füllstandsprozentsatz, der die Warnung bei niedrigem Gasstand auslöst",
-          "history_poll_interval": "Wie oft der Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' abgerufen wird (0 zum Deaktivieren)"
+          "enable_history_polling": "Verbindet sich mit dem Gerät, um den Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' zu lesen. Deaktivieren bei passiver Bluetooth-Hardware.",
+          "history_poll_interval": "Maximale Zeit zwischen Verlaufsaktualisierungen — Änderungen des Gasstands lösen ebenfalls eine sofortige Aktualisierung aus"
         }
       },
       "refill_tank": {
@@ -118,12 +120,14 @@
         "data": {
           "weight_unit": "Gewichtseinheit",
           "low_level_threshold": "Warnschwelle für niedrigen Füllstand (%)",
+          "enable_history_polling": "Automatische Verlaufsabfrage aktivieren",
           "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)"
         },
         "data_description": {
           "weight_unit": "Einheit für die Eingabe und Anzeige von Gewichtswerten",
           "low_level_threshold": "Füllstandsprozentsatz, der die Warnung bei niedrigem Gasstand auslöst",
-          "history_poll_interval": "Wie oft der Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' abgerufen wird (0 zum Deaktivieren)"
+          "enable_history_polling": "Verbindet sich mit dem Gerät, um den Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' zu lesen. Deaktivieren bei passiver Bluetooth-Hardware.",
+          "history_poll_interval": "Maximale Zeit zwischen Verlaufsaktualisierungen — Änderungen des Gasstands lösen ebenfalls eine sofortige Aktualisierung aus"
         }
       },
       "recalibrate": {
@@ -135,6 +139,7 @@
           "gas_capacity_kg": "Gaskapazität",
           "usage_mode": "Nutzungsmodus",
           "low_level_threshold": "Warnschwelle für niedrigen Füllstand (%)",
+          "enable_history_polling": "Automatische Verlaufsabfrage aktivieren",
           "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)"
         },
         "data_description": {
@@ -143,7 +148,8 @@
           "gas_capacity_kg": "Maximale Gaskapazität der Flasche",
           "usage_mode": "Voreingestellter Nutzungsmodus für das Gerät",
           "low_level_threshold": "Füllstandsprozentsatz, der die Warnung bei niedrigem Gasstand auslöst",
-          "history_poll_interval": "Wie oft der Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' abgerufen wird (0 zum Deaktivieren)"
+          "enable_history_polling": "Verbindet sich mit dem Gerät, um den Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' zu lesen. Deaktivieren bei passiver Bluetooth-Hardware.",
+          "history_poll_interval": "Maximale Zeit zwischen Verlaufsaktualisierungen — Änderungen des Gasstands lösen ebenfalls eine sofortige Aktualisierung aus"
         }
       },
       "recalibrate_replace": {

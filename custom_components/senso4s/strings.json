@@ -130,12 +130,14 @@
         "data": {
           "weight_unit": "Weight unit",
           "low_level_threshold": "Low level warning threshold (%)",
+          "enable_history_polling": "Enable automatic history polling",
           "history_poll_interval": "History refresh interval (minutes)"
         },
         "data_description": {
           "weight_unit": "Unit for entering and displaying weight values",
           "low_level_threshold": "Gas level percentage that triggers low gas warning",
-          "history_poll_interval": "How often to fetch consumption history for 'Estimated Empty' calculation (0 to disable)"
+          "enable_history_polling": "Connect to the device to read consumption history for the 'Estimated Empty' calculation. Disable if using passive-only Bluetooth hardware.",
+          "history_poll_interval": "Maximum time between history refreshes — gas level changes also trigger an immediate refresh"
         }
       },
       "refill_tank": {
@@ -144,12 +146,14 @@
         "data": {
           "weight_unit": "Weight unit",
           "low_level_threshold": "Low level warning threshold (%)",
+          "enable_history_polling": "Enable automatic history polling",
           "history_poll_interval": "History refresh interval (minutes)"
         },
         "data_description": {
           "weight_unit": "Unit for entering and displaying weight values",
           "low_level_threshold": "Gas level percentage that triggers low gas warning",
-          "history_poll_interval": "How often to fetch consumption history for 'Estimated Empty' calculation (0 to disable)"
+          "enable_history_polling": "Connect to the device to read consumption history for the 'Estimated Empty' calculation. Disable if using passive-only Bluetooth hardware.",
+          "history_poll_interval": "Maximum time between history refreshes — gas level changes also trigger an immediate refresh"
         }
       },
       "recalibrate": {
@@ -161,6 +165,7 @@
           "gas_capacity_kg": "Gas capacity",
           "usage_mode": "Usage mode",
           "low_level_threshold": "Low level warning threshold (%)",
+          "enable_history_polling": "Enable automatic history polling",
           "history_poll_interval": "History refresh interval (minutes)"
         },
         "data_description": {
@@ -169,7 +174,8 @@
           "gas_capacity_kg": "Maximum gas capacity of the cylinder",
           "usage_mode": "Preset usage mode for the device",
           "low_level_threshold": "Gas level percentage that triggers low gas warning",
-          "history_poll_interval": "How often to fetch consumption history for 'Estimated Empty' calculation (0 to disable)"
+          "enable_history_polling": "Connect to the device to read consumption history for the 'Estimated Empty' calculation. Disable if using passive-only Bluetooth hardware.",
+          "history_poll_interval": "Maximum time between history refreshes — gas level changes also trigger an immediate refresh"
         }
       },
       "recalibrate_replace": {

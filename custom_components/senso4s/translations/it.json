@@ -104,12 +104,14 @@
         "data": {
           "weight_unit": "Unità di peso",
           "low_level_threshold": "Soglia avviso livello basso (%)",
+          "enable_history_polling": "Abilita polling automatico della cronologia",
           "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)"
         },
         "data_description": {
           "weight_unit": "Unità per l'inserimento e la visualizzazione dei valori di peso",
           "low_level_threshold": "Percentuale del livello di gas che attiva l'avviso di gas basso",
-          "history_poll_interval": "Frequenza di recupero della cronologia dei consumi per il calcolo 'Stima esaurimento' (0 per disabilitare)"
+          "enable_history_polling": "Si connette al dispositivo per leggere la cronologia dei consumi per il calcolo 'Stima esaurimento'. Disabilitare con hardware Bluetooth solo passivo.",
+          "history_poll_interval": "Tempo massimo tra gli aggiornamenti della cronologia — le variazioni del livello di gas attivano anche un aggiornamento immediato"
         }
       },
       "refill_tank": {
@@ -118,12 +120,14 @@
         "data": {
           "weight_unit": "Unità di peso",
           "low_level_threshold": "Soglia avviso livello basso (%)",
+          "enable_history_polling": "Abilita polling automatico della cronologia",
           "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)"
         },
         "data_description": {
           "weight_unit": "Unità per l'inserimento e la visualizzazione dei valori di peso",
           "low_level_threshold": "Percentuale del livello di gas che attiva l'avviso di gas basso",
-          "history_poll_interval": "Frequenza di recupero della cronologia dei consumi per il calcolo 'Stima esaurimento' (0 per disabilitare)"
+          "enable_history_polling": "Si connette al dispositivo per leggere la cronologia dei consumi per il calcolo 'Stima esaurimento'. Disabilitare con hardware Bluetooth solo passivo.",
+          "history_poll_interval": "Tempo massimo tra gli aggiornamenti della cronologia — le variazioni del livello di gas attivano anche un aggiornamento immediato"
         }
       },
       "recalibrate": {
@@ -135,6 +139,7 @@
           "gas_capacity_kg": "Capacità gas",
           "usage_mode": "Modalità d'uso",
           "low_level_threshold": "Soglia avviso livello basso (%)",
+          "enable_history_polling": "Abilita polling automatico della cronologia",
           "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)"
         },
         "data_description": {
@@ -143,7 +148,8 @@
           "gas_capacity_kg": "Capacità massima di gas della bombola",
           "usage_mode": "Modalità d'uso preimpostata per il dispositivo",
           "low_level_threshold": "Percentuale del livello di gas che attiva l'avviso di gas basso",
-          "history_poll_interval": "Frequenza di recupero della cronologia dei consumi per il calcolo 'Stima esaurimento' (0 per disabilitare)"
+          "enable_history_polling": "Si connette al dispositivo per leggere la cronologia dei consumi per il calcolo 'Stima esaurimento'. Disabilitare con hardware Bluetooth solo passivo.",
+          "history_poll_interval": "Tempo massimo tra gli aggiornamenti della cronologia — le variazioni del livello di gas attivano anche un aggiornamento immediato"
         }
       },
       "recalibrate_replace": {

@@ -35,6 +35,7 @@ from .ble_client import Senso4sBLEClient
 from .const import (
     ANOMALY_NAMES,
     CONF_EMPTY_WEIGHT,
+    CONF_ENABLE_HISTORY_POLLING,
     CONF_GAS_CAPACITY,
     CONF_HISTORY_POLL_INTERVAL,
     CONF_IS_PLUS,
@@ -497,6 +498,12 @@ class Senso4sOptionsFlow(OptionsFlow):
 
     def _get_current_values(self) -> dict[str, Any]:
         """Get current config values with fallbacks."""
+        poll_interval = self.config_entry.options.get(
+            CONF_HISTORY_POLL_INTERVAL,
+            self.config_entry.data.get(
+                CONF_HISTORY_POLL_INTERVAL, DEFAULT_HISTORY_POLL_INTERVAL
+            ),
+        )
         return {
             CONF_WEIGHT_UNIT: self.config_entry.options.get(
                 CONF_WEIGHT_UNIT,
@@ -520,12 +527,11 @@ class Senso4sOptionsFlow(OptionsFlow):
                     CONF_LOW_LEVEL_THRESHOLD, DEFAULT_LOW_LEVEL_THRESHOLD
                 ),
             ),
-            CONF_HISTORY_POLL_INTERVAL: self.config_entry.options.get(
-                CONF_HISTORY_POLL_INTERVAL,
-                self.config_entry.data.get(
-                    CONF_HISTORY_POLL_INTERVAL, DEFAULT_HISTORY_POLL_INTERVAL
-                ),
+            CONF_ENABLE_HISTORY_POLLING: self.config_entry.options.get(
+                CONF_ENABLE_HISTORY_POLLING,
+                self.config_entry.data.get(CONF_ENABLE_HISTORY_POLLING, True),
             ),
+            CONF_HISTORY_POLL_INTERVAL: poll_interval,
         }
 
     def _get_ha_options_schema(self, current: dict[str, Any]) -> vol.Schema:
@@ -543,9 +549,13 @@ class Senso4sOptionsFlow(OptionsFlow):
                     CONF_LOW_LEVEL_THRESHOLD, default=current[CONF_LOW_LEVEL_THRESHOLD]
                 ): vol.All(vol.Coerce(int), vol.Range(min=5, max=50)),
                 vol.Required(
+                    CONF_ENABLE_HISTORY_POLLING,
+                    default=current[CONF_ENABLE_HISTORY_POLLING],
+                ): bool,
+                vol.Required(
                     CONF_HISTORY_POLL_INTERVAL,
                     default=current[CONF_HISTORY_POLL_INTERVAL],
-                ): vol.All(vol.Coerce(int), vol.Range(min=0, max=1440)),
+                ): vol.All(vol.Coerce(int), vol.Range(min=1, max=1440)),
             }
         )
 
@@ -589,9 +599,13 @@ class Senso4sOptionsFlow(OptionsFlow):
                     CONF_LOW_LEVEL_THRESHOLD, default=current[CONF_LOW_LEVEL_THRESHOLD]
                 ): vol.All(vol.Coerce(int), vol.Range(min=5, max=50)),
                 vol.Required(
+                    CONF_ENABLE_HISTORY_POLLING,
+                    default=current[CONF_ENABLE_HISTORY_POLLING],
+                ): bool,
+                vol.Required(
                     CONF_HISTORY_POLL_INTERVAL,
                     default=current[CONF_HISTORY_POLL_INTERVAL],
-                ): vol.All(vol.Coerce(int), vol.Range(min=0, max=1440)),
+                ): vol.All(vol.Coerce(int), vol.Range(min=1, max=1440)),
             }
         )
 
@@ -659,6 +673,9 @@ class Senso4sOptionsFlow(OptionsFlow):
             CONF_WEIGHT_UNIT: weight_unit,
             CONF_LOW_LEVEL_THRESHOLD: self._user_input.get(
                 CONF_LOW_LEVEL_THRESHOLD, current[CONF_LOW_LEVEL_THRESHOLD]
+            ),
+            CONF_ENABLE_HISTORY_POLLING: self._user_input.get(
+                CONF_ENABLE_HISTORY_POLLING, current[CONF_ENABLE_HISTORY_POLLING]
             ),
             CONF_HISTORY_POLL_INTERVAL: self._user_input.get(
                 CONF_HISTORY_POLL_INTERVAL, current[CONF_HISTORY_POLL_INTERVAL]

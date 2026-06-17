@@ -104,12 +104,14 @@
         "data": {
           "weight_unit": "Unidad de peso",
           "low_level_threshold": "Umbral de advertencia de nivel bajo (%)",
+          "enable_history_polling": "Activar consulta automática del historial",
           "history_poll_interval": "Intervalo de actualización del historial (minutos)"
         },
         "data_description": {
           "weight_unit": "Unidad para ingresar y mostrar valores de peso",
           "low_level_threshold": "Porcentaje de nivel de gas que activa la advertencia de gas bajo",
-          "history_poll_interval": "Con qué frecuencia obtener el historial de consumo para el cálculo de 'Estimado vacío' (0 para deshabilitar)"
+          "enable_history_polling": "Conectarse al dispositivo para leer el historial de consumo para el cálculo de 'Estimado vacío'. Desactivar si usa hardware Bluetooth solo pasivo.",
+          "history_poll_interval": "Tiempo máximo entre actualizaciones del historial — los cambios de nivel de gas también activan una actualización inmediata"
         }
       },
       "refill_tank": {
@@ -118,12 +120,14 @@
         "data": {
           "weight_unit": "Unidad de peso",
           "low_level_threshold": "Umbral de advertencia de nivel bajo (%)",
+          "enable_history_polling": "Activar consulta automática del historial",
           "history_poll_interval": "Intervalo de actualización del historial (minutos)"
         },
         "data_description": {
           "weight_unit": "Unidad para ingresar y mostrar valores de peso",
           "low_level_threshold": "Porcentaje de nivel de gas que activa la advertencia de gas bajo",
-          "history_poll_interval": "Con qué frecuencia obtener el historial de consumo para el cálculo de 'Estimado vacío' (0 para deshabilitar)"
+          "enable_history_polling": "Conectarse al dispositivo para leer el historial de consumo para el cálculo de 'Estimado vacío'. Desactivar si usa hardware Bluetooth solo pasivo.",
+          "history_poll_interval": "Tiempo máximo entre actualizaciones del historial — los cambios de nivel de gas también activan una actualización inmediata"
         }
       },
       "recalibrate": {
@@ -135,6 +139,7 @@
           "gas_capacity_kg": "Capacidad de gas",
           "usage_mode": "Modo de uso",
           "low_level_threshold": "Umbral de advertencia de nivel bajo (%)",
+          "enable_history_polling": "Activar consulta automática del historial",
           "history_poll_interval": "Intervalo de actualización del historial (minutos)"
         },
         "data_description": {
@@ -143,7 +148,8 @@
           "gas_capacity_kg": "Capacidad máxima de gas del cilindro",
           "usage_mode": "Modo de uso preestablecido para el dispositivo",
           "low_level_threshold": "Porcentaje de nivel de gas que activa la advertencia de gas bajo",
-          "history_poll_interval": "Con qué frecuencia obtener el historial de consumo para el cálculo de 'Estimado vacío' (0 para deshabilitar)"
+          "enable_history_polling": "Conectarse al dispositivo para leer el historial de consumo para el cálculo de 'Estimado vacío'. Desactivar si usa hardware Bluetooth solo pasivo.",
+          "history_poll_interval": "Tiempo máximo entre actualizaciones del historial — los cambios de nivel de gas también activan una actualización inmediata"
         }
       },
       "recalibrate_replace": {

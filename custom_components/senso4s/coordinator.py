@@ -30,10 +30,12 @@ from homeassistant.components.bluetooth.active_update_processor import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
 from .const import (
     CONF_EMPTY_WEIGHT,
+    CONF_ENABLE_HISTORY_POLLING,
     CONF_GAS_CAPACITY,
     CONF_HISTORY_POLL_INTERVAL,
     CONF_LAST_SETUP_DATE,
@@ -48,6 +50,8 @@ from .const import (
     DEFAULT_WEIGHT_UNIT,
     DOMAIN,
     MANUFACTURER,
+    PASSIVE_HISTORY_MAX_POINTS,
+    REFILL_THRESHOLD_PERCENT,
     UNIT_LB,
     UsageMode,
     kg_to_lb,
@@ -58,6 +62,7 @@ from .parser import parse_manufacturer_data
 _LOGGER = logging.getLogger(__name__)
 
 PROOF_OF_LIFE_INTERVAL = timedelta(seconds=30)
+PASSIVE_HISTORY_STORAGE_VERSION = 1
 
 
 class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData]):
@@ -99,6 +104,10 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             CONF_HISTORY_POLL_INTERVAL,
             entry.data.get(CONF_HISTORY_POLL_INTERVAL, DEFAULT_HISTORY_POLL_INTERVAL),
         )
+        self.enable_history_polling: bool = entry.options.get(
+            CONF_ENABLE_HISTORY_POLLING,
+            entry.data.get(CONF_ENABLE_HISTORY_POLLING, True),
+        )
 
         self.data: Senso4sDeviceData = Senso4sDeviceData()
         self.data.gas_capacity_kg = self.gas_capacity_kg
@@ -123,6 +132,15 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         self._last_polled_gas_level: Optional[int] = None
         self._last_proof_of_life_time: Optional[float] = None
         self._cancel_proof_of_life: Any = None
+
+        # Passive history: rolling window of advert-based percentage observations
+        self._passive_history: list[dict] = []
+        self._last_passive_pct: Optional[int] = None
+        self._passive_store: Store = Store(
+            hass,
+            PASSIVE_HISTORY_STORAGE_VERSION,
+            f"senso4s_{address.replace(':', '')}_passive_history",
+        )
 
         super().__init__(
             hass=hass,
@@ -187,6 +205,62 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
     def async_stop_periodic_poll(self) -> None:
         pass
 
+    async def async_load_passive_history(self) -> None:
+        data = await self._passive_store.async_load()
+        if data and isinstance(data, list):
+            self._passive_history = data
+            if self._passive_history:
+                self._last_passive_pct = self._passive_history[-1]["pct"]
+                _LOGGER.debug(
+                    "Loaded %d passive history points for %s (last pct=%d)",
+                    len(self._passive_history),
+                    self.address,
+                    self._last_passive_pct,
+                )
+
+    @callback
+    def _record_passive_data_point(
+        self, gas_level_percent: int, timestamp: datetime
+    ) -> None:
+        if gas_level_percent < 0 or gas_level_percent > 100:
+            return
+
+        if self._last_passive_pct == gas_level_percent:
+            return
+
+        # Detect refill: level increased significantly
+        if (
+            self._last_passive_pct is not None
+            and gas_level_percent
+            > self._last_passive_pct + REFILL_THRESHOLD_PERCENT
+        ):
+            _LOGGER.debug(
+                "Passive history: refill detected (%d%% -> %d%%), "
+                "resetting window",
+                self._last_passive_pct,
+                gas_level_percent,
+            )
+            self._passive_history.clear()
+
+        self._passive_history.append(
+            {"t": timestamp.isoformat(), "pct": gas_level_percent}
+        )
+        if len(self._passive_history) > PASSIVE_HISTORY_MAX_POINTS:
+            self._passive_history = self._passive_history[
+                -PASSIVE_HISTORY_MAX_POINTS:
+            ]
+        self._last_passive_pct = gas_level_percent
+
+        _LOGGER.debug(
+            "Passive history: recorded %d%% for %s (%d points)",
+            gas_level_percent,
+            self.address,
+            len(self._passive_history),
+        )
+        self.hass.async_create_task(
+            self._passive_store.async_save(list(self._passive_history))
+        )
+
     @callback
     def _async_proof_of_life_tick(self, _now: Any) -> None:
         info = bluetooth.async_last_service_info(
@@ -231,7 +305,8 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
 
         # Check if history cache is stale while the device is alive
         if (
-            self.history_poll_interval > 0
+            self.enable_history_polling
+            and self.history_poll_interval > 0
             and not self._poll_in_flight
             and self._last_service_info is not None
         ):
@@ -292,6 +367,9 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
                 self.data.has_error,
                 self.data.anomaly_names if self.data.anomalies else "none",
             )
+            self._record_passive_data_point(
+                parsed.gas_level_percent, self.data.last_seen
+            )
             break
         return self.data
 
@@ -305,7 +383,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             return False
         if self._poll_in_flight:
             return False
-        if self.history_poll_interval <= 0:
+        if not self.enable_history_polling:
             return False
         # Only poll when gas level actually changed — dispatch can fire on
         # debug-byte or anomaly-flag changes that don't affect history.
@@ -385,6 +463,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         usage_mode: Optional[UsageMode] = None,
         low_level_threshold: Optional[int] = None,
         weight_unit: Optional[str] = None,
+        enable_history_polling: Optional[bool] = None,
         history_poll_interval: Optional[int] = None,
     ) -> None:
         if empty_weight_kg is not None:
@@ -399,6 +478,8 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             self.low_level_threshold = low_level_threshold
         if weight_unit is not None:
             self.weight_unit = weight_unit
+        if enable_history_polling is not None:
+            self.enable_history_polling = enable_history_polling
         if history_poll_interval is not None:
             self.history_poll_interval = history_poll_interval
 
@@ -413,20 +494,24 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             return round(kg_to_lb(kg_value), 2)
         return round(kg_value, 2)
 
-    @property
-    def estimated_empty_date(self) -> Optional[datetime]:
-        if len(self.history) < 2:
+    def _regression_empty_estimate(
+        self,
+        timestamps: list[datetime],
+        kg_values: list[float],
+        label: str,
+    ) -> Optional[datetime]:
+        n = len(timestamps)
+        if n < 2:
             _LOGGER.debug(
-                "Estimated empty: not enough history (%d records, need 2+)",
-                len(self.history),
+                "Estimated empty [%s]: not enough data (%d points, need 2+)",
+                label,
+                n,
             )
             return None
 
-        recent = self.history[-min(10, len(self.history)):]
-        n = len(recent)
-        base_t = recent[0].timestamp
-        xs = [(r.timestamp - base_t).total_seconds() for r in recent]
-        ys = [r.remaining_gas_kg for r in recent]
+        base_t = timestamps[0]
+        xs = [(t - base_t).total_seconds() for t in timestamps]
+        ys = kg_values
 
         sum_x = sum(xs)
         sum_y = sum(ys)
@@ -436,7 +521,8 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         denom = n * sum_xx - sum_x * sum_x
         if denom <= 0:
             _LOGGER.debug(
-                "Estimated empty: degenerate window (denom=%.2f, n=%d)",
+                "Estimated empty [%s]: degenerate window (denom=%.2f, n=%d)",
+                label,
                 denom,
                 n,
             )
@@ -445,27 +531,67 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         slope = (n * sum_xy - sum_x * sum_y) / denom
         if slope >= 0:
             _LOGGER.debug(
-                "Estimated empty: slope >= 0, not consuming (slope=%.6g kg/s)",
+                "Estimated empty [%s]: slope >= 0, not consuming (slope=%.6g kg/s)",
+                label,
                 slope,
             )
             return None
 
         last_mass = ys[-1]
         if last_mass <= 0:
-            _LOGGER.debug("Estimated empty: last recorded mass <= 0 (%s)", last_mass)
+            _LOGGER.debug(
+                "Estimated empty [%s]: last recorded mass <= 0 (%s)",
+                label,
+                last_mass,
+            )
             return None
 
         seconds_until_empty = -last_mass / slope
-        estimated = recent[-1].timestamp + timedelta(seconds=seconds_until_empty)
+        estimated = timestamps[-1] + timedelta(seconds=seconds_until_empty)
         _LOGGER.debug(
-            "Estimated empty: n=%d, slope=%.6g kg/s, last_mass=%.3f kg @ %s → %s",
+            "Estimated empty [%s]: n=%d, slope=%.6g kg/s, last_mass=%.3f kg "
+            "@ %s → %s",
+            label,
             n,
             slope,
             last_mass,
-            recent[-1].timestamp,
+            timestamps[-1],
             estimated,
         )
         return estimated
+
+    @property
+    def estimated_empty_date(self) -> Optional[datetime]:
+        # Prefer active history when available
+        if self.enable_history_polling and len(self.history) >= 2:
+            recent = self.history[-min(10, len(self.history)):]
+            result = self._regression_empty_estimate(
+                [r.timestamp for r in recent],
+                [r.remaining_gas_kg for r in recent],
+                "active",
+            )
+            if result is not None:
+                return result
+
+        # Fall back to passive history (advert-based percentage tracking)
+        if len(self._passive_history) >= 2:
+            timestamps = [
+                datetime.fromisoformat(p["t"]) for p in self._passive_history
+            ]
+            kg_values = [
+                p["pct"] / 100.0 * self.gas_capacity_kg
+                for p in self._passive_history
+            ]
+            return self._regression_empty_estimate(
+                timestamps, kg_values, "passive"
+            )
+
+        _LOGGER.debug(
+            "Estimated empty: no data available (active=%d records, passive=%d points)",
+            len(self.history),
+            len(self._passive_history),
+        )
+        return None
 
 
 def process_service_info(

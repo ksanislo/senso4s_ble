@@ -104,12 +104,14 @@
         "data": {
           "weight_unit": "重量单位",
           "low_level_threshold": "低液位警告阈值 (%)",
+          "enable_history_polling": "启用自动历史记录轮询",
           "history_poll_interval": "历史记录刷新间隔（分钟）"
         },
         "data_description": {
           "weight_unit": "输入和显示重量值的单位",
           "low_level_threshold": "触发低气量警告的气体液位百分比",
-          "history_poll_interval": "获取消耗历史记录以计算'预计用完'的频率（0 表示禁用）"
+          "enable_history_polling": "连接设备以读取消耗历史记录，用于计算'预计用完'。如果使用仅被动蓝牙硬件，请禁用。",
+          "history_poll_interval": "历史记录更新的最大间隔时间 — 气体液位变化也会立即触发更新"
         }
       },
       "refill_tank": {
@@ -118,12 +120,14 @@
         "data": {
           "weight_unit": "重量单位",
           "low_level_threshold": "低液位警告阈值 (%)",
+          "enable_history_polling": "启用自动历史记录轮询",
           "history_poll_interval": "历史记录刷新间隔（分钟）"
         },
         "data_description": {
           "weight_unit": "输入和显示重量值的单位",
           "low_level_threshold": "触发低气量警告的气体液位百分比",
-          "history_poll_interval": "获取消耗历史记录以计算'预计用完'的频率（0 表示禁用）"
+          "enable_history_polling": "连接设备以读取消耗历史记录，用于计算'预计用完'。如果使用仅被动蓝牙硬件，请禁用。",
+          "history_poll_interval": "历史记录更新的最大间隔时间 — 气体液位变化也会立即触发更新"
         }
       },
       "recalibrate": {
@@ -135,6 +139,7 @@
           "gas_capacity_kg": "气体容量",
           "usage_mode": "使用模式",
           "low_level_threshold": "低液位警告阈值 (%)",
+          "enable_history_polling": "启用自动历史记录轮询",
           "history_poll_interval": "历史记录刷新间隔（分钟）"
         },
         "data_description": {
@@ -143,7 +148,8 @@
           "gas_capacity_kg": "气瓶的最大气体容量",
           "usage_mode": "设备的预设使用模式",
           "low_level_threshold": "触发低气量警告的气体液位百分比",
-          "history_poll_interval": "获取消耗历史记录以计算'预计用完'的频率（0 表示禁用）"
+          "enable_history_polling": "连接设备以读取消耗历史记录，用于计算'预计用完'。如果使用仅被动蓝牙硬件，请禁用。",
+          "history_poll_interval": "历史记录更新的最大间隔时间 — 气体液位变化也会立即触发更新"
         }
       },
       "recalibrate_replace": {

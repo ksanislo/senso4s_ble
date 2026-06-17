@@ -104,12 +104,14 @@
         "data": {
           "weight_unit": "Jednostka wagi",
           "low_level_threshold": "Próg ostrzeżenia o niskim poziomie (%)",
+          "enable_history_polling": "Włącz automatyczne odpytywanie historii",
           "history_poll_interval": "Interwał odświeżania historii (minuty)"
         },
         "data_description": {
           "weight_unit": "Jednostka do wprowadzania i wyświetlania wartości wagi",
           "low_level_threshold": "Procent poziomu gazu, który wyzwala ostrzeżenie o niskim poziomie",
-          "history_poll_interval": "Jak często pobierać historię zużycia do obliczenia 'Szacowane opróżnienie' (0 aby wyłączyć)"
+          "enable_history_polling": "Łączy się z urządzeniem, aby odczytać historię zużycia do obliczenia 'Szacowane opróżnienie'. Wyłącz przy pasywnym sprzęcie Bluetooth.",
+          "history_poll_interval": "Maksymalny czas między aktualizacjami historii — zmiany poziomu gazu również wyzwalają natychmiastową aktualizację"
         }
       },
       "refill_tank": {
@@ -118,12 +120,14 @@
         "data": {
           "weight_unit": "Jednostka wagi",
           "low_level_threshold": "Próg ostrzeżenia o niskim poziomie (%)",
+          "enable_history_polling": "Włącz automatyczne odpytywanie historii",
           "history_poll_interval": "Interwał odświeżania historii (minuty)"
         },
         "data_description": {
           "weight_unit": "Jednostka do wprowadzania i wyświetlania wartości wagi",
           "low_level_threshold": "Procent poziomu gazu, który wyzwala ostrzeżenie o niskim poziomie",
-          "history_poll_interval": "Jak często pobierać historię zużycia do obliczenia 'Szacowane opróżnienie' (0 aby wyłączyć)"
+          "enable_history_polling": "Łączy się z urządzeniem, aby odczytać historię zużycia do obliczenia 'Szacowane opróżnienie'. Wyłącz przy pasywnym sprzęcie Bluetooth.",
+          "history_poll_interval": "Maksymalny czas między aktualizacjami historii — zmiany poziomu gazu również wyzwalają natychmiastową aktualizację"
         }
       },
       "recalibrate": {
@@ -135,6 +139,7 @@
           "gas_capacity_kg": "Pojemność gazu",
           "usage_mode": "Tryb użytkowania",
           "low_level_threshold": "Próg ostrzeżenia o niskim poziomie (%)",
+          "enable_history_polling": "Włącz automatyczne odpytywanie historii",
           "history_poll_interval": "Interwał odświeżania historii (minuty)"
         },
         "data_description": {
@@ -143,7 +148,8 @@
           "gas_capacity_kg": "Maksymalna pojemność gazu butli",
           "usage_mode": "Predefiniowany tryb użytkowania urządzenia",
           "low_level_threshold": "Procent poziomu gazu, który wyzwala ostrzeżenie o niskim poziomie",
-          "history_poll_interval": "Jak często pobierać historię zużycia do obliczenia 'Szacowane opróżnienie' (0 aby wyłączyć)"
+          "enable_history_polling": "Łączy się z urządzeniem, aby odczytać historię zużycia do obliczenia 'Szacowane opróżnienie'. Wyłącz przy pasywnym sprzęcie Bluetooth.",
+          "history_poll_interval": "Maksymalny czas między aktualizacjami historii — zmiany poziomu gazu również wyzwalają natychmiastową aktualizację"
         }
       },
       "recalibrate_replace": {
