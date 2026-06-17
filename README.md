@@ -140,7 +140,7 @@ Change display settings without touching the device:
 | Gas Remaining | Calculated remaining mass in kg or lb |
 | Battery | Device battery level |
 | Usage Mode | Current usage mode preset |
-| Estimated Empty | Predicted date/time the tank will run dry (uses active history when available, falls back to passive percentage tracking) |
+| Estimated Empty | Predicted date/time the tank will run dry |
 | Last Setup | When the current measurement cycle was started |
 | Signal Strength | RSSI of the most recent advertisement (diagnostic) |
 | Empty Cylinder Weight | Configured empty weight (diagnostic) |
