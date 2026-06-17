@@ -128,7 +128,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             hass=hass,
             logger=_LOGGER,
             address=address,
-            mode=BluetoothScanningMode.ACTIVE,
+            mode=BluetoothScanningMode.PASSIVE,
             update_method=self._update_method,
             needs_poll_method=self._needs_poll,
             poll_method=self._async_poll_history,
