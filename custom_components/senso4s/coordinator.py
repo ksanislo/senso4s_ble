@@ -343,6 +343,10 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         finally:
             await client.disconnect()
             self._poll_in_flight = False
+            # Restart the periodic timer so it counts from this poll,
+            # not from whenever it was originally started — avoids the
+            # two-timer drift that doubles the effective poll interval.
+            self.async_start_periodic_poll()
         return self.data
 
     def update_setup_date(self, setup_date: Optional[datetime]) -> bool:
