@@ -9,17 +9,27 @@ A Home Assistant integration for the Senso4s LP/Propane Gas Cylinder Level Senso
 ## How it works
 
 Live data (gas level, battery, usage mode, anomaly flags) is parsed from BLE
-advertisements the device broadcasts continuously. The integration also makes
-brief active GATT connections when it needs to read consumption history,
-write cylinder configuration, set the measurement start date, or zero the
-scale ("calibration"). These connections are short, and the device only
-allows one connected client at a time — the OEM app and Home Assistant can
-both work with the same device, just not at the exact same moment.
+advertisements the device broadcasts continuously. When **automatic history
+polling** is enabled (the default), the integration also makes brief active
+GATT connections to read consumption history for a high-resolution
+**Estimated Empty** prediction. Active connections are also used for
+cylinder configuration, setting the measurement start date, and zeroing
+the scale ("calibration"). The device only allows one connected client at
+a time — the OEM app and Home Assistant can both work with the same device,
+just not at the exact same moment.
+
+With history polling disabled (passive-only mode), the integration never
+initiates active connections on its own. It still provides an **Estimated
+Empty** prediction by tracking percentage changes from advertisements — a
+coarser estimate, but functional for setups with passive-only Bluetooth
+hardware such as ESPHome BLE proxies without active connection support.
 
 Configurable from the integration options:
 
-- **History refresh interval** (minutes; default 15 to match the device's
-  measurement cycle, `0` disables)
+- **Enable automatic history polling** (default on; disable for passive-only
+  Bluetooth hardware)
+- **History refresh interval** (minutes; default 240 — gas level changes
+  also trigger an immediate refresh)
 - **Low-gas warning threshold** (percentage; default 10)
 - **Weight unit** (kg or lb)
 
@@ -29,7 +39,7 @@ Configurable from the integration options:
 - Battery monitoring
 - Anomaly detection on Plus models (temperature, incline, motion)
 - Calibration / zeroing from Home Assistant
-- Consumption history with predicted empty date
+- Consumption history with predicted empty date (active or passive mode)
 - Compatible with the official Senso4s mobile app — either can configure or
   zero the device
 
@@ -117,6 +127,7 @@ Change display settings without touching the device:
 
 - Weight Unit
 - Low Level Threshold
+- Enable Automatic History Polling
 - History Refresh Interval
 
 ## Entities
@@ -129,7 +140,7 @@ Change display settings without touching the device:
 | Gas Remaining | Calculated remaining mass in kg or lb |
 | Battery | Device battery level |
 | Usage Mode | Current usage mode preset |
-| Estimated Empty | Predicted date/time the tank will run dry |
+| Estimated Empty | Predicted date/time the tank will run dry (uses active history when available, falls back to passive percentage tracking) |
 | Last Setup | When the current measurement cycle was started |
 | Signal Strength | RSSI of the most recent advertisement (diagnostic) |
 | Empty Cylinder Weight | Configured empty weight (diagnostic) |
@@ -227,6 +238,9 @@ removed first).
   sensor
 - If your setup uses an ESPHome BLE proxy, ensure `bluetooth_proxy: active:
   true` is set so active connections can pass through
+- If your Bluetooth hardware only supports passive scanning, disable
+  **Enable automatic history polling** in Settings — the integration will
+  use passive percentage tracking for Estimated Empty instead
 
 ## Common cylinder sizes
 
