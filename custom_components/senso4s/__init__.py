@@ -179,11 +179,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     coordinator = Senso4sCoordinator(hass, entry, address)
 
-    # Seed from cache so entities render on warm restarts and the backfill
-    # below has data to read.
+    # Seed from cache so entities render on warm restarts, the backfill
+    # below has data to read, and the proof-of-life backstop can trigger
+    # an initial history poll without waiting for a dispatch.
     seed_info = bluetooth.async_last_service_info(hass, address, connectable=True)
     if seed_info is not None:
         coordinator._update_method(seed_info)
+        coordinator._last_service_info = seed_info
 
     # Backfill for entries created before rc8.
     if CONF_IS_PLUS not in entry.data:
