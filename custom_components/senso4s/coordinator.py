@@ -306,9 +306,9 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             return False
         if self.history_poll_interval <= 0:
             return False
-        if seconds_since_last_poll is None:
-            return True
-        return seconds_since_last_poll >= self.history_poll_interval * 60
+        # This callback only fires on dispatched adverts (data changed),
+        # which means the device recorded a new measurement — always poll.
+        return True
 
     async def _async_poll_history(
         self, last_service_info: BluetoothServiceInfoBleak

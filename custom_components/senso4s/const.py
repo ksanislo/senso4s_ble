@@ -56,7 +56,7 @@ DEFAULT_GAS_CAPACITY: Final = 11.0
 DEFAULT_USAGE_MODE: Final = 5  # Household
 DEFAULT_LOW_LEVEL_THRESHOLD: Final = 10
 DEFAULT_WEIGHT_UNIT: Final = UNIT_KG
-DEFAULT_HISTORY_POLL_INTERVAL: Final = 15  # minutes; matches device cycle. 0 disables.
+DEFAULT_HISTORY_POLL_INTERVAL: Final = 240  # minutes; backstop only — primary trigger is advert dispatch. 0 disables.
 
 
 def kg_to_lb(kg: float) -> float:
