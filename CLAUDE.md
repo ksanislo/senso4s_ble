@@ -173,12 +173,6 @@ When releasing, ALWAYS draft the release notes first and ask for
 verification before running `gh release create`. The user explicitly
 asked for this after the v1.4.0-beta.1 round.
 
-### Acknowledgements convention
-
-Every 1.4.0-line release notes ends with thanks to **Miha Finžgar and
-Senso4s** for providing test hardware. Keep this in future release notes
-unless the user says to drop it.
-
 ### Source attribution
 
 Some details of the integration's protocol handling and algorithms come
