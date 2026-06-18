@@ -293,12 +293,24 @@ class Senso4sSensorEntity(
             return None
 
         if key == "empty_weight":
-            return coord.empty_weight_kg
+            return coord.get_display_weight(coord.empty_weight_kg)
 
         if key == "gas_capacity":
-            return coord.gas_capacity_kg
+            return coord.get_display_weight(coord.gas_capacity_kg)
 
         return None
+
+    @property
+    def native_unit_of_measurement(self) -> Any:
+        # The cylinder-config diagnostics follow the unit chosen in options;
+        # their values are converted in native_value to match.
+        if self.entity_key.key in ("empty_weight", "gas_capacity"):
+            return (
+                UnitOfMass.POUNDS
+                if self._coordinator.use_pounds
+                else UnitOfMass.KILOGRAMS
+            )
+        return self.entity_description.native_unit_of_measurement
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
