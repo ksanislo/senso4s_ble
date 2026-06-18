@@ -33,6 +33,31 @@ from .models import CylinderConfig, HistoryRecord, Senso4sDeviceData
 _LOGGER = logging.getLogger(__name__)
 
 
+def interpret_level_byte(
+    level_byte: int,
+) -> tuple[int, bool, bool, Optional[int], list[AnomalyType]]:
+    """Interpret a D2 / mass byte.
+
+    Shared by the advertisement parser (byte 1) and the connected read of
+    characteristic 00007082, which carry the same value. Returns
+    (gas_level, needs_calibration, has_error, error_code, anomalies);
+    gas_level is the percentage 0-100, or -1 for any non-reading code.
+    """
+    if level_byte <= 100:
+        return level_byte, False, False, None, []
+    if level_byte == 0xFF:
+        # Not ready: untouched device, fresh batteries, or zeroing failed.
+        return -1, True, False, None, []
+    if level_byte in (0xFC, 0xFE):
+        # 0xFC = setup error (weight/capacity out of range); 0xFE = batteries empty.
+        return -1, False, True, level_byte, []
+    if 241 <= level_byte <= 247:
+        # Cycle-startup anomaly flags (PLUS): TEMPERATURE/INCLINE/MOTION bits.
+        flags = level_byte - 240
+        return -1, False, False, None, [a for a in AnomalyType if flags & a.value]
+    return -1, False, False, None, []
+
+
 def parse_manufacturer_data(
     mfr_id: int, data: bytes, device_name: str = ""
 ) -> Optional[Senso4sDeviceData]:
@@ -100,40 +125,19 @@ def parse_manufacturer_data(
     # Parse MAC address
     mac_address = ":".join(f"{b:02X}" for b in mac_bytes)
 
-    # Determine status
-    gas_level = level_byte
-    needs_calibration = False
-    has_error = False
-    error_code: Optional[int] = None
-    anomalies: list[AnomalyType] = []
-
     # Steady-state anomalies live in the upper nibble of D1 (PLUS only).
+    anomalies: list[AnomalyType] = []
     if is_plus and model_nibble != 0:
         for anomaly in AnomalyType:
             if model_nibble & anomaly.value:
                 anomalies.append(anomaly)
 
-    if level_byte == 255:
-        # "Not ready" per protocol §2.3: untouched device, fresh batteries, or
-        # zeroing failed. Triggers our existing repair flow.
-        needs_calibration = True
-        gas_level = -1
-    elif level_byte in (0xFC, 0xFE):
-        # 0xFC = setup error (weight/capacity out of allowed range)
-        # 0xFE = empty batteries (replace required)
-        has_error = True
-        error_code = level_byte
-        gas_level = -1
-    elif 241 <= level_byte <= 247:
-        # Cycle-startup anomaly flags (§2.3) — PLUS only. Lower nibble has the
-        # same TEMPERATURE/INCLINE/MOTION bit pattern as D1's upper nibble.
-        anomaly_flags = level_byte - 240
-        for anomaly in AnomalyType:
-            if anomaly_flags & anomaly.value and anomaly not in anomalies:
-                anomalies.append(anomaly)
-        gas_level = -1
-    elif level_byte > 100:
-        gas_level = -1
+    gas_level, needs_calibration, has_error, error_code, level_anomalies = (
+        interpret_level_byte(level_byte)
+    )
+    for anomaly in level_anomalies:
+        if anomaly not in anomalies:
+            anomalies.append(anomaly)
 
     return Senso4sDeviceData(
         mac_address=mac_address,

@@ -212,6 +212,31 @@ class Senso4sBLEClient:
             _LOGGER.warning("[%s] Failed to read level: %s", self._addr, err)
             return None
 
+    async def read_mass_level(self) -> Optional[int]:
+        """Read the current mass byte directly from the level characteristic.
+
+        A plain GATT read (not notify) so a steady device that isn't pushing
+        notifications still returns its current value. Used as a fallback when
+        a passive-scanning adapter never delivers the advertisement mass byte.
+        Returns the raw D2-equivalent byte, or None on failure.
+        """
+        if not self.is_connected or self._client is None:
+            return None
+
+        try:
+            data = await self._client.read_gatt_char(CHAR_LEVEL_UUID)
+            _LOGGER.debug(
+                "[%s] BLE RX [LEVEL-READ]: %s",
+                self._addr,
+                data.hex(" ") if data else "(empty)",
+            )
+            if data:
+                return data[0]
+            return None
+        except BleakError as err:
+            _LOGGER.warning("[%s] Failed to read mass level: %s", self._addr, err)
+            return None
+
     async def read_history(
         self, setup_date: datetime, timeout: float = NOTIFICATION_TIMEOUT
     ) -> list[HistoryRecord]:

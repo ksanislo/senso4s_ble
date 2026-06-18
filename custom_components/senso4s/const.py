@@ -143,6 +143,7 @@ ERROR_DESCRIPTIONS: Final = {
 
 # Repair issue IDs
 ISSUE_NEEDS_CALIBRATION: Final = "needs_calibration"
+ISSUE_PASSIVE_SCANNING: Final = "passive_scanning"
 
 # Calibration timeouts
 CALIBRATION_LEVEL_WAIT_TIMEOUT: Final = 5.0  # seconds

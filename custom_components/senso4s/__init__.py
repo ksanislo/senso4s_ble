@@ -47,6 +47,7 @@ from .const import (
     DEFAULT_HISTORY_POLL_INTERVAL,
     DOMAIN,
     ISSUE_NEEDS_CALIBRATION,
+    ISSUE_PASSIVE_SCANNING,
     UsageMode,
 )
 from .coordinator import Senso4sCoordinator
@@ -227,6 +228,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _CALIBRATION_STATE.pop(address, None)
         ir.async_delete_issue(
             hass, DOMAIN, f"{ISSUE_NEEDS_CALIBRATION}_{address}"
+        )
+        ir.async_delete_issue(
+            hass, DOMAIN, f"{ISSUE_PASSIVE_SCANNING}_{address}"
         )
     return unload_ok
 

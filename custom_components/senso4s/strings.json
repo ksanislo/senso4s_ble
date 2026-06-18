@@ -1,5 +1,9 @@
 {
   "issues": {
+    "passive_scanning": {
+      "title": "Senso4s is not receiving active Bluetooth scan data",
+      "description": "The Bluetooth adapter or proxy reaching **{device_name}** is not performing active scanning, so it never receives the scan-response advertisement that carries the live gas level and battery. The integration has fallen back to slower connected reads, which use more device battery.\n\nThe integration already asks Home Assistant for active scanning, and HA controls a proxy's scan mode automatically. If this notice persists, the adapter or proxy in range of this device likely can't active-scan — move the device near an adapter that can, or update the proxy's firmware."
+    },
     "needs_calibration": {
       "title": "Senso4s requires calibration",
       "fix_flow": {

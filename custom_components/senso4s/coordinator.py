@@ -29,6 +29,7 @@ from homeassistant.components.bluetooth.active_update_processor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
@@ -49,6 +50,7 @@ from .const import (
     DEFAULT_USAGE_MODE,
     DEFAULT_WEIGHT_UNIT,
     DOMAIN,
+    ISSUE_PASSIVE_SCANNING,
     MANUFACTURER,
     PASSIVE_HISTORY_MAX_POINTS,
     REFILL_THRESHOLD_PERCENT,
@@ -57,7 +59,7 @@ from .const import (
     kg_to_lb,
 )
 from .models import HistoryRecord, Senso4sDeviceData
-from .parser import parse_manufacturer_data
+from .parser import interpret_level_byte, parse_manufacturer_data
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -144,6 +146,11 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         self._last_proof_of_life_time: Optional[float] = None
         self._cancel_proof_of_life: Any = None
 
+        # Passive-scan detection: True once any advert carries manufacturer data.
+        self._advert_mfr_seen = False
+        self._passive_scan_empty_count = 0
+        self._passive_scan_issue_active = False
+
         # Passive history: rolling window of advert-based percentage observations
         self._passive_history: list[dict] = []
         self._last_passive_pct: Optional[int] = None
@@ -157,7 +164,11 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             hass=hass,
             logger=_LOGGER,
             address=address,
-            mode=BluetoothScanningMode.PASSIVE,
+            # ACTIVE so HA commands adapters/proxies to solicit the scan
+            # response, which is where the Senso4s mass/battery bytes live.
+            # PASSIVE starves us of all advert data on proxies that have no
+            # other reason to active-scan.
+            mode=BluetoothScanningMode.ACTIVE,
             update_method=self._update_method,
             needs_poll_method=self._needs_poll,
             poll_method=self._async_poll_history,
@@ -281,6 +292,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         con = bluetooth.async_last_service_info(
             self.hass, self.address, connectable=True
         )
+        self._check_passive_scanning(con, noncon)
         # Track the freshest of the two caches; the percent byte may arrive on
         # the connectable advert while the non-connectable mirror lags.
         info = noncon
@@ -343,6 +355,63 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
                 self._debounced_poll.async_schedule_call()
 
     @callback
+    def _check_passive_scanning(
+        self,
+        con: Optional[BluetoothServiceInfoBleak],
+        noncon: Optional[BluetoothServiceInfoBleak],
+    ) -> None:
+        """Warn when a device is only reachable via a passive-scanning adapter.
+
+        Senso4s carries its mass/battery bytes in the scan response, which only
+        active scanning retrieves. If we keep seeing the device advertise with
+        no manufacturer data, the adapter/proxy in range is passive-scanning.
+        """
+        has_mfr = bool(con and con.manufacturer_data) or bool(
+            noncon and noncon.manufacturer_data
+        )
+        if has_mfr or self._advert_mfr_seen:
+            self._passive_scan_empty_count = 0
+            self._clear_passive_scan_issue()
+            return
+        if con is None and noncon is None:
+            return
+        self._passive_scan_empty_count += 1
+        if (
+            self._passive_scan_empty_count >= 3
+            and not self._passive_scan_issue_active
+        ):
+            _LOGGER.warning(
+                "[%s] Advertisements carry no manufacturer data even though the "
+                "integration requests active scanning — the adapter/proxy "
+                "reaching this device isn't active-scanning (it may not support "
+                "it). The live gas level and battery never arrive; falling back "
+                "to slower connected reads.",
+                self.address,
+            )
+            self._raise_passive_scan_issue()
+
+    def _raise_passive_scan_issue(self) -> None:
+        self._passive_scan_issue_active = True
+        ir.async_create_issue(
+            self.hass,
+            DOMAIN,
+            f"{ISSUE_PASSIVE_SCANNING}_{self.address}",
+            is_fixable=False,
+            is_persistent=False,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key=ISSUE_PASSIVE_SCANNING,
+            translation_placeholders={"device_name": self.device_name},
+        )
+
+    def _clear_passive_scan_issue(self) -> None:
+        if not self._passive_scan_issue_active:
+            return
+        self._passive_scan_issue_active = False
+        ir.async_delete_issue(
+            self.hass, DOMAIN, f"{ISSUE_PASSIVE_SCANNING}_{self.address}"
+        )
+
+    @callback
     def _update_method(
         self, service_info: BluetoothServiceInfoBleak
     ) -> Senso4sDeviceData:
@@ -364,6 +433,8 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             )
             if parsed is None:
                 continue
+            self._advert_mfr_seen = True
+            self._clear_passive_scan_issue()
             self.data.mac_address = parsed.mac_address
             self.data.name = parsed.name or self.data.name
             self.data.gas_level_percent = parsed.gas_level_percent
@@ -447,11 +518,39 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
 
             history = await client.read_history(setup_date)
             self.update_history(history)
+
+            # Passive-scanning adapters never deliver the advertisement mass
+            # byte, so fill it from the level characteristic we can reach now.
+            if not self._advert_mfr_seen or self.data.gas_level_percent < 0:
+                mass_byte = await client.read_mass_level()
+                if mass_byte is not None:
+                    self._apply_mass_byte(mass_byte)
+
             self._last_polled_gas_level = self.data.gas_level_percent
         finally:
             await client.disconnect()
             self._poll_in_flight = False
         return self.data
+
+    def _apply_mass_byte(self, level_byte: int) -> None:
+        """Populate level state from a connected read of characteristic 00007082."""
+        gas_level, needs_cal, has_error, error_code, anomalies = interpret_level_byte(
+            level_byte
+        )
+        _LOGGER.debug(
+            "[%s] Connected mass read: byte=0x%02X -> level=%s",
+            self.address,
+            level_byte,
+            gas_level if gas_level >= 0 else "N/A",
+        )
+        self.data.gas_level_percent = gas_level
+        self.data.needs_calibration = needs_cal
+        self.data.has_error = has_error
+        self.data.error_code = error_code
+        self.data.anomalies = anomalies
+        self.data.last_seen = dt_util.now()
+        if gas_level >= 0:
+            self._record_passive_data_point(gas_level, self.data.last_seen)
 
     async def _sync_config_from_device(
         self, client, setup_date: datetime
