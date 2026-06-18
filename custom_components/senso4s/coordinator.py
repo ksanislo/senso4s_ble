@@ -65,6 +65,17 @@ PROOF_OF_LIFE_INTERVAL = timedelta(seconds=30)
 PASSIVE_HISTORY_STORAGE_VERSION = 1
 
 
+def _format_mfr(info: Optional[BluetoothServiceInfoBleak]) -> str:
+    """Format a cache's manufacturer data for logging, or note its absence."""
+    if info is None:
+        return "no-cache"
+    if not info.manufacturer_data:
+        return "EMPTY"
+    return " ".join(
+        f"{mid:04x}:{bytes(p).hex()}" for mid, p in info.manufacturer_data.items()
+    )
+
+
 class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData]):
     """ActiveBluetooth coordinator for a single Senso4s device."""
 
@@ -264,9 +275,17 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
 
     @callback
     def _async_proof_of_life_tick(self, _now: Any) -> None:
-        info = bluetooth.async_last_service_info(
+        noncon = bluetooth.async_last_service_info(
             self.hass, self.address, connectable=False
         )
+        con = bluetooth.async_last_service_info(
+            self.hass, self.address, connectable=True
+        )
+        # Track the freshest of the two caches; the percent byte may arrive on
+        # the connectable advert while the non-connectable mirror lags.
+        info = noncon
+        if con is not None and (info is None or con.time > info.time):
+            info = con
         if info is None:
             _LOGGER.debug(
                 "[%s] BLE RX [SCANNER] no advertisement cached", self.address
@@ -289,20 +308,23 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             if self._last_proof_of_life_time is not None
             else 0.0
         )
-        mfr_hex = " ".join(
-            f"{mid:04x}:{bytes(payload).hex()}"
-            for mid, payload in info.manufacturer_data.items()
-        )
+        self._last_proof_of_life_time = cur
         _LOGGER.debug(
-            "[%s] BLE RX [SCANNER] via %s (RSSI: %s dBm, %.1fs since "
-            "previous): %s",
+            "[%s] BLE RX [SCANNER] via %s (RSSI: %s dBm, %.1fs since previous) "
+            "name=%r connectable=%s tx_power=%s mfr[con]=%s mfr[noncon]=%s "
+            "svc_uuids=%s svc_data=%s",
             self.address,
             info.source,
             getattr(info, "rssi", "?"),
             gap,
-            mfr_hex,
+            info.name,
+            info.connectable,
+            getattr(info, "tx_power", "?"),
+            _format_mfr(con),
+            _format_mfr(noncon),
+            list(info.service_uuids),
+            {k: bytes(v).hex() for k, v in info.service_data.items()},
         )
-        self._last_proof_of_life_time = cur
 
         # Check if history cache is stale while the device is alive
         if (
