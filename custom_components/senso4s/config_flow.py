@@ -286,7 +286,7 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
                     ): vol.Coerce(float),
                     vol.Required(
                         CONF_USAGE_MODE, default=DEFAULT_USAGE_MODE
-                    ): vol.In(usage_options),
+                    ): vol.All(vol.Coerce(int), vol.In(usage_options)),
                 }
             ),
             description_placeholders={
@@ -594,8 +594,11 @@ class Senso4sOptionsFlow(OptionsFlow):
                     CONF_GAS_CAPACITY, default=round(display_capacity, 2)
                 ): vol.Coerce(float),
                 vol.Required(
-                    CONF_USAGE_MODE, default=current[CONF_USAGE_MODE]
-                ): vol.In(usage_options),
+                    CONF_USAGE_MODE,
+                    default=current[CONF_USAGE_MODE]
+                    if current[CONF_USAGE_MODE] in usage_options
+                    else DEFAULT_USAGE_MODE,
+                ): vol.All(vol.Coerce(int), vol.In(usage_options)),
                 vol.Required(
                     CONF_LOW_LEVEL_THRESHOLD, default=current[CONF_LOW_LEVEL_THRESHOLD]
                 ): vol.All(vol.Coerce(int), vol.Range(min=5, max=50)),

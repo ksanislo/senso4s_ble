@@ -50,6 +50,7 @@ from .const import (
     DEFAULT_USAGE_MODE,
     DEFAULT_WEIGHT_UNIT,
     DOMAIN,
+    ISSUE_NEEDS_CALIBRATION,
     ISSUE_PASSIVE_SCANNING,
     MANUFACTURER,
     PASSIVE_HISTORY_MAX_POINTS,
@@ -148,6 +149,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         self._advert_mfr_seen = False
         self._passive_scan_empty_count = 0
         self._passive_scan_issue_active = False
+        self._calibration_issue_active = False
 
         # Passive history: rolling window of advert-based percentage observations
         self._passive_history: list[dict] = []
@@ -402,6 +404,35 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         )
 
     @callback
+    def check_calibration_issue(self) -> None:
+        """Raise/clear the calibration repair as needs_calibration transitions.
+
+        Must run on every state update, not just at setup — the device flips to
+        0xFF (zeroing required) mid-run, while the integration is already loaded.
+        """
+        needs_cal = self.data.needs_calibration
+        if needs_cal == self._calibration_issue_active:
+            return
+        self._calibration_issue_active = needs_cal
+        issue_id = f"{ISSUE_NEEDS_CALIBRATION}_{self.address}"
+        if needs_cal:
+            _LOGGER.debug("[%s] Creating calibration issue", self.address)
+            ir.async_create_issue(
+                self.hass,
+                DOMAIN,
+                issue_id,
+                is_fixable=True,
+                is_persistent=False,
+                severity=ir.IssueSeverity.WARNING,
+                translation_key=ISSUE_NEEDS_CALIBRATION,
+                translation_placeholders={"device_name": self.device_name},
+                data={"entry_id": self.entry.entry_id},
+            )
+        else:
+            _LOGGER.debug("[%s] Deleting calibration issue", self.address)
+            ir.async_delete_issue(self.hass, DOMAIN, issue_id)
+
+    @callback
     def _update_method(
         self, service_info: BluetoothServiceInfoBleak
     ) -> Senso4sDeviceData:
@@ -455,6 +486,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             self._record_passive_data_point(
                 parsed.gas_level_percent, self.data.last_seen
             )
+            self.check_calibration_issue()
             break
         return self.data
 
@@ -541,6 +573,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         self.data.last_seen = dt_util.now()
         if gas_level >= 0:
             self._record_passive_data_point(gas_level, self.data.last_seen)
+        self.check_calibration_issue()
 
     async def _sync_config_from_device(
         self, client, setup_date: datetime

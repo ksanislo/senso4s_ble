@@ -56,41 +56,6 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
-_CALIBRATION_STATE: dict[str, bool] = {}
-
-
-def _check_calibration_issue(
-    hass: HomeAssistant,
-    entry: ConfigEntry,
-    coordinator: Senso4sCoordinator,
-) -> None:
-    """Create / clear the calibration repair issue as the device state changes."""
-    address = coordinator.address
-    needs_calibration = coordinator.data.needs_calibration
-    previous_state = _CALIBRATION_STATE.get(address)
-    _CALIBRATION_STATE[address] = needs_calibration
-
-    if previous_state == needs_calibration:
-        return
-
-    issue_id = f"{ISSUE_NEEDS_CALIBRATION}_{address}"
-    if needs_calibration:
-        _LOGGER.debug("Creating calibration issue for %s", address)
-        ir.async_create_issue(
-            hass,
-            DOMAIN,
-            issue_id,
-            is_fixable=True,
-            is_persistent=False,
-            severity=ir.IssueSeverity.WARNING,
-            translation_key=ISSUE_NEEDS_CALIBRATION,
-            translation_placeholders={"device_name": coordinator.device_name},
-            data={"entry_id": entry.entry_id},
-        )
-    else:
-        _LOGGER.debug("Deleting calibration issue for %s", address)
-        ir.async_delete_issue(hass, DOMAIN, issue_id)
-
 
 def _check_and_sync_usage_mode(
     hass: HomeAssistant,
@@ -215,7 +180,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_on_unload(entry.add_update_listener(_async_update_options))
 
     if coordinator.data.mac_address:
-        _check_calibration_issue(hass, entry, coordinator)
+        coordinator.check_calibration_issue()
 
     return True
 
@@ -225,7 +190,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     address = entry.data[CONF_ADDRESS]
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         hass.data[DOMAIN].pop(entry.entry_id)
-        _CALIBRATION_STATE.pop(address, None)
         ir.async_delete_issue(
             hass, DOMAIN, f"{ISSUE_NEEDS_CALIBRATION}_{address}"
         )
