@@ -67,14 +67,12 @@ PROOF_OF_LIFE_INTERVAL = timedelta(seconds=30)
 PASSIVE_HISTORY_STORAGE_VERSION = 1
 
 
-def _format_mfr(info: Optional[BluetoothServiceInfoBleak]) -> str:
-    """Format a cache's manufacturer data for logging, or note its absence."""
-    if info is None:
-        return "no-cache"
-    if not info.manufacturer_data:
+def _format_mfr(manufacturer_data: dict) -> str:
+    """Format a manufacturer-data dict for logging, or note its absence."""
+    if not manufacturer_data:
         return "EMPTY"
     return " ".join(
-        f"{mid:04x}:{bytes(p).hex()}" for mid, p in info.manufacturer_data.items()
+        f"{mid:04x}:{bytes(p).hex()}" for mid, p in manufacturer_data.items()
     )
 
 
@@ -286,18 +284,16 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
 
     @callback
     def _async_proof_of_life_tick(self, _now: Any) -> None:
-        noncon = bluetooth.async_last_service_info(
+        # Enumerate every scanner hearing this device so the active/passive
+        # split is visible: one scanner may carry the manufacturer data (scan
+        # response, active) while another only sees the bare advert (passive).
+        devices = bluetooth.async_scanner_devices_by_address(
             self.hass, self.address, connectable=False
         )
-        con = bluetooth.async_last_service_info(
-            self.hass, self.address, connectable=True
+        self._check_passive_scanning(devices)
+        info = bluetooth.async_last_service_info(
+            self.hass, self.address, connectable=False
         )
-        self._check_passive_scanning(con, noncon)
-        # Track the freshest of the two caches; the percent byte may arrive on
-        # the connectable advert while the non-connectable mirror lags.
-        info = noncon
-        if con is not None and (info is None or con.time > info.time):
-            info = con
         if info is None:
             _LOGGER.debug(
                 "[%s] BLE RX [SCANNER] no advertisement cached", self.address
@@ -321,21 +317,21 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             else 0.0
         )
         self._last_proof_of_life_time = cur
+        scanners = " | ".join(
+            "%s(RSSI %sdBm, mfr=%s)"
+            % (
+                d.scanner.source,
+                getattr(d.advertisement, "rssi", "?"),
+                _format_mfr(d.advertisement.manufacturer_data),
+            )
+            for d in devices
+        )
         _LOGGER.debug(
-            "[%s] BLE RX [SCANNER] via %s (RSSI: %s dBm, %.1fs since previous) "
-            "name=%r connectable=%s tx_power=%s mfr[con]=%s mfr[noncon]=%s "
-            "svc_uuids=%s svc_data=%s",
+            "[%s] BLE RX [SCANNER] %.1fs since previous; heard by %d scanner(s): %s",
             self.address,
-            info.source,
-            getattr(info, "rssi", "?"),
             gap,
-            info.name,
-            info.connectable,
-            getattr(info, "tx_power", "?"),
-            _format_mfr(con),
-            _format_mfr(noncon),
-            list(info.service_uuids),
-            {k: bytes(v).hex() for k, v in info.service_data.items()},
+            len(devices),
+            scanners or "(none)",
         )
 
         # Check if history cache is stale while the device is alive
@@ -355,25 +351,19 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
                 self._debounced_poll.async_schedule_call()
 
     @callback
-    def _check_passive_scanning(
-        self,
-        con: Optional[BluetoothServiceInfoBleak],
-        noncon: Optional[BluetoothServiceInfoBleak],
-    ) -> None:
-        """Warn when a device is only reachable via a passive-scanning adapter.
+    def _check_passive_scanning(self, devices: list) -> None:
+        """Warn when no scanner hearing this device delivers manufacturer data.
 
         Senso4s carries its mass/battery bytes in the scan response, which only
-        active scanning retrieves. If we keep seeing the device advertise with
-        no manufacturer data, the adapter/proxy in range is passive-scanning.
+        active scanning retrieves. If every scanner that hears the device sees
+        only the bare advert, the adapters in range are all passive-scanning.
         """
-        has_mfr = bool(con and con.manufacturer_data) or bool(
-            noncon and noncon.manufacturer_data
-        )
+        has_mfr = any(d.advertisement.manufacturer_data for d in devices)
         if has_mfr or self._advert_mfr_seen:
             self._passive_scan_empty_count = 0
             self._clear_passive_scan_issue()
             return
-        if con is None and noncon is None:
+        if not devices:
             return
         self._passive_scan_empty_count += 1
         if (
