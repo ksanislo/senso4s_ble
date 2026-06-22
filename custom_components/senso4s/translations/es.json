@@ -1,20 +1,20 @@
 {
   "issues": {
     "needs_calibration": {
-      "title": "Senso4s requiere calibración",
+      "title": "{device_name} requiere calibración",
       "fix_flow": {
         "step": {
           "init": {
             "title": "Calibración requerida",
-            "description": "Su báscula Senso4s necesita ser calibrada para medir los niveles de gas con precisión.\n\n**Qué sucede durante la calibración:**\n1. Retirará el cilindro de gas de la báscula\n2. La báscula se calibrará mientras está vacía\n3. Colocará el cilindro de nuevo en la báscula\n4. Se guardará la configuración\n\nHaga clic en Enviar cuando esté listo para comenzar."
+            "description": "**{device_name}**\n\nSu báscula Senso4s necesita ser calibrada para medir los niveles de gas con precisión.\n\n**Qué sucede durante la calibración:**\n1. Retirará el cilindro de gas de la báscula\n2. La báscula se calibrará mientras está vacía\n3. Colocará el cilindro de nuevo en la báscula\n4. Se guardará la configuración\n\nHaga clic en Enviar cuando esté listo para comenzar."
           },
           "remove_cylinder": {
             "title": "Retirar cilindro de gas",
-            "description": "**Retire el cilindro de gas de la báscula ahora.**\n\nLa báscula debe estar completamente vacía para que la calibración funcione correctamente. Asegúrese de que no haya nada en la báscula.\n\nUna vez retirado el cilindro, haga clic en Enviar para iniciar la calibración."
+            "description": "**{device_name}**\n\n**Retire el cilindro de gas de la báscula ahora.**\n\nLa báscula debe estar completamente vacía para que la calibración funcione correctamente. Asegúrese de que no haya nada en la báscula.\n\nUna vez retirado el cilindro, haga clic en Enviar para iniciar la calibración."
           },
           "replace_tank": {
             "title": "Colocar cilindro de gas",
-            "description": "¡Calibración completada!\n\nColoque el cilindro de gas de nuevo en la báscula y luego haga clic en Enviar para escribir la configuración y verificar la lectura."
+            "description": "**{device_name}**\n\n¡Calibración completada!\n\nColoque el cilindro de gas de nuevo en la báscula y luego haga clic en Enviar para escribir la configuración y verificar la lectura."
           }
         },
         "abort": {

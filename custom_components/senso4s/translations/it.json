@@ -1,20 +1,20 @@
 {
   "issues": {
     "needs_calibration": {
-      "title": "Senso4s richiede calibrazione",
+      "title": "{device_name} richiede calibrazione",
       "fix_flow": {
         "step": {
           "init": {
             "title": "Calibrazione richiesta",
-            "description": "La tua bilancia Senso4s deve essere calibrata per misurare accuratamente i livelli di gas.\n\n**Cosa succede durante la calibrazione:**\n1. Rimuoverai la bombola del gas dalla bilancia\n2. La bilancia si calibrerà da vuota\n3. Rimetterai la bombola sulla bilancia\n4. La configurazione verrà salvata\n\nClicca su Invia quando sei pronto per iniziare."
+            "description": "**{device_name}**\n\nLa tua bilancia Senso4s deve essere calibrata per misurare accuratamente i livelli di gas.\n\n**Cosa succede durante la calibrazione:**\n1. Rimuoverai la bombola del gas dalla bilancia\n2. La bilancia si calibrerà da vuota\n3. Rimetterai la bombola sulla bilancia\n4. La configurazione verrà salvata\n\nClicca su Invia quando sei pronto per iniziare."
           },
           "remove_cylinder": {
             "title": "Rimuovere la bombola del gas",
-            "description": "**Rimuovi ora la bombola del gas dalla bilancia.**\n\nLa bilancia deve essere completamente vuota affinché la calibrazione funzioni correttamente. Assicurati che non ci sia nulla sulla bilancia.\n\nUna volta rimossa la bombola, clicca su Invia per avviare la calibrazione."
+            "description": "**{device_name}**\n\n**Rimuovi ora la bombola del gas dalla bilancia.**\n\nLa bilancia deve essere completamente vuota affinché la calibrazione funzioni correttamente. Assicurati che non ci sia nulla sulla bilancia.\n\nUna volta rimossa la bombola, clicca su Invia per avviare la calibrazione."
           },
           "replace_tank": {
             "title": "Riposizionare la bombola del gas",
-            "description": "Calibrazione completata!\n\nRimetti la bombola del gas sulla bilancia, poi clicca su Invia per scrivere la configurazione e verificare la lettura."
+            "description": "**{device_name}**\n\nCalibrazione completata!\n\nRimetti la bombola del gas sulla bilancia, poi clicca su Invia per scrivere la configurazione e verificare la lettura."
           }
         },
         "abort": {

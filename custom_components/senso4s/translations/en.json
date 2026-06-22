@@ -5,20 +5,20 @@
       "description": "The Bluetooth adapter or proxy reaching **{device_name}** is not performing active scanning, so it never receives the scan-response advertisement that carries the live gas level and battery. The integration has fallen back to slower connected reads, which use more device battery.\n\nThe integration already asks Home Assistant for active scanning, and HA controls a proxy's scan mode automatically. If this notice persists, the adapter or proxy in range of this device likely can't active-scan — move the device near an adapter that can, or update the proxy's firmware."
     },
     "needs_calibration": {
-      "title": "Senso4s requires calibration",
+      "title": "{device_name} requires calibration",
       "fix_flow": {
         "step": {
           "init": {
             "title": "Calibration Required",
-            "description": "Your Senso4s scale needs to be calibrated to measure gas levels accurately.\n\n**What happens during calibration:**\n1. You will remove the gas cylinder from the scale\n2. The scale will calibrate itself while empty\n3. You will place the cylinder back on the scale\n4. The configuration will be saved\n\nClick Submit when you are ready to begin."
+            "description": "**{device_name}**\n\nYour Senso4s scale needs to be calibrated to measure gas levels accurately.\n\n**What happens during calibration:**\n1. You will remove the gas cylinder from the scale\n2. The scale will calibrate itself while empty\n3. You will place the cylinder back on the scale\n4. The configuration will be saved\n\nClick Submit when you are ready to begin."
           },
           "remove_cylinder": {
             "title": "Remove Gas Cylinder",
-            "description": "**Remove the gas cylinder from the scale now.**\n\nThe scale must be completely empty for calibration to work correctly. Make sure nothing is on the scale.\n\nOnce the cylinder is removed, click Submit to start calibration."
+            "description": "**{device_name}**\n\n**Remove the gas cylinder from the scale now.**\n\nThe scale must be completely empty for calibration to work correctly. Make sure nothing is on the scale.\n\nOnce the cylinder is removed, click Submit to start calibration."
           },
           "replace_tank": {
             "title": "Replace Gas Cylinder",
-            "description": "Calibration complete!\n\nPlace the gas cylinder back on the scale, then click Submit to write the configuration and verify the reading."
+            "description": "**{device_name}**\n\nCalibration complete!\n\nPlace the gas cylinder back on the scale, then click Submit to write the configuration and verify the reading."
           }
         },
         "abort": {

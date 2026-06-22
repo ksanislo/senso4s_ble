@@ -1,20 +1,20 @@
 {
   "issues": {
     "needs_calibration": {
-      "title": "Senso4s nécessite une calibration",
+      "title": "{device_name} nécessite une calibration",
       "fix_flow": {
         "step": {
           "init": {
             "title": "Calibration requise",
-            "description": "Votre balance Senso4s doit être calibrée pour mesurer les niveaux de gaz avec précision.\n\n**Ce qui se passe pendant la calibration :**\n1. Vous retirerez la bouteille de gaz de la balance\n2. La balance se calibrera à vide\n3. Vous replacerez la bouteille sur la balance\n4. La configuration sera enregistrée\n\nCliquez sur Soumettre lorsque vous êtes prêt à commencer."
+            "description": "**{device_name}**\n\nVotre balance Senso4s doit être calibrée pour mesurer les niveaux de gaz avec précision.\n\n**Ce qui se passe pendant la calibration :**\n1. Vous retirerez la bouteille de gaz de la balance\n2. La balance se calibrera à vide\n3. Vous replacerez la bouteille sur la balance\n4. La configuration sera enregistrée\n\nCliquez sur Soumettre lorsque vous êtes prêt à commencer."
           },
           "remove_cylinder": {
             "title": "Retirer la bouteille de gaz",
-            "description": "**Retirez la bouteille de gaz de la balance maintenant.**\n\nLa balance doit être complètement vide pour que la calibration fonctionne correctement. Assurez-vous que rien ne se trouve sur la balance.\n\nUne fois la bouteille retirée, cliquez sur Soumettre pour démarrer la calibration."
+            "description": "**{device_name}**\n\n**Retirez la bouteille de gaz de la balance maintenant.**\n\nLa balance doit être complètement vide pour que la calibration fonctionne correctement. Assurez-vous que rien ne se trouve sur la balance.\n\nUne fois la bouteille retirée, cliquez sur Soumettre pour démarrer la calibration."
           },
           "replace_tank": {
             "title": "Replacer la bouteille de gaz",
-            "description": "Calibration terminée !\n\nReplacez la bouteille de gaz sur la balance, puis cliquez sur Soumettre pour écrire la configuration et vérifier la lecture."
+            "description": "**{device_name}**\n\nCalibration terminée !\n\nReplacez la bouteille de gaz sur la balance, puis cliquez sur Soumettre pour écrire la configuration et vérifier la lecture."
           }
         },
         "abort": {

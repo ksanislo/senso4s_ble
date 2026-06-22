@@ -1,20 +1,20 @@
 {
   "issues": {
     "needs_calibration": {
-      "title": "Senso4s vereist kalibratie",
+      "title": "{device_name} vereist kalibratie",
       "fix_flow": {
         "step": {
           "init": {
             "title": "Kalibratie vereist",
-            "description": "Uw Senso4s-weegschaal moet worden gekalibreerd om de gasniveaus nauwkeurig te meten.\n\n**Wat er tijdens de kalibratie gebeurt:**\n1. U verwijdert de gasfles van de weegschaal\n2. De weegschaal kalibreert zichzelf terwijl deze leeg is\n3. U plaatst de fles terug op de weegschaal\n4. De configuratie wordt opgeslagen\n\nKlik op Verzenden wanneer u klaar bent om te beginnen."
+            "description": "**{device_name}**\n\nUw Senso4s-weegschaal moet worden gekalibreerd om de gasniveaus nauwkeurig te meten.\n\n**Wat er tijdens de kalibratie gebeurt:**\n1. U verwijdert de gasfles van de weegschaal\n2. De weegschaal kalibreert zichzelf terwijl deze leeg is\n3. U plaatst de fles terug op de weegschaal\n4. De configuratie wordt opgeslagen\n\nKlik op Verzenden wanneer u klaar bent om te beginnen."
           },
           "remove_cylinder": {
             "title": "Gasfles verwijderen",
-            "description": "**Verwijder nu de gasfles van de weegschaal.**\n\nDe weegschaal moet volledig leeg zijn om correct te kunnen kalibreren. Zorg ervoor dat er niets op de weegschaal staat.\n\nZodra de fles is verwijderd, klikt u op Verzenden om de kalibratie te starten."
+            "description": "**{device_name}**\n\n**Verwijder nu de gasfles van de weegschaal.**\n\nDe weegschaal moet volledig leeg zijn om correct te kunnen kalibreren. Zorg ervoor dat er niets op de weegschaal staat.\n\nZodra de fles is verwijderd, klikt u op Verzenden om de kalibratie te starten."
           },
           "replace_tank": {
             "title": "Gasfles terugplaatsen",
-            "description": "Kalibratie voltooid!\n\nPlaats de gasfles terug op de weegschaal en klik vervolgens op Verzenden om de configuratie te schrijven en de meting te verifiëren."
+            "description": "**{device_name}**\n\nKalibratie voltooid!\n\nPlaats de gasfles terug op de weegschaal en klik vervolgens op Verzenden om de configuratie te schrijven en de meting te verifiëren."
           }
         },
         "abort": {

@@ -29,7 +29,11 @@ from homeassistant.components.bluetooth.active_update_processor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers import (
+    area_registry as ar,
+    device_registry as dr,
+    issue_registry as ir,
+)
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
@@ -179,6 +183,26 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
     def device_name(self) -> str:
         suffix = self.address[-5:].replace(":", "")
         return f"Senso4s Gas Sensor ({suffix})"
+
+    @property
+    def friendly_device_label(self) -> str:
+        """User-facing name (and area, if assigned) for repair/notification text.
+
+        Resolves the registry name the user actually set, falling back to the
+        address-suffix device_name when no registry entry exists yet.
+        """
+        device = dr.async_get(self.hass).async_get_device(
+            identifiers={(DOMAIN, self.address)},
+            connections={(dr.CONNECTION_BLUETOOTH, self.address)},
+        )
+        if device is None:
+            return self.device_name
+        name = device.name_by_user or device.name or self.device_name
+        if device.area_id:
+            area = ar.async_get(self.hass).async_get_area(device.area_id)
+            if area is not None:
+                return f"{name} ({area.name})"
+        return name
 
     @property
     def name(self) -> str:
@@ -425,7 +449,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
                 is_persistent=False,
                 severity=ir.IssueSeverity.WARNING,
                 translation_key=ISSUE_NEEDS_CALIBRATION,
-                translation_placeholders={"device_name": self.device_name},
+                translation_placeholders={"device_name": self.friendly_device_label},
                 data={"entry_id": self.entry.entry_id},
             )
         else:

@@ -1,20 +1,20 @@
 {
   "issues": {
     "needs_calibration": {
-      "title": "Senso4s 需要校准",
+      "title": "{device_name} 需要校准",
       "fix_flow": {
         "step": {
           "init": {
             "title": "需要校准",
-            "description": "您的 Senso4s 秤需要校准以准确测量气体液位。\n\n**校准过程中会发生什么：**\n1. 您将从秤上移除气瓶\n2. 秤将在空载状态下进行校准\n3. 您将气瓶放回秤上\n4. 配置将被保存\n\n准备好后点击提交开始。"
+            "description": "**{device_name}**\n\n您的 Senso4s 秤需要校准以准确测量气体液位。\n\n**校准过程中会发生什么：**\n1. 您将从秤上移除气瓶\n2. 秤将在空载状态下进行校准\n3. 您将气瓶放回秤上\n4. 配置将被保存\n\n准备好后点击提交开始。"
           },
           "remove_cylinder": {
             "title": "移除气瓶",
-            "description": "**现在从秤上移除气瓶。**\n\n秤必须完全为空才能正确校准。确保秤上没有任何东西。\n\n气瓶移除后，点击提交开始校准。"
+            "description": "**{device_name}**\n\n**现在从秤上移除气瓶。**\n\n秤必须完全为空才能正确校准。确保秤上没有任何东西。\n\n气瓶移除后，点击提交开始校准。"
           },
           "replace_tank": {
             "title": "放回气瓶",
-            "description": "校准完成！\n\n将气瓶放回秤上，然后点击提交以写入配置并验证读数。"
+            "description": "**{device_name}**\n\n校准完成！\n\n将气瓶放回秤上，然后点击提交以写入配置并验证读数。"
           }
         },
         "abort": {

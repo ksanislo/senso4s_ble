@@ -1,20 +1,20 @@
 {
   "issues": {
     "needs_calibration": {
-      "title": "Senso4s erfordert Kalibrierung",
+      "title": "{device_name} erfordert Kalibrierung",
       "fix_flow": {
         "step": {
           "init": {
             "title": "Kalibrierung erforderlich",
-            "description": "Ihre Senso4s-Waage muss kalibriert werden, um den Gasstand genau zu messen.\n\n**Was während der Kalibrierung passiert:**\n1. Sie entfernen die Gasflasche von der Waage\n2. Die Waage kalibriert sich im leeren Zustand\n3. Sie stellen die Flasche wieder auf die Waage\n4. Die Konfiguration wird gespeichert\n\nKlicken Sie auf Absenden, wenn Sie bereit sind zu beginnen."
+            "description": "**{device_name}**\n\nIhre Senso4s-Waage muss kalibriert werden, um den Gasstand genau zu messen.\n\n**Was während der Kalibrierung passiert:**\n1. Sie entfernen die Gasflasche von der Waage\n2. Die Waage kalibriert sich im leeren Zustand\n3. Sie stellen die Flasche wieder auf die Waage\n4. Die Konfiguration wird gespeichert\n\nKlicken Sie auf Absenden, wenn Sie bereit sind zu beginnen."
           },
           "remove_cylinder": {
             "title": "Gasflasche entfernen",
-            "description": "**Entfernen Sie jetzt die Gasflasche von der Waage.**\n\nDie Waage muss für eine korrekte Kalibrierung vollständig leer sein. Stellen Sie sicher, dass nichts auf der Waage steht.\n\nSobald die Flasche entfernt ist, klicken Sie auf Absenden, um die Kalibrierung zu starten."
+            "description": "**{device_name}**\n\n**Entfernen Sie jetzt die Gasflasche von der Waage.**\n\nDie Waage muss für eine korrekte Kalibrierung vollständig leer sein. Stellen Sie sicher, dass nichts auf der Waage steht.\n\nSobald die Flasche entfernt ist, klicken Sie auf Absenden, um die Kalibrierung zu starten."
           },
           "replace_tank": {
             "title": "Gasflasche wieder aufstellen",
-            "description": "Kalibrierung abgeschlossen!\n\nStellen Sie die Gasflasche wieder auf die Waage und klicken Sie dann auf Absenden, um die Konfiguration zu schreiben und den Messwert zu überprüfen."
+            "description": "**{device_name}**\n\nKalibrierung abgeschlossen!\n\nStellen Sie die Gasflasche wieder auf die Waage und klicken Sie dann auf Absenden, um die Konfiguration zu schreiben und den Messwert zu überprüfen."
           }
         },
         "abort": {

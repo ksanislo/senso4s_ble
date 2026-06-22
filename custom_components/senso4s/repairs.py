@@ -54,7 +54,9 @@ class CalibrationRepairFlow(RepairsFlow):
             # User acknowledged, proceed to cylinder removal step
             return await self.async_step_remove_cylinder()
 
-        return self.async_show_form(step_id="init")
+        return self.async_show_form(
+            step_id="init", description_placeholders=self._device_placeholders()
+        )
 
     async def async_step_remove_cylinder(
         self, user_input: dict[str, Any] | None = None
@@ -64,7 +66,10 @@ class CalibrationRepairFlow(RepairsFlow):
             # User confirmed cylinder is removed, proceed to calibration
             return await self.async_step_calibrating()
 
-        return self.async_show_form(step_id="remove_cylinder")
+        return self.async_show_form(
+            step_id="remove_cylinder",
+            description_placeholders=self._device_placeholders(),
+        )
 
     async def async_step_calibrating(
         self, user_input: dict[str, Any] | None = None
@@ -121,7 +126,10 @@ class CalibrationRepairFlow(RepairsFlow):
             # User confirmed tank is replaced, write config
             return await self.async_step_write_config()
 
-        return self.async_show_form(step_id="replace_tank")
+        return self.async_show_form(
+            step_id="replace_tank",
+            description_placeholders=self._device_placeholders(),
+        )
 
     async def async_step_write_config(
         self, user_input: dict[str, Any] | None = None
@@ -224,6 +232,12 @@ class CalibrationRepairFlow(RepairsFlow):
         if DOMAIN not in self.hass.data:
             return None
         return self.hass.data[DOMAIN].get(self._entry_id)
+
+    def _device_placeholders(self) -> dict[str, str]:
+        """Device name for the {device_name} placeholder in the step text."""
+        coordinator = self._get_coordinator()
+        name = coordinator.friendly_device_label if coordinator else "this device"
+        return {"device_name": name}
 
     async def _cleanup(self) -> None:
         """Clean up BLE connection."""

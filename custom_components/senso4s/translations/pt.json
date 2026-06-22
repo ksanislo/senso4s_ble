@@ -1,20 +1,20 @@
 {
   "issues": {
     "needs_calibration": {
-      "title": "Senso4s requer calibração",
+      "title": "{device_name} requer calibração",
       "fix_flow": {
         "step": {
           "init": {
             "title": "Calibração necessária",
-            "description": "A sua balança Senso4s precisa ser calibrada para medir os níveis de gás com precisão.\n\n**O que acontece durante a calibração:**\n1. Você removerá o cilindro de gás da balança\n2. A balança se calibrará enquanto estiver vazia\n3. Você colocará o cilindro de volta na balança\n4. A configuração será salva\n\nClique em Enviar quando estiver pronto para começar."
+            "description": "**{device_name}**\n\nA sua balança Senso4s precisa ser calibrada para medir os níveis de gás com precisão.\n\n**O que acontece durante a calibração:**\n1. Você removerá o cilindro de gás da balança\n2. A balança se calibrará enquanto estiver vazia\n3. Você colocará o cilindro de volta na balança\n4. A configuração será salva\n\nClique em Enviar quando estiver pronto para começar."
           },
           "remove_cylinder": {
             "title": "Remover cilindro de gás",
-            "description": "**Remova o cilindro de gás da balança agora.**\n\nA balança deve estar completamente vazia para que a calibração funcione corretamente. Certifique-se de que não há nada na balança.\n\nAssim que o cilindro for removido, clique em Enviar para iniciar a calibração."
+            "description": "**{device_name}**\n\n**Remova o cilindro de gás da balança agora.**\n\nA balança deve estar completamente vazia para que a calibração funcione corretamente. Certifique-se de que não há nada na balança.\n\nAssim que o cilindro for removido, clique em Enviar para iniciar a calibração."
           },
           "replace_tank": {
             "title": "Recolocar cilindro de gás",
-            "description": "Calibração concluída!\n\nColoque o cilindro de gás de volta na balança e clique em Enviar para gravar a configuração e verificar a leitura."
+            "description": "**{device_name}**\n\nCalibração concluída!\n\nColoque o cilindro de gás de volta na balança e clique em Enviar para gravar a configuração e verificar a leitura."
           }
         },
         "abort": {

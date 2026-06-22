@@ -1,20 +1,20 @@
 {
   "issues": {
     "needs_calibration": {
-      "title": "Senso4s wymaga kalibracji",
+      "title": "{device_name} wymaga kalibracji",
       "fix_flow": {
         "step": {
           "init": {
             "title": "Wymagana kalibracja",
-            "description": "Twoja waga Senso4s musi zostać skalibrowana, aby dokładnie mierzyć poziom gazu.\n\n**Co dzieje się podczas kalibracji:**\n1. Usuniesz butlę gazową z wagi\n2. Waga skalibruje się będąc pustą\n3. Umieścisz butlę z powrotem na wadze\n4. Konfiguracja zostanie zapisana\n\nKliknij Wyślij, gdy będziesz gotowy, aby rozpocząć."
+            "description": "**{device_name}**\n\nTwoja waga Senso4s musi zostać skalibrowana, aby dokładnie mierzyć poziom gazu.\n\n**Co dzieje się podczas kalibracji:**\n1. Usuniesz butlę gazową z wagi\n2. Waga skalibruje się będąc pustą\n3. Umieścisz butlę z powrotem na wadze\n4. Konfiguracja zostanie zapisana\n\nKliknij Wyślij, gdy będziesz gotowy, aby rozpocząć."
           },
           "remove_cylinder": {
             "title": "Usuń butlę gazową",
-            "description": "**Usuń teraz butlę gazową z wagi.**\n\nWaga musi być całkowicie pusta, aby kalibracja działała poprawnie. Upewnij się, że nic nie znajduje się na wadze.\n\nPo usunięciu butli kliknij Wyślij, aby rozpocząć kalibrację."
+            "description": "**{device_name}**\n\n**Usuń teraz butlę gazową z wagi.**\n\nWaga musi być całkowicie pusta, aby kalibracja działała poprawnie. Upewnij się, że nic nie znajduje się na wadze.\n\nPo usunięciu butli kliknij Wyślij, aby rozpocząć kalibrację."
           },
           "replace_tank": {
             "title": "Umieść butlę gazową",
-            "description": "Kalibracja zakończona!\n\nUmieść butlę gazową z powrotem na wadze, a następnie kliknij Wyślij, aby zapisać konfigurację i zweryfikować odczyt."
+            "description": "**{device_name}**\n\nKalibracja zakończona!\n\nUmieść butlę gazową z powrotem na wadze, a następnie kliknij Wyślij, aby zapisać konfigurację i zweryfikować odczyt."
           }
         },
         "abort": {
