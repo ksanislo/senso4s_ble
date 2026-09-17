@@ -18,12 +18,14 @@ from __future__ import annotations
 import logging
 import struct
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Final, Optional
 
 from homeassistant.util import dt as dt_util
 
 from .const import (
+    AMBIGUOUS_MANUFACTURER_IDS,
     CYCLE_DURATION_MINUTES,
+    DEVICE_NAME,
     MANUFACTURER_IDS,
     AnomalyType,
     UsageMode,
@@ -58,8 +60,56 @@ def interpret_level_byte(
     return -1, False, False, None, []
 
 
+VALID_LEVEL_BYTES: Final = (
+    frozenset(range(0, 101)) | frozenset(range(0xF1, 0xF8)) | {0xFC, 0xFE, 0xFF}
+)
+
+
+def _mac_order(mac_bytes: bytes, address: Optional[str]) -> str:
+    """Which byte order D6 uses relative to the advertising address.
+
+    The protocol doc does not pin this down and we have no confirmed capture,
+    so both orders are accepted and the result is logged to settle it from the
+    field. Returns "forward", "reversed", "mismatch" or "unknown".
+    """
+    if not address:
+        return "unknown"
+    try:
+        addr = bytes.fromhex(address.replace(":", "").replace("-", ""))
+    except ValueError:
+        return "unknown"
+    if len(addr) != 6:
+        return "unknown"
+    if mac_bytes == addr:
+        return "forward"
+    if mac_bytes == addr[::-1]:
+        return "reversed"
+    return "mismatch"
+
+
+def _looks_like_senso4s(data: bytes, address: Optional[str]) -> bool:
+    """Structural check for adverts matched only by the shared Nordic vendor ID.
+
+    Every field the protocol pins down has to hold, and D6 has to name the
+    address we received the advert from. Without this an unrelated nRF-based
+    product parses into a plausible-looking device.
+    """
+    if len(data) != 12:
+        return False
+    if not 1 <= (data[0] & 0x0F) <= 5:
+        return False
+    if data[1] not in VALID_LEVEL_BYTES:
+        return False
+    if data[4] > 100:
+        return False
+    return _mac_order(data[6:12], address) in ("forward", "reversed")
+
+
 def parse_manufacturer_data(
-    mfr_id: int, data: bytes, device_name: str = ""
+    mfr_id: int,
+    data: bytes,
+    device_name: str = "",
+    address: Optional[str] = None,
 ) -> Optional[Senso4sDeviceData]:
     """
     Parse BLE manufacturer advertisement data.
@@ -68,6 +118,7 @@ def parse_manufacturer_data(
         mfr_id: Manufacturer ID from advertisement
         data: Manufacturer data bytes (without the ID)
         device_name: Device name from advertisement
+        address: Address the advert arrived from, for the D6 cross-check
 
     Returns:
         Parsed device data or None if invalid
@@ -87,6 +138,22 @@ def parse_manufacturer_data(
         )
         return None
 
+    named_senso4s = bool(device_name) and device_name.upper() == DEVICE_NAME
+    if (
+        mfr_id in AMBIGUOUS_MANUFACTURER_IDS
+        and not named_senso4s
+        and not _looks_like_senso4s(data, address)
+    ):
+        _LOGGER.debug(
+            "BLE PARSE: Rejecting 0x%04X advert from %s (name: %s) - "
+            "failed structural check: %s",
+            mfr_id,
+            address,
+            device_name,
+            data.hex(),
+        )
+        return None
+
     flags_byte = data[0]
     level_byte = data[1]
     battery_raw = data[4]
@@ -94,7 +161,7 @@ def parse_manufacturer_data(
 
     _LOGGER.debug(
         "BLE PARSE [BYTES] flags=0x%02X (model=%s, mode_raw=%d), "
-        "level=0x%02X (%d), battery_raw=%d, mac=%s",
+        "level=0x%02X (%d), battery_raw=%d, mac=%s, addr=%s, mac_order=%s",
         flags_byte,
         "BASIC" if (flags_byte >> 4) == 0x8 else "PLUS",
         flags_byte & 0x0F,
@@ -102,6 +169,8 @@ def parse_manufacturer_data(
         level_byte,
         battery_raw,
         mac_bytes.hex(":"),
+        address,
+        _mac_order(mac_bytes, address),
     )
 
     # Parse model + warning flags (upper nibble of D1, per protocol §2.2.2)

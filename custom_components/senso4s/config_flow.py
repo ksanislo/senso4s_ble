@@ -33,6 +33,7 @@ from homeassistant.util import dt as dt_util
 
 from .ble_client import Senso4sBLEClient
 from .const import (
+    AMBIGUOUS_MANUFACTURER_IDS,
     ANOMALY_NAMES,
     CONF_EMPTY_WEIGHT,
     CONF_ENABLE_HISTORY_POLLING,
@@ -66,29 +67,39 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def _is_senso4s_device(service_info: BluetoothServiceInfoBleak) -> bool:
-    """Check if a service info is from a Senso4s device."""
-    matched_mfr_id = None
-    matched_name = False
+    """Check if a service info is from a Senso4s device.
 
-    for mfr_id in service_info.manufacturer_data:
-        if mfr_id in MANUFACTURER_IDS:
-            matched_mfr_id = mfr_id
-            break
+    Delegates to the parser rather than matching on the company ID alone, so
+    discovery and runtime agree on what counts as ours.
+    """
+    matched_name = bool(service_info.name) and service_info.name.upper() == DEVICE_NAME
+    # Senso4s' own company ID still matches on presence alone — the structural
+    # check exists only to disambiguate the shared Nordic ID, so it must not
+    # narrow anything else.
+    matched_known_id = any(
+        mfr_id in MANUFACTURER_IDS - AMBIGUOUS_MANUFACTURER_IDS
+        for mfr_id in service_info.manufacturer_data
+    )
+    matched_payload = process_service_info(service_info) is not None
 
-    if service_info.name and service_info.name.upper() == DEVICE_NAME:
-        matched_name = True
-
-    if matched_mfr_id is not None or matched_name:
+    if matched_name or matched_known_id or matched_payload:
         _LOGGER.debug(
             "[%s] Senso4s device detected - name: %s, "
-            "matched_by_mfr_id: %s, matched_by_name: %s",
+            "matched_by_payload: %s, matched_by_id: %s, matched_by_name: %s",
             service_info.address,
             service_info.name,
-            f"{matched_mfr_id} (0x{matched_mfr_id:04X})" if matched_mfr_id else None,
+            matched_payload,
+            matched_known_id,
             matched_name,
         )
         return True
 
+    _LOGGER.debug(
+        "[%s] Not a Senso4s device - name: %s, manufacturer_data: %s",
+        service_info.address,
+        service_info.name,
+        {f"0x{m:04X}": bytes(d).hex() for m, d in service_info.manufacturer_data.items()},
+    )
     return False
 
 

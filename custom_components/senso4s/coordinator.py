@@ -474,7 +474,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
 
         for mfr_id, mfr_data in service_info.manufacturer_data.items():
             parsed = parse_manufacturer_data(
-                mfr_id, bytes(mfr_data), service_info.name
+                mfr_id, bytes(mfr_data), service_info.name, service_info.address
             )
             if parsed is None:
                 continue
@@ -827,7 +827,9 @@ def process_service_info(
 ) -> Optional[Senso4sDeviceData]:
     """Parse a service_info into Senso4sDeviceData (used by config flow)."""
     for mfr_id, mfr_data in service_info.manufacturer_data.items():
-        parsed = parse_manufacturer_data(mfr_id, bytes(mfr_data), service_info.name)
+        parsed = parse_manufacturer_data(
+            mfr_id, bytes(mfr_data), service_info.name, service_info.address
+        )
         if parsed is not None:
             return parsed
     return None

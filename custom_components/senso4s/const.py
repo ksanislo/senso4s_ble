@@ -30,6 +30,10 @@ CHAR_SETUP_DATE_UUID: Final = "00007087-a20b-4d4d-a4de-7f071dbbc1d8"
 # Device identification
 DEVICE_NAME: Final = "SENSO4S"
 MANUFACTURER_IDS: Final = frozenset({0x0059, 0x09CC})
+# 0x0059 is Nordic Semiconductor's chip-vendor ID, not Senso4s'. Unrelated
+# nRF-based products advertise under it too, so adverts matched only by that
+# ID must prove themselves structurally before we claim the device.
+AMBIGUOUS_MANUFACTURER_IDS: Final = frozenset({0x0059})
 MANUFACTURER: Final = "Senso4s"
 
 # Configuration keys
