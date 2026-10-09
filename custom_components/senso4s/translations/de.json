@@ -85,7 +85,8 @@
       "setup_date_write_failed": "Einrichtungsdatum konnte nicht auf das Gerät geschrieben werden. Bitte versuchen Sie es erneut.",
       "verification_timeout": "Zeitüberschreitung beim Warten auf den Messwert. Das Gerät benötigt möglicherweise mehr Zeit zur Stabilisierung.",
       "verification_anomaly": "Kalibrierung abgeschlossen, aber das Gerät meldet Anomalien: {anomalies}. Überprüfen Sie die Geräteplatzierung.",
-      "verification_failed": "Kalibrierungsergebnis konnte nicht überprüft werden. Bitte überprüfen Sie das Gerät."
+      "verification_failed": "Kalibrierungsergebnis konnte nicht überprüft werden. Bitte überprüfen Sie das Gerät.",
+      "cannot_connect": "Verbindung zum Gerät nicht möglich. Für die Einrichtung ist ein Bluetooth-Adapter oder Proxy erforderlich, der sowohl aktiv scannen als auch Verbindungen herstellen kann. Rein passive Proxys sehen das Gerät, können es aber nicht einrichten."
     }
   },
   "options": {

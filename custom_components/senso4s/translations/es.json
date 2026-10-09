@@ -85,7 +85,8 @@
       "setup_date_write_failed": "Error al escribir la fecha de configuración en el dispositivo. Por favor, inténtelo de nuevo.",
       "verification_timeout": "Tiempo de espera agotado para la lectura del nivel. El dispositivo puede necesitar más tiempo para estabilizarse.",
       "verification_anomaly": "Calibración completada pero el dispositivo reporta anomalías: {anomalies}. Verifique la ubicación del dispositivo.",
-      "verification_failed": "Error al verificar el resultado de la calibración. Por favor, revise el dispositivo."
+      "verification_failed": "Error al verificar el resultado de la calibración. Por favor, revise el dispositivo.",
+      "cannot_connect": "No se pudo conectar con el dispositivo. La configuración requiere un adaptador o proxy Bluetooth capaz de realizar escaneo activo y abrir conexiones; los proxies solo pasivos ven el dispositivo pero no pueden configurarlo."
     }
   },
   "options": {

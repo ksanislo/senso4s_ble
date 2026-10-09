@@ -3,6 +3,9 @@
   "name": "Senso4s Gas Cylinder Sensor",
   "bluetooth": [
     {
+      "service_uuid": "00007081-0000-1000-8000-00805f9b34fb"
+    },
+    {
       "local_name": "SENSO4S"
     },
     {

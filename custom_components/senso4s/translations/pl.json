@@ -85,7 +85,8 @@
       "setup_date_write_failed": "Nie udało się zapisać daty konfiguracji na urządzeniu. Spróbuj ponownie.",
       "verification_timeout": "Przekroczono limit czasu oczekiwania na odczyt poziomu. Urządzenie może potrzebować więcej czasu na stabilizację.",
       "verification_anomaly": "Kalibracja zakończona, ale urządzenie zgłasza anomalie: {anomalies}. Sprawdź położenie urządzenia.",
-      "verification_failed": "Nie udało się zweryfikować wyniku kalibracji. Sprawdź urządzenie."
+      "verification_failed": "Nie udało się zweryfikować wyniku kalibracji. Sprawdź urządzenie.",
+      "cannot_connect": "Nie można połączyć się z urządzeniem. Konfiguracja wymaga adaptera lub serwera proxy Bluetooth, który potrafi zarówno skanować aktywnie, jak i otwierać połączenia; serwery proxy działające tylko pasywnie widzą urządzenie, ale nie mogą go skonfigurować."
     }
   },
   "options": {

@@ -85,7 +85,8 @@
       "setup_date_write_failed": "写入配置日期到设备失败。请重试。",
       "verification_timeout": "等待液位读数超时。设备可能需要更多时间来稳定。",
       "verification_anomaly": "校准完成，但设备报告异常：{anomalies}。请检查设备放置位置。",
-      "verification_failed": "验证校准结果失败。请检查设备。"
+      "verification_failed": "验证校准结果失败。请检查设备。",
+      "cannot_connect": "无法连接到设备。设置需要同时支持主动扫描和建立连接的蓝牙适配器或代理；仅支持被动扫描的代理虽能发现该设备，但无法完成设置。"
     }
   },
   "options": {

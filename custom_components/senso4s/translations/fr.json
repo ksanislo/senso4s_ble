@@ -85,7 +85,8 @@
       "setup_date_write_failed": "Échec de l'écriture de la date de configuration sur l'appareil. Veuillez réessayer.",
       "verification_timeout": "Délai d'attente dépassé pour la lecture du niveau. L'appareil peut avoir besoin de plus de temps pour se stabiliser.",
       "verification_anomaly": "Calibration terminée mais l'appareil signale des anomalies : {anomalies}. Vérifiez le placement de l'appareil.",
-      "verification_failed": "Échec de la vérification du résultat de la calibration. Veuillez vérifier l'appareil."
+      "verification_failed": "Échec de la vérification du résultat de la calibration. Veuillez vérifier l'appareil.",
+      "cannot_connect": "Impossible de se connecter à l'appareil. La configuration nécessite un adaptateur ou un proxy Bluetooth capable à la fois d'effectuer un balayage actif et d'ouvrir des connexions ; les proxys purement passifs voient l'appareil mais ne peuvent pas le configurer."
     }
   },
   "options": {

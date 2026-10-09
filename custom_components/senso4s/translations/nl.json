@@ -85,7 +85,8 @@
       "setup_date_write_failed": "Installatiedatum schrijven naar apparaat mislukt. Probeer het opnieuw.",
       "verification_timeout": "Timeout bij wachten op niveaumeting. Het apparaat heeft mogelijk meer tijd nodig om te stabiliseren.",
       "verification_anomaly": "Kalibratie voltooid maar apparaat meldt anomalieën: {anomalies}. Controleer de plaatsing van het apparaat.",
-      "verification_failed": "Verificatie van kalibratieresultaat mislukt. Controleer het apparaat."
+      "verification_failed": "Verificatie van kalibratieresultaat mislukt. Controleer het apparaat.",
+      "cannot_connect": "Kan geen verbinding maken met het apparaat. Voor de installatie is een Bluetooth-adapter of proxy nodig die zowel actief kan scannen als verbindingen kan openen; proxy's die alleen passief werken zien het apparaat wel, maar kunnen het niet instellen."
     }
   },
   "options": {

@@ -89,7 +89,8 @@
       "setup_date_write_failed": "Failed to write setup date to the device. Please try again.",
       "verification_timeout": "Timed out waiting for level reading. The device may need more time to stabilize.",
       "verification_anomaly": "Calibration completed but device reports anomalies: {anomalies}. Check device placement.",
-      "verification_failed": "Failed to verify calibration result. Please check the device."
+      "verification_failed": "Failed to verify calibration result. Please check the device.",
+      "cannot_connect": "Could not connect to the device. Setup needs a Bluetooth adapter or proxy that can both active-scan and open connections; passive-only proxies can see this device but cannot set it up."
     }
   },
   "options": {
