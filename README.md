@@ -129,6 +129,7 @@ Change display settings without touching the device:
 - Low Level Threshold
 - Enable Automatic History Polling
 - History Refresh Interval
+- Gas Volume per kg
 
 ## Entities
 
@@ -138,6 +139,8 @@ Change display settings without touching the device:
 |---|---|
 | Gas Level | Current gas level (0–100%) |
 | Gas Remaining | Calculated remaining mass in kg or lb |
+| Gas Consumed | Gas used from the current cylinder, in m³, for the Energy dashboard |
+| Gas Flow Rate | Current consumption rate in m³/h |
 | Battery | Device battery level |
 | Usage Mode | Current usage mode preset |
 | Estimated Empty | Predicted date/time the tank will run dry |
@@ -160,6 +163,40 @@ Change display settings without touching the device:
 
 The four Plus-only anomaly binary sensors are created for Plus devices but
 disabled by default — enable them in the entity registry if you want them.
+
+## Energy dashboard
+
+**Gas Consumed** can be added under **Settings → Dashboards → Energy → Gas
+consumption**. It is a `total_increasing` sensor in m³, so Home Assistant
+derives daily, monthly and yearly totals from it. Swapping a cylinder drops
+the value, which Home Assistant records as a meter reset and carries over
+correctly.
+
+### Gas Volume per kg
+
+The scale measures mass, while the Energy dashboard works in volume, so the
+two are bridged by a conversion factor in **Device options → Settings**.
+
+The default `0.536` is the volume one kilogram of propane vapour occupies at
+15 °C and 101.325 kPa. Change it to match what you actually burn:
+
+| Gas | m³/kg |
+|---|---|
+| Propane at 15 °C | 0.536 |
+| Propane at 0 °C | 0.508 |
+| Butane at 15 °C | 0.407 |
+| Butane at 0 °C | 0.386 |
+
+Suppliers differ on which reference temperature they bill at, and regional
+LPG is usually a propane/butane blend rather than either one pure. If you
+want the dashboard to agree with your invoices, take the factor from the
+supplier rather than from this table.
+
+### Cost tracking
+
+The integration does not track what you paid. Enter a price per m³ in the
+Energy dashboard's own **Use a static price** field, or point it at a
+template sensor if your price changes between refills.
 
 ## Services
 

@@ -44,12 +44,14 @@ from .const import (
     CONF_GAS_CAPACITY,
     CONF_HISTORY_POLL_INTERVAL,
     CONF_LAST_SETUP_DATE,
+    CONF_M3_PER_KG,
     CONF_LOW_LEVEL_THRESHOLD,
     CONF_USAGE_MODE,
     CONF_WEIGHT_UNIT,
     DEFAULT_EMPTY_WEIGHT,
     DEFAULT_GAS_CAPACITY,
     DEFAULT_HISTORY_POLL_INTERVAL,
+    DEFAULT_M3_PER_KG,
     DEFAULT_LOW_LEVEL_THRESHOLD,
     DEFAULT_USAGE_MODE,
     DEFAULT_WEIGHT_UNIT,
@@ -124,6 +126,10 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             CONF_ENABLE_HISTORY_POLLING,
             entry.data.get(CONF_ENABLE_HISTORY_POLLING, True),
         )
+        self.m3_per_kg: float = entry.options.get(
+            CONF_M3_PER_KG,
+            entry.data.get(CONF_M3_PER_KG, DEFAULT_M3_PER_KG),
+        )
 
         self.data: Senso4sDeviceData = Senso4sDeviceData()
         self.data.gas_capacity_kg = self.gas_capacity_kg
@@ -143,6 +149,8 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
                 self._last_known_setup_date = dt
             except (ValueError, TypeError):
                 pass
+
+        self._consumed_m3: Optional[float] = None
 
         self._poll_in_flight = False
         self._last_polled_gas_level: Optional[int] = None
@@ -493,6 +501,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             self.data.last_seen = dt_util.now()
             self.data.gas_capacity_kg = self.gas_capacity_kg
             self.data.empty_weight_kg = self.empty_weight_kg
+            self._update_consumption()
             _LOGGER.debug(
                 "[%s] BLE RX [PARSED] level=%s%% battery=%d%% mode=%s model=%s "
                 "needs_cal=%s has_error=%s anomalies=%s",
@@ -680,7 +689,15 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         weight_unit: Optional[str] = None,
         enable_history_polling: Optional[bool] = None,
         history_poll_interval: Optional[int] = None,
+        m3_per_kg: Optional[float] = None,
     ) -> None:
+        # Either of these moves the consumption baseline, so drop the held
+        # value and let the next advert re-derive it rather than publish a
+        # step that HA would read as consumption.
+        if (gas_capacity_kg is not None and gas_capacity_kg != self.gas_capacity_kg) or (
+            m3_per_kg is not None and m3_per_kg != self.m3_per_kg
+        ):
+            self._consumed_m3 = None
         if empty_weight_kg is not None:
             self.empty_weight_kg = empty_weight_kg
             self.data.empty_weight_kg = empty_weight_kg
@@ -697,6 +714,8 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             self.enable_history_polling = enable_history_polling
         if history_poll_interval is not None:
             self.history_poll_interval = history_poll_interval
+        if m3_per_kg is not None:
+            self.m3_per_kg = m3_per_kg
 
     @callback
     def async_request_refresh(self) -> None:
@@ -716,16 +735,17 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             return round(kg_to_lb(kg_value), 2)
         return round(kg_value, 2)
 
-    def _regression_empty_estimate(
+    def _regression_slope_kg_per_s(
         self,
         timestamps: list[datetime],
         kg_values: list[float],
         label: str,
-    ) -> Optional[datetime]:
+    ) -> Optional[float]:
+        """Least-squares slope of remaining mass over the window, kg/s."""
         n = len(timestamps)
         if n < 2:
             _LOGGER.debug(
-                "[%s] Estimated empty [%s]: not enough data (%d points, need 2+)",
+                "[%s] Consumption slope [%s]: not enough data (%d points, need 2+)",
                 self.address,
                 label,
                 n,
@@ -744,7 +764,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
         denom = n * sum_xx - sum_x * sum_x
         if denom <= 0:
             _LOGGER.debug(
-                "[%s] Estimated empty [%s]: degenerate window (denom=%.2f, n=%d)",
+                "[%s] Consumption slope [%s]: degenerate window (denom=%.2f, n=%d)",
                 self.address,
                 label,
                 denom,
@@ -752,7 +772,44 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             )
             return None
 
-        slope = (n * sum_xy - sum_x * sum_y) / denom
+        return (n * sum_xy - sum_x * sum_y) / denom
+
+    def _consumption_window(self) -> tuple[list[datetime], list[float], str]:
+        """Timestamps and remaining-mass values the consumption math runs on.
+
+        Active history wins whenever polling is enabled — falling back to the
+        passive window there would mix two sources of differing resolution.
+        """
+        if self.enable_history_polling:
+            if len(self.history) >= 2:
+                recent = self.history[-min(10, len(self.history)):]
+                return (
+                    [r.timestamp for r in recent],
+                    [r.remaining_gas_kg for r in recent],
+                    "active",
+                )
+            return [], [], "active"
+
+        if len(self._passive_history) >= 2:
+            return (
+                [datetime.fromisoformat(p["t"]) for p in self._passive_history],
+                [
+                    p["pct"] / 100.0 * self.gas_capacity_kg
+                    for p in self._passive_history
+                ],
+                "passive",
+            )
+        return [], [], "passive"
+
+    def _regression_empty_estimate(
+        self,
+        timestamps: list[datetime],
+        kg_values: list[float],
+        label: str,
+    ) -> Optional[datetime]:
+        slope = self._regression_slope_kg_per_s(timestamps, kg_values, label)
+        if slope is None:
+            return None
         if slope >= 0:
             _LOGGER.debug(
                 "[%s] Estimated empty [%s]: slope >= 0, not consuming "
@@ -763,7 +820,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             )
             return None
 
-        last_mass = ys[-1]
+        last_mass = kg_values[-1]
         if last_mass <= 0:
             _LOGGER.debug(
                 "[%s] Estimated empty [%s]: last recorded mass <= 0 (%s)",
@@ -780,7 +837,7 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
             "@ %s → %s",
             self.address,
             label,
-            n,
+            len(timestamps),
             slope,
             last_mass,
             timestamps[-1],
@@ -790,36 +847,62 @@ class Senso4sCoordinator(ActiveBluetoothProcessorCoordinator[Senso4sDeviceData])
 
     @property
     def estimated_empty_date(self) -> Optional[datetime]:
-        if self.enable_history_polling:
-            if len(self.history) >= 2:
-                recent = self.history[-min(10, len(self.history)):]
-                return self._regression_empty_estimate(
-                    [r.timestamp for r in recent],
-                    [r.remaining_gas_kg for r in recent],
-                    "active",
-                )
-            return None
-
-        if len(self._passive_history) >= 2:
-            timestamps = [
-                datetime.fromisoformat(p["t"]) for p in self._passive_history
-            ]
-            kg_values = [
-                p["pct"] / 100.0 * self.gas_capacity_kg
-                for p in self._passive_history
-            ]
-            return self._regression_empty_estimate(
-                timestamps, kg_values, "passive"
+        timestamps, kg_values, label = self._consumption_window()
+        if not timestamps:
+            _LOGGER.debug(
+                "[%s] Estimated empty: no data available "
+                "(active=%d records, passive=%d points)",
+                self.address,
+                len(self.history),
+                len(self._passive_history),
             )
+            return None
+        return self._regression_empty_estimate(timestamps, kg_values, label)
 
-        _LOGGER.debug(
-            "[%s] Estimated empty: no data available "
-            "(active=%d records, passive=%d points)",
-            self.address,
-            len(self.history),
-            len(self._passive_history),
-        )
-        return None
+    @property
+    def gas_consumed_m3(self) -> Optional[float]:
+        return self._consumed_m3
+
+    @property
+    def gas_flow_rate_m3_per_hour(self) -> Optional[float]:
+        timestamps, kg_values, label = self._consumption_window()
+        if not timestamps:
+            return None
+        slope = self._regression_slope_kg_per_s(timestamps, kg_values, label)
+        if slope is None:
+            return None
+        if slope >= 0:
+            return 0.0
+        return round(-slope * 3600.0 * self.m3_per_kg, 4)
+
+    def _update_consumption(self) -> None:
+        """Recompute gas consumed from the current cylinder.
+
+        Published as total_increasing, so a refill has to drop the value by
+        more than 10% for HA to record a meter reset; within that band HA
+        instead warns about a non-increasing total. Level resolution is one
+        percent, so an upward blip would land in exactly that band — hold the
+        previous value rather than emit a dip. The cost is that a top-off
+        smaller than 10% of the consumed total is not counted until
+        consumption passes the earlier high-water mark.
+        """
+        remaining = self.data.gas_remaining_kg
+        if remaining is None or not self.gas_capacity_kg:
+            return
+
+        consumed = max(0.0, self.gas_capacity_kg - remaining) * self.m3_per_kg
+        previous = self._consumed_m3
+        if previous is not None and previous * 0.9 <= consumed < previous:
+            _LOGGER.debug(
+                "[%s] Gas consumed: holding %.4f m3, dip to %.4f within "
+                "HA's reset tolerance",
+                self.address,
+                previous,
+                consumed,
+            )
+            return
+
+        self._consumed_m3 = round(consumed, 4)
 
 
 def process_service_info(

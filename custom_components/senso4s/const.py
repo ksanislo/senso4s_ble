@@ -46,6 +46,7 @@ CONF_ENABLE_HISTORY_POLLING: Final = "enable_history_polling"
 CONF_HISTORY_POLL_INTERVAL: Final = "history_poll_interval"
 CONF_LAST_SETUP_DATE: Final = "last_setup_date"  # ISO format string
 CONF_IS_PLUS: Final = "is_plus_model"
+CONF_M3_PER_KG: Final = "m3_per_kg"
 
 # Weight units
 UNIT_KG: Final = "kg"
@@ -61,6 +62,11 @@ DEFAULT_GAS_CAPACITY: Final = 11.0
 DEFAULT_USAGE_MODE: Final = 5  # Household
 DEFAULT_LOW_LEVEL_THRESHOLD: Final = 10
 DEFAULT_WEIGHT_UNIT: Final = UNIT_KG
+# Vapour volume per kg of liquid LPG. Ideal-gas value for propane at 15 degC /
+# 101.325 kPa; butane is ~0.407 and the same propane at 0 degC is ~0.508, so the
+# blend and the supplier's reference temperature both move it. User-settable
+# because guessing wrong silently skews every figure the Energy dashboard shows.
+DEFAULT_M3_PER_KG: Final = 0.536
 DEFAULT_HISTORY_POLL_INTERVAL: Final = 240  # minutes; backstop only — primary trigger is advert dispatch. 0 disables.
 
 

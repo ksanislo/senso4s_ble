@@ -37,6 +37,8 @@ from homeassistant.const import (
     PERCENTAGE,
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     UnitOfMass,
+    UnitOfVolume,
+    UnitOfVolumeFlowRate,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.core import callback
@@ -71,6 +73,22 @@ SENSOR_DESCRIPTIONS: dict[str, SensorEntityDescription] = {
         device_class=SensorDeviceClass.WEIGHT,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:propane-tank",
+    ),
+    "gas_consumed": SensorEntityDescription(
+        key="gas_consumed",
+        translation_key="gas_consumed",
+        native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
+        device_class=SensorDeviceClass.GAS,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        icon="mdi:meter-gas",
+    ),
+    "gas_flow_rate": SensorEntityDescription(
+        key="gas_flow_rate",
+        translation_key="gas_flow_rate",
+        native_unit_of_measurement=UnitOfVolumeFlowRate.CUBIC_METERS_PER_HOUR,
+        device_class=SensorDeviceClass.VOLUME_FLOW_RATE,
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:gas-burner",
     ),
     "battery": SensorEntityDescription(
         key="battery",
@@ -278,6 +296,12 @@ class Senso4sSensorEntity(
                 return round(coord.data.gas_remaining_kg, 2)
             return None
 
+        if key == "gas_consumed":
+            return coord.gas_consumed_m3
+
+        if key == "gas_flow_rate":
+            return coord.gas_flow_rate_m3_per_hour
+
         if key == "estimated_empty":
             return coord.estimated_empty_date
 
@@ -339,6 +363,9 @@ class Senso4sSensorEntity(
                 attrs[f"gas_capacity_{unit_suffix}"] = coord.get_display_weight(
                     data.gas_capacity_kg
                 )
+
+        elif key in ("gas_consumed", "gas_flow_rate"):
+            attrs["m3_per_kg"] = coord.m3_per_kg
 
         elif key == "usage_mode":
             attrs["is_plus_model"] = data.is_plus_model

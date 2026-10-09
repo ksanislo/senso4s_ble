@@ -42,12 +42,14 @@ from .const import (
     CONF_IS_PLUS,
     CONF_LAST_SETUP_DATE,
     CONF_LOW_LEVEL_THRESHOLD,
+    CONF_M3_PER_KG,
     CONF_USAGE_MODE,
     CONF_WEIGHT_UNIT,
     DEFAULT_EMPTY_WEIGHT,
     DEFAULT_GAS_CAPACITY,
     DEFAULT_HISTORY_POLL_INTERVAL,
     DEFAULT_LOW_LEVEL_THRESHOLD,
+    DEFAULT_M3_PER_KG,
     DEFAULT_USAGE_MODE,
     DEFAULT_WEIGHT_UNIT,
     DEVICE_NAME,
@@ -544,6 +546,10 @@ class Senso4sOptionsFlow(OptionsFlow):
                 self.config_entry.data.get(CONF_ENABLE_HISTORY_POLLING, True),
             ),
             CONF_HISTORY_POLL_INTERVAL: poll_interval,
+            CONF_M3_PER_KG: self.config_entry.options.get(
+                CONF_M3_PER_KG,
+                self.config_entry.data.get(CONF_M3_PER_KG, DEFAULT_M3_PER_KG),
+            ),
         }
 
     def _get_ha_options_schema(self, current: dict[str, Any]) -> vol.Schema:
@@ -568,6 +574,9 @@ class Senso4sOptionsFlow(OptionsFlow):
                     CONF_HISTORY_POLL_INTERVAL,
                     default=current[CONF_HISTORY_POLL_INTERVAL],
                 ): vol.All(vol.Coerce(int), vol.Range(min=1, max=1440)),
+                vol.Required(
+                    CONF_M3_PER_KG, default=current[CONF_M3_PER_KG]
+                ): vol.All(vol.Coerce(float), vol.Range(min=0.1, max=1.0)),
             }
         )
 
@@ -621,6 +630,9 @@ class Senso4sOptionsFlow(OptionsFlow):
                     CONF_HISTORY_POLL_INTERVAL,
                     default=current[CONF_HISTORY_POLL_INTERVAL],
                 ): vol.All(vol.Coerce(int), vol.Range(min=1, max=1440)),
+                vol.Required(
+                    CONF_M3_PER_KG, default=current[CONF_M3_PER_KG]
+                ): vol.All(vol.Coerce(float), vol.Range(min=0.1, max=1.0)),
             }
         )
 
@@ -694,6 +706,9 @@ class Senso4sOptionsFlow(OptionsFlow):
             ),
             CONF_HISTORY_POLL_INTERVAL: self._user_input.get(
                 CONF_HISTORY_POLL_INTERVAL, current[CONF_HISTORY_POLL_INTERVAL]
+            ),
+            CONF_M3_PER_KG: self._user_input.get(
+                CONF_M3_PER_KG, current[CONF_M3_PER_KG]
             ),
             CONF_EMPTY_WEIGHT: round(empty_weight, 2)
             if empty_weight is not None

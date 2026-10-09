@@ -105,13 +105,15 @@
           "weight_unit": "Unità di peso",
           "low_level_threshold": "Soglia avviso livello basso (%)",
           "enable_history_polling": "Abilita polling automatico della cronologia",
-          "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)"
+          "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)",
+          "m3_per_kg": "Volume di gas per kg (m³/kg)"
         },
         "data_description": {
           "weight_unit": "Unità per l'inserimento e la visualizzazione dei valori di peso",
           "low_level_threshold": "Percentuale del livello di gas che attiva l'avviso di gas basso",
           "enable_history_polling": "Si connette al dispositivo per leggere la cronologia dei consumi per il calcolo 'Stima esaurimento'. Disabilitare con hardware Bluetooth solo passivo.",
-          "history_poll_interval": "Tempo massimo tra gli aggiornamenti della cronologia — le variazioni del livello di gas attivano anche un aggiornamento immediato"
+          "history_poll_interval": "Tempo massimo tra gli aggiornamenti della cronologia — le variazioni del livello di gas attivano anche un aggiornamento immediato",
+          "m3_per_kg": "Volume di vapore in cui si espande un chilogrammo di gas liquido, usato dalla dashboard Energia. Il valore predefinito 0,536 corrisponde al propano a 15 °C; il butano è circa 0,407. Verifica la temperatura di riferimento del tuo fornitore."
         }
       },
       "refill_tank": {
@@ -121,13 +123,15 @@
           "weight_unit": "Unità di peso",
           "low_level_threshold": "Soglia avviso livello basso (%)",
           "enable_history_polling": "Abilita polling automatico della cronologia",
-          "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)"
+          "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)",
+          "m3_per_kg": "Volume di gas per kg (m³/kg)"
         },
         "data_description": {
           "weight_unit": "Unità per l'inserimento e la visualizzazione dei valori di peso",
           "low_level_threshold": "Percentuale del livello di gas che attiva l'avviso di gas basso",
           "enable_history_polling": "Si connette al dispositivo per leggere la cronologia dei consumi per il calcolo 'Stima esaurimento'. Disabilitare con hardware Bluetooth solo passivo.",
-          "history_poll_interval": "Tempo massimo tra gli aggiornamenti della cronologia — le variazioni del livello di gas attivano anche un aggiornamento immediato"
+          "history_poll_interval": "Tempo massimo tra gli aggiornamenti della cronologia — le variazioni del livello di gas attivano anche un aggiornamento immediato",
+          "m3_per_kg": "Volume di vapore in cui si espande un chilogrammo di gas liquido, usato dalla dashboard Energia. Il valore predefinito 0,536 corrisponde al propano a 15 °C; il butano è circa 0,407. Verifica la temperatura di riferimento del tuo fornitore."
         }
       },
       "recalibrate": {
@@ -140,7 +144,8 @@
           "usage_mode": "Modalità d'uso",
           "low_level_threshold": "Soglia avviso livello basso (%)",
           "enable_history_polling": "Abilita polling automatico della cronologia",
-          "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)"
+          "history_poll_interval": "Intervallo aggiornamento cronologia (minuti)",
+          "m3_per_kg": "Volume di gas per kg (m³/kg)"
         },
         "data_description": {
           "weight_unit": "Unità per l'inserimento e la visualizzazione dei valori di peso",
@@ -149,7 +154,8 @@
           "usage_mode": "Modalità d'uso preimpostata per il dispositivo",
           "low_level_threshold": "Percentuale del livello di gas che attiva l'avviso di gas basso",
           "enable_history_polling": "Si connette al dispositivo per leggere la cronologia dei consumi per il calcolo 'Stima esaurimento'. Disabilitare con hardware Bluetooth solo passivo.",
-          "history_poll_interval": "Tempo massimo tra gli aggiornamenti della cronologia — le variazioni del livello di gas attivano anche un aggiornamento immediato"
+          "history_poll_interval": "Tempo massimo tra gli aggiornamenti della cronologia — le variazioni del livello di gas attivano anche un aggiornamento immediato",
+          "m3_per_kg": "Volume di vapore in cui si espande un chilogrammo di gas liquido, usato dalla dashboard Energia. Il valore predefinito 0,536 corrisponde al propano a 15 °C; il butano è circa 0,407. Verifica la temperatura di riferimento del tuo fornitore."
         }
       },
       "recalibrate_replace": {
@@ -195,6 +201,12 @@
       },
       "gas_capacity": {
         "name": "Capacità del gas"
+      },
+      "gas_consumed": {
+        "name": "Gas consumato"
+      },
+      "gas_flow_rate": {
+        "name": "Portata di gas"
       }
     },
     "binary_sensor": {

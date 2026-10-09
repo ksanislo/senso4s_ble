@@ -42,9 +42,11 @@ from .const import (
     CONF_IS_PLUS,
     CONF_LAST_SETUP_DATE,
     CONF_LOW_LEVEL_THRESHOLD,
+    CONF_M3_PER_KG,
     CONF_USAGE_MODE,
     CONF_WEIGHT_UNIT,
     DEFAULT_HISTORY_POLL_INTERVAL,
+    DEFAULT_M3_PER_KG,
     DOMAIN,
     ISSUE_NEEDS_CALIBRATION,
     ISSUE_PASSIVE_SCANNING,
@@ -227,6 +229,9 @@ async def _async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None
             entry.data.get(CONF_ENABLE_HISTORY_POLLING, True),
         ),
         history_poll_interval=poll_interval,
+        m3_per_kg=entry.options.get(
+            CONF_M3_PER_KG, entry.data.get(CONF_M3_PER_KG, DEFAULT_M3_PER_KG)
+        ),
     )
 
     new_setup_date_str = entry.data.get(CONF_LAST_SETUP_DATE)

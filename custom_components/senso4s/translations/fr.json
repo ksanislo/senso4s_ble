@@ -105,13 +105,15 @@
           "weight_unit": "Unité de poids",
           "low_level_threshold": "Seuil d'avertissement niveau bas (%)",
           "enable_history_polling": "Activer l'interrogation automatique de l'historique",
-          "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)"
+          "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)",
+          "m3_per_kg": "Volume de gaz par kg (m³/kg)"
         },
         "data_description": {
           "weight_unit": "Unité pour la saisie et l'affichage des valeurs de poids",
           "low_level_threshold": "Pourcentage de niveau de gaz déclenchant l'avertissement de gaz bas",
           "enable_history_polling": "Se connecte à l'appareil pour lire l'historique de consommation pour le calcul 'Estimé vide'. Désactiver avec du matériel Bluetooth passif uniquement.",
-          "history_poll_interval": "Durée maximale entre les actualisations de l'historique — les changements de niveau de gaz déclenchent également une actualisation immédiate"
+          "history_poll_interval": "Durée maximale entre les actualisations de l'historique — les changements de niveau de gaz déclenchent également une actualisation immédiate",
+          "m3_per_kg": "Volume de vapeur obtenu à partir d'un kilogramme de gaz liquide, utilisé par le tableau de bord Énergie. La valeur par défaut 0,536 correspond au propane à 15 °C ; le butane est d'environ 0,407. Vérifiez la température de référence de votre fournisseur."
         }
       },
       "refill_tank": {
@@ -121,13 +123,15 @@
           "weight_unit": "Unité de poids",
           "low_level_threshold": "Seuil d'avertissement niveau bas (%)",
           "enable_history_polling": "Activer l'interrogation automatique de l'historique",
-          "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)"
+          "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)",
+          "m3_per_kg": "Volume de gaz par kg (m³/kg)"
         },
         "data_description": {
           "weight_unit": "Unité pour la saisie et l'affichage des valeurs de poids",
           "low_level_threshold": "Pourcentage de niveau de gaz déclenchant l'avertissement de gaz bas",
           "enable_history_polling": "Se connecte à l'appareil pour lire l'historique de consommation pour le calcul 'Estimé vide'. Désactiver avec du matériel Bluetooth passif uniquement.",
-          "history_poll_interval": "Durée maximale entre les actualisations de l'historique — les changements de niveau de gaz déclenchent également une actualisation immédiate"
+          "history_poll_interval": "Durée maximale entre les actualisations de l'historique — les changements de niveau de gaz déclenchent également une actualisation immédiate",
+          "m3_per_kg": "Volume de vapeur obtenu à partir d'un kilogramme de gaz liquide, utilisé par le tableau de bord Énergie. La valeur par défaut 0,536 correspond au propane à 15 °C ; le butane est d'environ 0,407. Vérifiez la température de référence de votre fournisseur."
         }
       },
       "recalibrate": {
@@ -140,7 +144,8 @@
           "usage_mode": "Mode d'utilisation",
           "low_level_threshold": "Seuil d'avertissement niveau bas (%)",
           "enable_history_polling": "Activer l'interrogation automatique de l'historique",
-          "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)"
+          "history_poll_interval": "Intervalle de rafraîchissement de l'historique (minutes)",
+          "m3_per_kg": "Volume de gaz par kg (m³/kg)"
         },
         "data_description": {
           "weight_unit": "Unité pour la saisie et l'affichage des valeurs de poids",
@@ -149,7 +154,8 @@
           "usage_mode": "Mode d'utilisation prédéfini pour l'appareil",
           "low_level_threshold": "Pourcentage de niveau de gaz déclenchant l'avertissement de gaz bas",
           "enable_history_polling": "Se connecte à l'appareil pour lire l'historique de consommation pour le calcul 'Estimé vide'. Désactiver avec du matériel Bluetooth passif uniquement.",
-          "history_poll_interval": "Durée maximale entre les actualisations de l'historique — les changements de niveau de gaz déclenchent également une actualisation immédiate"
+          "history_poll_interval": "Durée maximale entre les actualisations de l'historique — les changements de niveau de gaz déclenchent également une actualisation immédiate",
+          "m3_per_kg": "Volume de vapeur obtenu à partir d'un kilogramme de gaz liquide, utilisé par le tableau de bord Énergie. La valeur par défaut 0,536 correspond au propane à 15 °C ; le butane est d'environ 0,407. Vérifiez la température de référence de votre fournisseur."
         }
       },
       "recalibrate_replace": {
@@ -195,6 +201,12 @@
       },
       "gas_capacity": {
         "name": "Capacité de gaz"
+      },
+      "gas_consumed": {
+        "name": "Gaz consommé"
+      },
+      "gas_flow_rate": {
+        "name": "Débit de gaz"
       }
     },
     "binary_sensor": {

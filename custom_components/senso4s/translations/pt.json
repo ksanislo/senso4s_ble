@@ -105,13 +105,15 @@
           "weight_unit": "Unidade de peso",
           "low_level_threshold": "Limiar de aviso de nível baixo (%)",
           "enable_history_polling": "Ativar consulta automática do histórico",
-          "history_poll_interval": "Intervalo de atualização do histórico (minutos)"
+          "history_poll_interval": "Intervalo de atualização do histórico (minutos)",
+          "m3_per_kg": "Volume de gás por kg (m³/kg)"
         },
         "data_description": {
           "weight_unit": "Unidade para inserir e exibir valores de peso",
           "low_level_threshold": "Percentagem de nível de gás que aciona o aviso de gás baixo",
           "enable_history_polling": "Liga-se ao dispositivo para ler o histórico de consumo para o cálculo 'Estimativa de vazio'. Desativar com hardware Bluetooth apenas passivo.",
-          "history_poll_interval": "Tempo máximo entre atualizações do histórico — alterações no nível de gás também acionam uma atualização imediata"
+          "history_poll_interval": "Tempo máximo entre atualizações do histórico — alterações no nível de gás também acionam uma atualização imediata",
+          "m3_per_kg": "Volume de vapor para o qual um quilograma de gás líquido se expande, usado pelo painel de Energia. O valor predefinido 0,536 corresponde a propano a 15 °C; o butano é cerca de 0,407. Verifique a temperatura de referência do seu fornecedor."
         }
       },
       "refill_tank": {
@@ -121,13 +123,15 @@
           "weight_unit": "Unidade de peso",
           "low_level_threshold": "Limiar de aviso de nível baixo (%)",
           "enable_history_polling": "Ativar consulta automática do histórico",
-          "history_poll_interval": "Intervalo de atualização do histórico (minutos)"
+          "history_poll_interval": "Intervalo de atualização do histórico (minutos)",
+          "m3_per_kg": "Volume de gás por kg (m³/kg)"
         },
         "data_description": {
           "weight_unit": "Unidade para inserir e exibir valores de peso",
           "low_level_threshold": "Percentagem de nível de gás que aciona o aviso de gás baixo",
           "enable_history_polling": "Liga-se ao dispositivo para ler o histórico de consumo para o cálculo 'Estimativa de vazio'. Desativar com hardware Bluetooth apenas passivo.",
-          "history_poll_interval": "Tempo máximo entre atualizações do histórico — alterações no nível de gás também acionam uma atualização imediata"
+          "history_poll_interval": "Tempo máximo entre atualizações do histórico — alterações no nível de gás também acionam uma atualização imediata",
+          "m3_per_kg": "Volume de vapor para o qual um quilograma de gás líquido se expande, usado pelo painel de Energia. O valor predefinido 0,536 corresponde a propano a 15 °C; o butano é cerca de 0,407. Verifique a temperatura de referência do seu fornecedor."
         }
       },
       "recalibrate": {
@@ -140,7 +144,8 @@
           "usage_mode": "Modo de utilização",
           "low_level_threshold": "Limiar de aviso de nível baixo (%)",
           "enable_history_polling": "Ativar consulta automática do histórico",
-          "history_poll_interval": "Intervalo de atualização do histórico (minutos)"
+          "history_poll_interval": "Intervalo de atualização do histórico (minutos)",
+          "m3_per_kg": "Volume de gás por kg (m³/kg)"
         },
         "data_description": {
           "weight_unit": "Unidade para inserir e exibir valores de peso",
@@ -149,7 +154,8 @@
           "usage_mode": "Modo de utilização predefinido para o dispositivo",
           "low_level_threshold": "Percentagem de nível de gás que aciona o aviso de gás baixo",
           "enable_history_polling": "Liga-se ao dispositivo para ler o histórico de consumo para o cálculo 'Estimativa de vazio'. Desativar com hardware Bluetooth apenas passivo.",
-          "history_poll_interval": "Tempo máximo entre atualizações do histórico — alterações no nível de gás também acionam uma atualização imediata"
+          "history_poll_interval": "Tempo máximo entre atualizações do histórico — alterações no nível de gás também acionam uma atualização imediata",
+          "m3_per_kg": "Volume de vapor para o qual um quilograma de gás líquido se expande, usado pelo painel de Energia. O valor predefinido 0,536 corresponde a propano a 15 °C; o butano é cerca de 0,407. Verifique a temperatura de referência do seu fornecedor."
         }
       },
       "recalibrate_replace": {
@@ -195,6 +201,12 @@
       },
       "gas_capacity": {
         "name": "Capacidade de gás"
+      },
+      "gas_consumed": {
+        "name": "Gás consumido"
+      },
+      "gas_flow_rate": {
+        "name": "Caudal de gás"
       }
     },
     "binary_sensor": {

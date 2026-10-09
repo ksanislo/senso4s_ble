@@ -105,13 +105,15 @@
           "weight_unit": "Gewichtseinheit",
           "low_level_threshold": "Warnschwelle für niedrigen Füllstand (%)",
           "enable_history_polling": "Automatische Verlaufsabfrage aktivieren",
-          "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)"
+          "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)",
+          "m3_per_kg": "Gasvolumen pro kg (m³/kg)"
         },
         "data_description": {
           "weight_unit": "Einheit für die Eingabe und Anzeige von Gewichtswerten",
           "low_level_threshold": "Füllstandsprozentsatz, der die Warnung bei niedrigem Gasstand auslöst",
           "enable_history_polling": "Verbindet sich mit dem Gerät, um den Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' zu lesen. Deaktivieren bei passiver Bluetooth-Hardware.",
-          "history_poll_interval": "Maximale Zeit zwischen Verlaufsaktualisierungen — Änderungen des Gasstands lösen ebenfalls eine sofortige Aktualisierung aus"
+          "history_poll_interval": "Maximale Zeit zwischen Verlaufsaktualisierungen — Änderungen des Gasstands lösen ebenfalls eine sofortige Aktualisierung aus",
+          "m3_per_kg": "Gasvolumen, auf das sich ein Kilogramm Flüssiggas ausdehnt — wird vom Energie-Dashboard verwendet. Der Standardwert 0,536 entspricht Propan bei 15 °C; Butan liegt bei etwa 0,407. Prüfen Sie die Referenztemperatur Ihres Lieferanten."
         }
       },
       "refill_tank": {
@@ -121,13 +123,15 @@
           "weight_unit": "Gewichtseinheit",
           "low_level_threshold": "Warnschwelle für niedrigen Füllstand (%)",
           "enable_history_polling": "Automatische Verlaufsabfrage aktivieren",
-          "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)"
+          "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)",
+          "m3_per_kg": "Gasvolumen pro kg (m³/kg)"
         },
         "data_description": {
           "weight_unit": "Einheit für die Eingabe und Anzeige von Gewichtswerten",
           "low_level_threshold": "Füllstandsprozentsatz, der die Warnung bei niedrigem Gasstand auslöst",
           "enable_history_polling": "Verbindet sich mit dem Gerät, um den Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' zu lesen. Deaktivieren bei passiver Bluetooth-Hardware.",
-          "history_poll_interval": "Maximale Zeit zwischen Verlaufsaktualisierungen — Änderungen des Gasstands lösen ebenfalls eine sofortige Aktualisierung aus"
+          "history_poll_interval": "Maximale Zeit zwischen Verlaufsaktualisierungen — Änderungen des Gasstands lösen ebenfalls eine sofortige Aktualisierung aus",
+          "m3_per_kg": "Gasvolumen, auf das sich ein Kilogramm Flüssiggas ausdehnt — wird vom Energie-Dashboard verwendet. Der Standardwert 0,536 entspricht Propan bei 15 °C; Butan liegt bei etwa 0,407. Prüfen Sie die Referenztemperatur Ihres Lieferanten."
         }
       },
       "recalibrate": {
@@ -140,7 +144,8 @@
           "usage_mode": "Nutzungsmodus",
           "low_level_threshold": "Warnschwelle für niedrigen Füllstand (%)",
           "enable_history_polling": "Automatische Verlaufsabfrage aktivieren",
-          "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)"
+          "history_poll_interval": "Verlauf-Aktualisierungsintervall (Minuten)",
+          "m3_per_kg": "Gasvolumen pro kg (m³/kg)"
         },
         "data_description": {
           "weight_unit": "Einheit für die Eingabe und Anzeige von Gewichtswerten",
@@ -149,7 +154,8 @@
           "usage_mode": "Voreingestellter Nutzungsmodus für das Gerät",
           "low_level_threshold": "Füllstandsprozentsatz, der die Warnung bei niedrigem Gasstand auslöst",
           "enable_history_polling": "Verbindet sich mit dem Gerät, um den Verbrauchsverlauf für die Berechnung 'Voraussichtlich leer' zu lesen. Deaktivieren bei passiver Bluetooth-Hardware.",
-          "history_poll_interval": "Maximale Zeit zwischen Verlaufsaktualisierungen — Änderungen des Gasstands lösen ebenfalls eine sofortige Aktualisierung aus"
+          "history_poll_interval": "Maximale Zeit zwischen Verlaufsaktualisierungen — Änderungen des Gasstands lösen ebenfalls eine sofortige Aktualisierung aus",
+          "m3_per_kg": "Gasvolumen, auf das sich ein Kilogramm Flüssiggas ausdehnt — wird vom Energie-Dashboard verwendet. Der Standardwert 0,536 entspricht Propan bei 15 °C; Butan liegt bei etwa 0,407. Prüfen Sie die Referenztemperatur Ihres Lieferanten."
         }
       },
       "recalibrate_replace": {
@@ -195,6 +201,12 @@
       },
       "gas_capacity": {
         "name": "Gaskapazität"
+      },
+      "gas_consumed": {
+        "name": "Gasverbrauch"
+      },
+      "gas_flow_rate": {
+        "name": "Gasdurchfluss"
       }
     },
     "binary_sensor": {
