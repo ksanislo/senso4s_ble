@@ -92,13 +92,15 @@ def _is_senso4s_device(service_info: BluetoothServiceInfoBleak) -> bool:
     if matched_service_uuid or matched_name or matched_known_id or matched_payload:
         _LOGGER.debug(
             "[%s] Senso4s device detected - name: %s, matched_by_service_uuid: %s, "
-            "matched_by_payload: %s, matched_by_id: %s, matched_by_name: %s",
+            "matched_by_payload: %s, matched_by_id: %s, matched_by_name: %s, "
+            "service_uuids: %s",
             service_info.address,
             service_info.name,
             matched_service_uuid,
             matched_payload,
             matched_known_id,
             matched_name,
+            list(service_info.service_uuids),
         )
         return True
 
