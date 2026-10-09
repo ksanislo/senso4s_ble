@@ -201,4 +201,4 @@ versions" toggle in HACS.
 
 - GitHub: https://github.com/ksanislo/senso4s_ble
 - HACS layout: `custom_components/senso4s/`
-- Stable channel currently tracks `v1.3.0`. The 1.4.0 line is in pre-release.
+- Stable channel currently tracks `v1.5.1`. The 1.6.0 line is in pre-release.
