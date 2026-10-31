@@ -87,7 +87,7 @@
       "verification_anomaly": "校准完成，但设备报告异常：{anomalies}。请检查设备放置位置。",
       "verification_failed": "验证校准结果失败。请检查设备。",
       "cannot_connect": "无法连接到设备。设置需要同时支持主动扫描和建立连接的蓝牙适配器或代理；仅支持被动扫描的代理虽能发现该设备，但无法完成设置。",
-      "unsupported_firmware": "设备已连接，但未提供此集成所需的特征（{missing}）。设备固件可能尚未受支持。请在 https://github.com/ksanislo/senso4s_ble/issues 报告，并附上 Home Assistant 日志。"
+      "unsupported_firmware": "设备已连接，但未提供此集成所需的特征（{missing}）。设备固件可能尚未受支持。请在 {issues_url} 报告，并附上 Home Assistant 日志。"
     }
   },
   "options": {

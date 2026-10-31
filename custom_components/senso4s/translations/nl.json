@@ -87,7 +87,7 @@
       "verification_anomaly": "Kalibratie voltooid maar apparaat meldt anomalieën: {anomalies}. Controleer de plaatsing van het apparaat.",
       "verification_failed": "Verificatie van kalibratieresultaat mislukt. Controleer het apparaat.",
       "cannot_connect": "Kan geen verbinding maken met het apparaat. Voor de installatie is een Bluetooth-adapter of proxy nodig die zowel actief kan scannen als verbindingen kan openen; proxy's die alleen passief werken zien het apparaat wel, maar kunnen het niet instellen.",
-      "unsupported_firmware": "Het apparaat is verbonden maar biedt niet de kenmerken die deze integratie nodig heeft ({missing}). Mogelijk draait er firmware die nog niet wordt ondersteund. Meld dit op https://github.com/ksanislo/senso4s_ble/issues met je Home Assistant-logboek."
+      "unsupported_firmware": "Het apparaat is verbonden maar biedt niet de kenmerken die deze integratie nodig heeft ({missing}). Mogelijk draait er firmware die nog niet wordt ondersteund. Meld dit op {issues_url} met je Home Assistant-logboek."
     }
   },
   "options": {

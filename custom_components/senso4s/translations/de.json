@@ -87,7 +87,7 @@
       "verification_anomaly": "Kalibrierung abgeschlossen, aber das Gerät meldet Anomalien: {anomalies}. Überprüfen Sie die Geräteplatzierung.",
       "verification_failed": "Kalibrierungsergebnis konnte nicht überprüft werden. Bitte überprüfen Sie das Gerät.",
       "cannot_connect": "Verbindung zum Gerät nicht möglich. Für die Einrichtung ist ein Bluetooth-Adapter oder Proxy erforderlich, der sowohl aktiv scannen als auch Verbindungen herstellen kann. Rein passive Proxys sehen das Gerät, können es aber nicht einrichten.",
-      "unsupported_firmware": "Das Gerät wurde verbunden, stellt aber benötigte Charakteristiken nicht bereit ({missing}). Möglicherweise läuft eine Firmware, die diese Integration noch nicht unterstützt. Bitte melden Sie dies unter https://github.com/ksanislo/senso4s_ble/issues mit Ihrem Home-Assistant-Protokoll."
+      "unsupported_firmware": "Das Gerät wurde verbunden, stellt aber benötigte Charakteristiken nicht bereit ({missing}). Möglicherweise läuft eine Firmware, die diese Integration noch nicht unterstützt. Bitte melden Sie dies unter {issues_url} mit Ihrem Home-Assistant-Protokoll."
     }
   },
   "options": {

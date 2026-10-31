@@ -87,7 +87,7 @@
       "verification_anomaly": "Calibration terminée mais l'appareil signale des anomalies : {anomalies}. Vérifiez le placement de l'appareil.",
       "verification_failed": "Échec de la vérification du résultat de la calibration. Veuillez vérifier l'appareil.",
       "cannot_connect": "Impossible de se connecter à l'appareil. La configuration nécessite un adaptateur ou un proxy Bluetooth capable à la fois d'effectuer un balayage actif et d'ouvrir des connexions ; les proxys purement passifs voient l'appareil mais ne peuvent pas le configurer.",
-      "unsupported_firmware": "L'appareil s'est connecté mais ne fournit pas les caractéristiques requises par cette intégration ({missing}). Il utilise peut-être un firmware pas encore pris en charge. Merci de le signaler sur https://github.com/ksanislo/senso4s_ble/issues avec votre journal Home Assistant."
+      "unsupported_firmware": "L'appareil s'est connecté mais ne fournit pas les caractéristiques requises par cette intégration ({missing}). Il utilise peut-être un firmware pas encore pris en charge. Merci de le signaler sur {issues_url} avec votre journal Home Assistant."
     }
   },
   "options": {

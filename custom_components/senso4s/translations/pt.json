@@ -87,7 +87,7 @@
       "verification_anomaly": "Calibração concluída mas o dispositivo reporta anomalias: {anomalies}. Verifique o posicionamento do dispositivo.",
       "verification_failed": "Falha ao verificar o resultado da calibração. Por favor, verifique o dispositivo.",
       "cannot_connect": "Não foi possível ligar ao dispositivo. A configuração requer um adaptador ou proxy Bluetooth capaz de fazer análise ativa e de abrir ligações; os proxies apenas passivos veem o dispositivo mas não o conseguem configurar.",
-      "unsupported_firmware": "O dispositivo conectou-se, mas não fornece características de que esta integração precisa ({missing}). Pode estar a usar um firmware ainda não suportado. Reporte em https://github.com/ksanislo/senso4s_ble/issues com o registo do Home Assistant."
+      "unsupported_firmware": "O dispositivo conectou-se, mas não fornece características de que esta integração precisa ({missing}). Pode estar a usar um firmware ainda não suportado. Reporte em {issues_url} com o registo do Home Assistant."
     }
   },
   "options": {

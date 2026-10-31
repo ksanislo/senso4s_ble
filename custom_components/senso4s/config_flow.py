@@ -192,7 +192,10 @@ class Senso4sConfigFlow(ConfigFlow, domain=DOMAIN):
                 await self._cleanup_client()
                 return self.async_abort(
                     reason="unsupported_firmware",
-                    description_placeholders={"missing": missing},
+                    description_placeholders={
+                        "missing": missing,
+                        "issues_url": "https://github.com/ksanislo/senso4s_ble/issues",
+                    },
                 )
 
             # Check if device has been configured
